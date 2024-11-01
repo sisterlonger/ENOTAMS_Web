@@ -23,7 +23,7 @@
                 <tiny-button type="primary" @click="handleSubmit()">
                     提交
                 </tiny-button>
-                <tiny-button type="primary" @click="resetForm"> 重置表单 </tiny-button>
+                <tiny-button  @click="resetForm"> 重置 </tiny-button>
             </tiny-form-item>
         </tiny-form>
     </div>

@@ -2,22 +2,22 @@
     <div class="demo-form">
         <tiny-form ref="ruleFormRef" :model="createData" :rules="rules" label-width="100px">
             <tiny-form-item label="模块" prop="module">
-                <tiny-input v-model="createData.module"></tiny-input>
+                <tiny-input v-model="createData.module" disabled></tiny-input>
             </tiny-form-item>
             <tiny-form-item label="日志级别" prop="level" :validate-icon="validateIcon">
-                <tiny-input v-model="createData.level"></tiny-input>
+                <tiny-input v-model="createData.level" disabled></tiny-input>
             </tiny-form-item>
             <tiny-form-item label="操作人" prop="logger">
-                <tiny-input v-model="createData.logger"></tiny-input>
+                <tiny-input v-model="createData.logger" disabled></tiny-input>
             </tiny-form-item>
             <tiny-form-item label="对象" prop="object">
-                <tiny-input v-model="createData.object"></tiny-input>
+                <tiny-input v-model="createData.object" disabled></tiny-input>
             </tiny-form-item>
             <tiny-form-item label="日志内容" prop="message">
-                <tiny-input v-model="createData.message"></tiny-input>
+                <tiny-input v-model="createData.message" disabled></tiny-input>
             </tiny-form-item>
             <tiny-form-item label="异常" prop="exception">
-                <tiny-input v-model="createData.exception"></tiny-input>
+                <tiny-input v-model="createData.exception" disabled></tiny-input>
             </tiny-form-item>
             <tiny-form-item>
                 <tiny-button type="primary" @click="handleSubmit()">

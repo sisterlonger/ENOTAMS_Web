@@ -56,8 +56,8 @@
                     <tiny-grid-column field="email" title="邮箱"></tiny-grid-column>
                     <tiny-grid-column title="操作" width="200" align="center">
                         <template #default="data">
-                            <tiny-button size="mini" type="primary" :icon="IconEdit" circle
-                                @click="editRowEvent(data.row)"></tiny-button>
+                            <tiny-button size="mini" type="primary"
+                                @click="editRowEvent(data.row)">编辑</tiny-button>
                         </template>
                     </tiny-grid-column>
                 </tiny-grid>
@@ -76,12 +76,10 @@ import {
     FormItem as TinyFormItem, Layout as TinyLayout, Row as TinyRow, Col as TinyCol, Modal, Collapse as TinyCollapse,
     CollapseItem as TinyCollapseItem,Cascader as TinyCascader,
 } from '@opentiny/vue';
-import { iconEdit } from '@opentiny/vue-icon';
 import { queryUserList, deleteUser } from '@/api/user';
 import { queryDepartmentTreeList } from '@/api/department';
 import userForm from './components/form.vue';
 
-const IconEdit = iconEdit()
 
 const pagerConfig = ref({
     attrs: {

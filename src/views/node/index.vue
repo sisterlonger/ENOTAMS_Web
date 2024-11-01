@@ -52,7 +52,12 @@ const handleNodeClick = async (data) => {
     height: 70vh;
     overflow-y: auto;
 }
-
+:deep(.tiny-tree-menu .tiny-input) {
+    margin: var(--tv-TreeMenu-padding-top) var(--tv-TreeMenu-padding-left);
+    position: relative;
+    max-width: 1880px; 
+    width: 90%;
+}
 .content {
     display: flex;
     flex-direction: column;

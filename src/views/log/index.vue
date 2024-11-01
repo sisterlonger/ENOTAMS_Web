@@ -67,8 +67,8 @@
           <tiny-grid-column field="exception" title="异常"></tiny-grid-column>
           <tiny-grid-column title="操作" width="200" align="center">
             <template #default="data">
-              <tiny-button size="mini" type="primary" :icon="IconSearch" circle
-                @click="editRowEvent(data.row)"></tiny-button>
+              <tiny-button size="mini" type="primary"
+                @click="editRowEvent(data.row)">查看</tiny-button>
             </template>
           </tiny-grid-column>
         </tiny-grid>
@@ -86,11 +86,8 @@ import {
   Grid as TinyGrid, GridColumn as TinyGridColumn, Button as TinyButton, DialogBox as TinyDialogBox, GridToolbar as TinyGridToolbar, Input as TinyInput, Form as TinyForm,
   FormItem as TinyFormItem, Layout as TinyLayout, Row as TinyRow, Col as TinyCol, Modal, Collapse as TinyCollapse, CollapseItem as TinyCollapseItem, Select as TinySelect,
 } from '@opentiny/vue';
-import { iconSearch } from '@opentiny/vue-icon';
 import { queryLogsList, deleteLogs } from '@/api/log';
 import dictionaryForm from './components/form.vue';
-
-const IconSearch = iconSearch()
 
 const pagerConfig = ref({
   attrs: {
