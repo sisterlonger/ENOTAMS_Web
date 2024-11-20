@@ -10,6 +10,11 @@ export interface KeyWordVM {
     keyword: string;
     inputType: string;
     state: string;
+    placeholder: string;
+    dicType: string;
+    prefix: string;
+    suffix: string;
+    span: string;
 }
 
 export function queryKeyWordList(params: KeyWordSearch) {
@@ -21,7 +26,7 @@ export function queryKeyWordDetail(params: { id: number }) {
     });
 }
 export function deleteKeyWord(ids: []) {
-    return axios.post(`/keyword/delete`,  ids );
+    return axios.post(`/keyword/delete`, ids);
 }
 export function postKeyWord(data: KeyWordVM) {
     return axios.post<KeyWordVM>(`/keyword/post`, data);

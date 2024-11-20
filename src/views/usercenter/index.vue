@@ -3,9 +3,11 @@
     <div class="general-top">
         <headtop></headtop>
     </div>
+    <div><formgenerator /></div>
 </template>
 
 <script lang="ts" setup>
+import formgenerator from '@/components/formgenerator/index.vue';
 import headtop from './components/head.vue';
 </script>
 <style scoped lang="less">

@@ -24,11 +24,11 @@ export function queryDictionaryDetail(params: { id: number }) {
     });
 }
 export function deleteDictionary(ids: []) {
-    return axios.post(`/dictionary/delete`,  ids );
+    return axios.post(`/dictionary/delete`, ids);
 }
 export function postDictionary(data: DictionaryVM) {
     return axios.post<DictionaryVM>(`/dictionary/post`, data);
 }
-export function queryDicType() {
-    return axios.get('/dictionary/getdictype');
+export function queryDicType(params: { dicType: string, naipValue?: string }) {
+    return axios.get('/dictionary/getdictype', { params });
 }

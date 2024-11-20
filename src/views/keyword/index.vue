@@ -55,7 +55,7 @@
           </tiny-grid-column>
         </tiny-grid>
         <tiny-dialog-box v-if="boxVisibility" v-model:visible="boxVisibility" title="编辑" width="30%">
-          <keywordForm :keywordID="keywordID" @close="dialogClose" />
+          <keywordForm :keyWordID="keyWordID" @close="dialogClose" />
         </tiny-dialog-box>
       </div>
     </div>
@@ -89,7 +89,7 @@ const fetchData = ref({
 const tableData = ref([
 ])
 const boxVisibility = ref(false)
-const keywordID = ref(0)
+const keyWordID = ref(0)
 const formData = ref({
   keyword: "",
   inputType: "",
@@ -116,7 +116,8 @@ async function getData({ page }) {
 }
 // 行操作
 const editRowEvent = (row) => {
-  keywordID.value = row.keywordID;
+  keyWordID.value = row.keyWordID;
+  console.log(row);
   boxVisibility.value = true;
 }
 // 表操作
@@ -135,12 +136,12 @@ const toolbarButtons = ref([
 async function toolbarButtonClickEvent({ code, $grid }) {
   switch (code) {
     case 'addSelection': {
-      keywordID.value = 0;
+      keyWordID.value = 0;
       boxVisibility.value = true;
       break
     }
     case 'deleteSelection': {
-      let ids = $grid.getSelectRecords().map((item) => { return item.keywordID });
+      let ids = $grid.getSelectRecords().map((item) => { return item.keyWordID });
       await deleteKeyWord(ids);
       Modal.message({
         message: '删除成功!',
@@ -154,7 +155,7 @@ async function toolbarButtonClickEvent({ code, $grid }) {
 }
 // 关闭弹窗
 function dialogClose() {
-  keywordID.value = 0;
+  keyWordID.value = 0;
   boxVisibility.value = false;
   submitClick();
 }

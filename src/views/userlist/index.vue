@@ -21,9 +21,9 @@
                                 </tiny-col>
                                 <tiny-col :span="4">
                                     <tiny-form-item label="部门">
-                                        <tiny-cascader v-model="formData.depID" :options="departmentOptions"
+                                        <tiny-cascader v-model="formData.depName" :options="departmentOptions"
                                             style="width:100%"
-                                            :props="{ emitPath: false, value: 'depID', label: 'depName', expandTrigger: 'hover' }"
+                                            :props="{ emitPath: false, value: 'depName', label: 'depName', expandTrigger: 'hover' }"
                                             autosize filterable clearable>
                                         </tiny-cascader>
                                     </tiny-form-item>
@@ -51,7 +51,7 @@
                     <tiny-grid-column type="selection" width="60"></tiny-grid-column>
                     <tiny-grid-column field="userName" title="用户名"></tiny-grid-column>
                     <tiny-grid-column field="role" title="角色"></tiny-grid-column>
-                    <tiny-grid-column field="depID" title="部门"></tiny-grid-column>
+                    <tiny-grid-column field="depName" title="部门"></tiny-grid-column>
                     <tiny-grid-column field="mobile" title="手机号"></tiny-grid-column>
                     <tiny-grid-column field="email" title="邮箱"></tiny-grid-column>
                     <tiny-grid-column title="操作" width="200" align="center">
