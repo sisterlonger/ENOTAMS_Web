@@ -39,7 +39,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted,toRefs,watch } from 'vue';
 import { queryDicType } from '@/api/dictionary';
 import { queryValidationDetail } from '@/api/validation';
 import {
@@ -63,6 +63,12 @@ defineProps({
 });*/
 
 import children from './components/children.vue';
+
+const props = defineProps({
+    formFields: Object,
+});
+const { formFields } = toRefs(props);
+
 
 const formData = reactive({ username: 'test' });
 const submitFormData = reactive({});
@@ -115,9 +121,9 @@ const getOption = async (data, field) => {
 };
 
 // 按formFields中，children组件的所有变量顺序组装合成变成children组件变量值
-const handleFormData = (formFields) => {
+const handleFormData = (formFieldList) => {
     let result = "";
-    formFields.forEach((field) => {
+    formFieldList.forEach((field) => {
         // 如果是子组件则递归
         if (field.type.includes("hildren")) {
             submitFormData[field.prop] = `${field.prefix || ''}${handleFormData(field.children, field.prop)}${field.suffix || ''}`;
@@ -129,27 +135,29 @@ const handleFormData = (formFields) => {
     console.log(result);
     return result;
 }
-const handleSubmit = () => {
+const handleSubmit = async() => {
     console.log(formData, formFields);
     submitFormData.value = {};
     handleFormData(formFields);
     console.log(formData);
     console.log("submitFormData", submitFormData);
+
 }
 /*
 const formRules = reactive({});
 const formFields = reactive([]);*/
 
 // 递归式初始化options
-const initOption = async (formFields) => {
+const initOption = async (fieldList) => {
     /*
     let test = await queryValidationDetail({id:34});
     console.log(test);
     console.log(test.data.editMask);
     formRules.value = JSON.parse(test.data.editMask);
-    formFields.value = JSON.parse(test.data.remark);
-    console.log(formData,formFields);*/
-    await formFields.forEach(async (field) => {
+    fieldList.value = JSON.parse(test.data.remark);
+    console.log(formData,fieldList);*/
+    console.log("fieldList",fieldList);
+    await fieldList.forEach(async (field) => {
         if (field.type === "select" && field.dicType) {
             let response = await queryDicType({ dicType: field.dicType });
             field.options = response.data;
@@ -159,7 +167,7 @@ const initOption = async (formFields) => {
             field.children = await initOption(field.children);
         }
     })
-    return formFields;
+    return fieldList;
 }
 
 const formRules = reactive(
@@ -184,6 +192,7 @@ const formRules = reactive(
         },
         area: { required: true, trigger: 'change' },
     })
+    /*
 const formFields = reactive([
     {
         prop: 'username',
@@ -476,9 +485,11 @@ const formFields = reactive([
         ]
     },
 ]);
-
-onMounted(() => {
+*/
+onMounted(async () => {
+    console.log(2,formFields);
     formFields.value = initOption(formFields);
+    console.log(3,formFields);
 });
 </script>
 

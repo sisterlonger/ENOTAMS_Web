@@ -14,7 +14,13 @@ export interface KeyWordVM {
     dicType: string;
     prefix: string;
     suffix: string;
+    width: string;
     span: string;
+    childrenIDList: object;
+    relationIDList: object;
+    childrenID: "",
+    relationID: "",
+    createTime: "",
 }
 
 export function queryKeyWordList(params: KeyWordSearch) {
@@ -30,4 +36,7 @@ export function deleteKeyWord(ids: []) {
 }
 export function postKeyWord(data: KeyWordVM) {
     return axios.post<KeyWordVM>(`/keyword/post`, data);
+}
+export function getKeyWordJSON(params: {model:string}) {
+    return axios.get('/keyword/getkeywordJSON', { params } );
 }

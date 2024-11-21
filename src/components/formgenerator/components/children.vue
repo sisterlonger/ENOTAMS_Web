@@ -10,7 +10,7 @@
             </tiny-select>
             <!--子组件内容-->
             <div v-for="(childrenItem, childrenIndex) in item.children" :key="`${item.prop}${childrenIndex}`"
-                :style="item.type === 'children' ? childrenItem.hasOwnProperty('width') ? `width:${childrenItem.width};display:inline-block` : `width:${90 / item.children.length}%;display:inline-block` : 'margin-top:10px'">
+                :style="item.type === 'children' ? childrenItem.width!==null ? `width:${childrenItem.width};display:inline-block` : `width:${90 / item.children.length}%;display:inline-block` : 'margin-top:10px'">
                 <tiny-form-item v-if="item.type === 'children' ? true : formData[item.prop] == childrenItem.label"
                     v-model="formData[item.prop]" :prop="item.prop">
                     <!--输入组件-->

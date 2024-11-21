@@ -44,8 +44,7 @@
           </template>
           <tiny-grid-column type="index" width="60"></tiny-grid-column>
           <tiny-grid-column type="selection" width="60"></tiny-grid-column>
-          <tiny-grid-column field="keyword" title="关键字"></tiny-grid-column>
-          <tiny-grid-column field="inputType" title="输入类型"></tiny-grid-column>
+          <tiny-grid-column field="keyWord" title="关键字"></tiny-grid-column>
           <tiny-grid-column field="state" title="状态"></tiny-grid-column>
           <tiny-grid-column title="操作" width="200" align="center">
             <template #default="data">
@@ -76,7 +75,7 @@ import keywordForm from './components/form.vue';
 const pagerConfig = ref({
   attrs: {
     currentPage: 1,
-    pageSize: 20,
+    pageSize: 10,
     pageSizes: [10, 20, 50, 100],
     total: 0,
     align: 'left', // 可选值：['left', 'center', 'right']
@@ -163,7 +162,7 @@ function dialogClose() {
 
 <style lang="less" scoped>
 .tiny-grid {
-  height: 60vh;
+  height: 50vh;
   overflow-y: auto;
 }
 

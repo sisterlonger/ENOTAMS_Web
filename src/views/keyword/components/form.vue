@@ -5,7 +5,8 @@
                 <tiny-input v-model="createData.keyWord"></tiny-input>
             </tiny-form-item>
             <tiny-form-item label="输入类型" prop="inputType">
-                <tiny-input v-model="createData.inputType"></tiny-input>
+                <tiny-select v-model="createData.inputType" searchable :options="inputTypeOption">
+                </tiny-select>
             </tiny-form-item>
             <tiny-form-item label="备注" prop="placeholder">
                 <tiny-input v-model="createData.placeholder"></tiny-input>
@@ -16,11 +17,22 @@
             <tiny-form-item label="前缀" prop="prefix">
                 <tiny-input v-model="createData.prefix"></tiny-input>
             </tiny-form-item>
-            <tiny-form-item label="后缀" prop="prefix">
-                <tiny-input v-model="createData.prefix"></tiny-input>
+            <tiny-form-item label="后缀" prop="suffix">
+                <tiny-input v-model="createData.suffix"></tiny-input>
             </tiny-form-item>
             <tiny-form-item label="比例" prop="span">
                 <tiny-input v-model="createData.span"></tiny-input>
+            </tiny-form-item>
+            <tiny-form-item label="宽度" prop="width">
+                <tiny-input v-model="createData.width"></tiny-input>
+            </tiny-form-item>
+            <tiny-form-item label="关联关键字" prop="relationIDList">
+                <tiny-select v-model="createData.relationIDList" multiple searchable :options="keyWordOption">
+                </tiny-select>
+            </tiny-form-item>
+            <tiny-form-item label="子关键字" prop="childrenIDList">
+                <tiny-select v-model="createData.childrenIDList" multiple searchable :options="keyWordOption">
+                </tiny-select>
             </tiny-form-item>
             <tiny-form-item label="状态" prop="state">
                 <tiny-input v-model="createData.state"></tiny-input>
@@ -41,13 +53,14 @@ import {
     Form as TinyForm,
     FormItem as TinyFormItem,
     Input as TinyInput,
+    Select as TinySelect,
     Button as TinyButton,
     Loading,
     Modal,
     Numeric as TinyNumeric,
 } from '@opentiny/vue'
 import { iconWarning } from '@opentiny/vue-icon';
-import { queryKeyWordDetail, postKeyWord } from '@/api/keyword';
+import { queryKeyWordDetail, postKeyWord, queryKeyWordList } from '@/api/keyword';
 
 
 const props = defineProps({
@@ -66,8 +79,21 @@ const createData = reactive({
     prefix: "",
     suffix: "",
     span: "",
+    width: "",
+    relationIDList: [],
+    childrenIDList: [],
+    relationID: "",
+    childrenID: "",
     state: '生效',
+    createTime:"",
 })
+const keyWordOption = ref([]);
+const inputTypeOption = ref([
+    {key:"input",value:"input",label:"输入框"},
+    {key:"select",value:"select",label:"选择框"},
+    {key:"children",value:"children",label:"父组件"},
+    {key:"selectChildren",value:"selectChildren",label:"选择型父组件"},
+]);
 const rules = ref({
     keyWord: [{ required: true, message: '请输入关键字', trigger: 'change' }],
     inputType: [
@@ -81,7 +107,14 @@ const state = reactive<{
 }>({
     loading: null,
 });
-
+// 获取列表数据
+async function getOption() {
+    let response = await queryKeyWordList({ pageIndex: 1, pageSize: 10000 });
+    let result = [];
+    response.data.forEach((keyword) => { result.push({ value: keyword.keyWordID, label: keyword.keyWord, key: keyword.keyWordID }) });
+    console.log(result);
+    return result;
+}
 
 // 请求数据接口方法
 const fetchData = async () => {
@@ -101,6 +134,13 @@ const fetchData = async () => {
         createData.prefix = data.prefix;
         createData.suffix = data.suffix;
         createData.span = data.span;
+        createData.width = data.width;
+        createData.relationIDList = data.relationID ? data.relationID.split(",").map(function (num:string) {return Number(num);}) : [];
+        createData.childrenIDList = data.childrenID ? data.childrenID.split(",").map(function (num:string) {return Number(num);}) : [];
+        createData.relationID = data.relationID;
+        createData.childrenID = data.childrenID;
+        createData.createTime = data.createTime;
+        console.log(createData);
     }
     catch (err) {
         Modal.alert('获取数据错误');
@@ -112,10 +152,11 @@ const fetchData = async () => {
 };
 
 // 初始化请求数据
-onMounted(() => {
+onMounted(async () => {
     if (keyWordID.value) {
         fetchData();
     }
+    keyWordOption.value = await getOption();
 });
 
 
@@ -125,6 +166,8 @@ const emit = defineEmits(['close']);
 function handleSubmit() {
     ruleFormRef.value.validate(async (valid) => {
         if (valid) {
+            createData.relationID = createData.relationIDList.join(",");
+            createData.childrenID = createData.childrenIDList.join(",");
             await postKeyWord(createData);
             emit('close');
         } else {
