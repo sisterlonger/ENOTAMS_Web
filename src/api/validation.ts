@@ -11,6 +11,7 @@ export interface ValidationVM {
     dicType: string;
     editMask: string;
     remark: string;
+    required:boolean;
 }
 
 export function queryValidationList(params: ValidationSearch) {

@@ -15,12 +15,11 @@ export interface KeyWordVM {
     prefix: string;
     suffix: string;
     width: string;
-    span: string;
     childrenIDList: object;
     relationIDList: object;
     childrenID: "",
     relationID: "",
-    createTime: "",
+    createTime: null,
 }
 
 export function queryKeyWordList(params: KeyWordSearch) {

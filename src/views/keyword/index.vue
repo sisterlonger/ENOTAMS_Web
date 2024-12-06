@@ -10,12 +10,14 @@
               <tiny-row>
                 <tiny-col :span="4">
                   <tiny-form-item label="关键字">
-                    <tiny-input v-model="formData.keyword" placeholder="请输入关键字" clearable></tiny-input>
+                    <tiny-input v-model="formData.keyWord" placeholder="请输入关键字" clearable></tiny-input>
                   </tiny-form-item>
                 </tiny-col>
                 <tiny-col :span="4">
                   <tiny-form-item label="输入类型">
-                    <tiny-input v-model="formData.inputType" placeholder="请输入输入类型" clearable></tiny-input>
+                    <tiny-select v-model="formData.inputType" searchable placeholder="请选择输入类型"
+                      :options="inputTypeOption">
+                    </tiny-select>
                   </tiny-form-item>
                 </tiny-col>
                 <tiny-col :span="4">
@@ -45,11 +47,11 @@
           <tiny-grid-column type="index" width="60"></tiny-grid-column>
           <tiny-grid-column type="selection" width="60"></tiny-grid-column>
           <tiny-grid-column field="keyWord" title="关键字"></tiny-grid-column>
+          <tiny-grid-column field="inputType" title="输入类型"></tiny-grid-column>
           <tiny-grid-column field="state" title="状态"></tiny-grid-column>
           <tiny-grid-column title="操作" width="200" align="center">
             <template #default="data">
-              <tiny-button size="mini" type="primary"
-                @click="editRowEvent(data.row)">编辑</tiny-button>
+              <tiny-button size="mini" type="primary" @click="editRowEvent(data.row)">编辑</tiny-button>
             </template>
           </tiny-grid-column>
         </tiny-grid>
@@ -66,7 +68,7 @@ import { ref } from 'vue'
 import {
   Grid as TinyGrid, GridColumn as TinyGridColumn, Button as TinyButton, DialogBox as TinyDialogBox, GridToolbar as TinyGridToolbar, Input as TinyInput, Form as TinyForm,
   FormItem as TinyFormItem, Layout as TinyLayout, Row as TinyRow, Col as TinyCol, Modal, Collapse as TinyCollapse,
-  CollapseItem as TinyCollapseItem,
+  CollapseItem as TinyCollapseItem, Select as TinySelect,
 } from '@opentiny/vue';
 import { queryKeyWordList, deleteKeyWord } from '@/api/keyword';
 import keywordForm from './components/form.vue';
@@ -90,13 +92,24 @@ const tableData = ref([
 const boxVisibility = ref(false)
 const keyWordID = ref(0)
 const formData = ref({
-  keyword: "",
+  keyWord: "",
   inputType: "",
   state: "",
 })
+const inputTypeOption = ref(
+  [
+    { key: "input", value: "input", label: "输入框" },
+    { key: "select", value: "select", label: "选择框" },
+    { key: "children", value: "children", label: "父组件" },
+    { key: "selectChildren", value: "selectChildren", label: "选择型父组件" },
+  ]
+)
 const gridRef = ref()
 const activeNames = ref(['0'])
-
+async function queryClick() {
+  getData({ page: pagerConfig.value.attrs });
+  gridRef.value.handleFetch();
+}
 async function submitClick() {
   getData({ page: pagerConfig.value.attrs });
   gridRef.value.handleFetch();
@@ -108,6 +121,8 @@ async function getData({ page }) {
   formData.value.pageSize = pageSize;
   let response = await queryKeyWordList(formData.value);
   tableData.value = response.data;
+  // 置换inputType的内容
+  tableData.value.forEach((item) => { let option = inputTypeOption.value.find((dic) => { return (dic.key === item.inputType) }); if (option) { item.inputType = option.label } })
   return Promise.resolve({
     result: tableData.value,
     page: { total: response.count },

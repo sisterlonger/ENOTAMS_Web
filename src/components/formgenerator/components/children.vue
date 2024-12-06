@@ -1,78 +1,63 @@
 <template>
     <div class="demo-form">
         <!--chilren组件-->
-        <div>
-            <!--组件-->
-            <!--选择子组件-->
-            <tiny-select v-model="formData[item.prop]" v-if="item.type === 'selectChildren'"
-                :placeholder="item.placeholder" :options="item.options" clearable
-                @change="changeOption(formData[item.prop], item)">
-            </tiny-select>
-            <!--子组件内容-->
-            <div v-for="(childrenItem, childrenIndex) in item.children" :key="`${item.prop}${childrenIndex}`"
-                :style="item.type === 'children' ? childrenItem.width!==null ? `width:${childrenItem.width};display:inline-block` : `width:${90 / item.children.length}%;display:inline-block` : 'margin-top:10px'">
-                <tiny-form-item v-if="item.type === 'children' ? true : formData[item.prop] == childrenItem.label"
-                    v-model="formData[item.prop]" :prop="item.prop">
-                    <!--输入组件-->
-                    <tiny-form-item v-if="childrenItem.type === 'input'" v-model="formData[childrenItem.prop]"
-                        :prop="childrenItem.prop">
-                        <tiny-row>
-                            <tiny-col v-if="childrenItem.prefix"
-                                :span="childrenItem.span && childrenItem.span[0]"><span>{{
-                                    childrenItem.prefix
-                                }}</span></tiny-col>
-                            <tiny-col :span="childrenItem.span && childrenItem.span[1]" class="col-100">
-                                <tiny-input v-model="formData[childrenItem.prop]"
-                                    :placeholder="childrenItem.placeholder" clearable
-                                    @change="changeOption(formData[childrenItem.prop], childrenItem)"></tiny-input></tiny-col>
-                            <tiny-col v-if="childrenItem.suffix"
-                                :span="childrenItem.span && childrenItem.span[2]"><span>{{
-                                    childrenItem.suffix
-                                }}</span></tiny-col>
-                        </tiny-row>
-                    </tiny-form-item>
-                    <!--选择组件-->
-                    <tiny-form-item v-if="childrenItem.type === 'select'" v-model="formData[childrenItem.prop]"
-                        :prop="childrenItem.prop">
-                        <tiny-row>
-                            <tiny-col v-if="childrenItem.prefix"
-                                :span="childrenItem.span && childrenItem.span[0]"><span>{{
-                                    childrenItem.prefix
-                                }}</span></tiny-col>
-                            <tiny-col :span="childrenItem.span && childrenItem.span[1]" class="col-100">
-                                <tiny-select v-model="formData[childrenItem.prop]"
-                                    :placeholder="childrenItem.placeholder" :options="childrenItem.options" clearable
-                                    @change="changeOption(formData[childrenItem.prop], childrenItem)"></tiny-select>
-                            </tiny-col>
-                            <tiny-col v-if="childrenItem.suffix"
-                                :span="childrenItem.span && childrenItem.span[2]"><span>{{
-                                    childrenItem.suffix
-                                }}</span></tiny-col>
-                        </tiny-row>
-                    </tiny-form-item>
-                    <!--递归子组件-->
-                    <tiny-form-item v-if="childrenItem.type === 'children'" v-model="formData[childrenItem.prop]"
-                        :prop="childrenItem.prop">
-                        <tiny-row>
-                            <tiny-col v-if="childrenItem.prefix"
-                                :span="childrenItem.span && childrenItem.span[0]"><span>{{
-                                    childrenItem.prefix
-                                }}</span></tiny-col>
-                            <!--TODO此处必须加height：32px，不然高度会变-->
-                            <tiny-col :span="childrenItem.span && childrenItem.span[1]" class="col-100" :style="`height:32px`">
-                                <children :item="childrenItem" :formData="formData" :formFields="formFields"
-                                    @update:formData="val => parentFormData = val"
-                                    @update:formFields="val => parentFormData = val"
-                                    @getOption="getOption(formData[item.prop], item)"></children>
-                            </tiny-col>
-                            <tiny-col v-if="childrenItem.suffix"
-                                :span="childrenItem.span && childrenItem.span[2]"><span>{{
-                                    childrenItem.suffix
-                                }}</span></tiny-col>
-                        </tiny-row>
-                    </tiny-form-item>
+        <!--选择子组件-->
+        <tiny-select v-model="formData[item.prop]" v-if="item.type === 'selectChildren'" :placeholder="item.placeholder"
+            :options="item.options" clearable @change="changeOption(formData[item.prop], item)" :style="`width:500px`">
+        </tiny-select>
+        <!--子组件内容-->
+        <div v-for="(childrenItem, childrenIndex) in item.children" :key="`${item.prop}${childrenIndex}`"
+            :style="`display:inline-block;`">
+            <tiny-form-item v-if="item.type === 'children' ? true : formData[item.prop] == childrenItem.label"
+                v-model="formData[item.prop]" :prop="item.prop">
+                <!--输入组件-->
+                <tiny-form-item v-if="childrenItem.type.includes('input')" v-model="formData[childrenItem.prop]"
+                    :prop="childrenItem.prop">
+                    <span>{{
+                        childrenItem.prefix
+                    }}</span>
+                    <tiny-input v-model="formData[childrenItem.prop]"
+                        :style="`width:${childrenItem.width !== null ? childrenItem.width : '200px'}`"
+                        :placeholder="childrenItem.placeholder" clearable
+                        :type="childrenItem.type === 'inputtextarea' ? 'textarea' : 'text'" autosize
+                        :maxlength="childrenItem.maxLength"
+                        @change="changeOption(formData[childrenItem.prop], childrenItem)"></tiny-input>
+                    <span>{{
+                        childrenItem.suffix
+                    }}</span>
                 </tiny-form-item>
-            </div>
+                <!--选择组件-->
+                <tiny-form-item v-if="childrenItem.type === 'select'" v-model="formData[childrenItem.prop]"
+                    :prop="childrenItem.prop">
+                    <span>{{
+                        childrenItem.prefix
+                    }}</span>
+
+                    <tiny-select v-model="formData[childrenItem.prop]"
+                        :style="`width:${childrenItem.width !== null ? childrenItem.width : '200px'}`"
+                        :placeholder="childrenItem.placeholder" :options="childrenItem.options" clearable
+                        @change="changeOption(formData[childrenItem.prop], childrenItem)"></tiny-select>
+
+                    <span>{{
+                        childrenItem.suffix
+                    }}</span>
+
+                </tiny-form-item>
+                <!--递归子组件-->
+                <tiny-form-item v-if="childrenItem.type === 'children'" v-model="formData[childrenItem.prop]"
+                    :prop="childrenItem.prop">
+                    <span :style="`flex:1`">{{
+                        childrenItem.prefix
+                    }}</span>
+                    <children :item="childrenItem" :formData="formData" :formFields="formFields" class="col-100"
+                        @update:formData="val => parentFormData = val" @update:formFields="val => parentFormData = val"
+                        @getOption="getOption(formData[item.prop], item)"></children>
+
+                    <span :style="`flex:1`">{{
+                        childrenItem.suffix
+                    }}</span>
+                </tiny-form-item>
+            </tiny-form-item>
         </div>
     </div>
 </template>
@@ -171,5 +156,9 @@ onMounted(() => {
 .col-100 {
     padding-left: 0px;
     padding-right: 0px;
+    margin-top: 2px;
+    display: inline-block;
+    /* 换行 */
+    flex: 1
 }
 </style>

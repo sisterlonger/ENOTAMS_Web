@@ -14,25 +14,23 @@
             <tiny-form-item label="字典" prop="dicType">
                 <tiny-input v-model="createData.dicType"></tiny-input>
             </tiny-form-item>
-            <tiny-form-item label="前缀" prop="prefix">
-                <tiny-input v-model="createData.prefix"></tiny-input>
-            </tiny-form-item>
-            <tiny-form-item label="后缀" prop="suffix">
-                <tiny-input v-model="createData.suffix"></tiny-input>
-            </tiny-form-item>
-            <tiny-form-item label="比例" prop="span">
-                <tiny-input v-model="createData.span"></tiny-input>
-            </tiny-form-item>
             <tiny-form-item label="宽度" prop="width">
                 <tiny-input v-model="createData.width"></tiny-input>
             </tiny-form-item>
-            <tiny-form-item label="关联关键字" prop="relationIDList">
+            <tiny-form-item v-if="false" label="关联关键字" prop="relationIDList">
                 <tiny-select v-model="createData.relationIDList" multiple searchable :options="keyWordOption">
                 </tiny-select>
             </tiny-form-item>
             <tiny-form-item label="子关键字" prop="childrenIDList">
                 <tiny-select v-model="createData.childrenIDList" multiple searchable :options="keyWordOption">
                 </tiny-select>
+            </tiny-form-item>
+            <tiny-form-item label="校验组" prop="validationIDList">
+                <tiny-select v-model="createData.validationIDList" multiple searchable :options="validationOption">
+                </tiny-select>
+            </tiny-form-item>
+            <tiny-form-item label="文字配置" prop="template">
+                <tiny-input v-model="createData.template"></tiny-input>
             </tiny-form-item>
             <tiny-form-item label="状态" prop="state">
                 <tiny-input v-model="createData.state"></tiny-input>
@@ -61,6 +59,7 @@ import {
 } from '@opentiny/vue'
 import { iconWarning } from '@opentiny/vue-icon';
 import { queryKeyWordDetail, postKeyWord, queryKeyWordList } from '@/api/keyword';
+import { queryValidationList } from '@/api/validation';
 
 
 const props = defineProps({
@@ -78,21 +77,24 @@ const createData = reactive({
     dicType: "",
     prefix: "",
     suffix: "",
-    span: "",
     width: "",
     relationIDList: [],
     childrenIDList: [],
+    validationIDList: [],
     relationID: "",
     childrenID: "",
+    validationID: "",
+    template: "",
     state: '生效',
-    createTime:"",
+    createTime: null,
 })
 const keyWordOption = ref([]);
+const validationOption = ref([]);
 const inputTypeOption = ref([
-    {key:"input",value:"input",label:"输入框"},
-    {key:"select",value:"select",label:"选择框"},
-    {key:"children",value:"children",label:"父组件"},
-    {key:"selectChildren",value:"selectChildren",label:"选择型父组件"},
+    { key: "input", value: "input", label: "输入框" },
+    { key: "select", value: "select", label: "选择框" },
+    { key: "children", value: "children", label: "父组件" },
+    { key: "selectChildren", value: "selectChildren", label: "选择型父组件" },
 ]);
 const rules = ref({
     keyWord: [{ required: true, message: '请输入关键字', trigger: 'change' }],
@@ -107,11 +109,19 @@ const state = reactive<{
 }>({
     loading: null,
 });
-// 获取列表数据
-async function getOption() {
+// 获取关键字数据
+async function getKeyWordOption() {
     let response = await queryKeyWordList({ pageIndex: 1, pageSize: 10000 });
     let result = [];
     response.data.forEach((keyword) => { result.push({ value: keyword.keyWordID, label: keyword.keyWord, key: keyword.keyWordID }) });
+    console.log(result);
+    return result;
+}
+// 获取校验组数据
+async function getValidationOption() {
+    let response = await queryValidationList({ pageIndex: 1, pageSize: 10000 });
+    let result = [];
+    response.data.forEach((validation) => { result.push({ value: validation.validationID, label: validation.validationName, key: validation.validationID }) });
     console.log(result);
     return result;
 }
@@ -133,14 +143,17 @@ const fetchData = async () => {
         createData.dicType = data.dicType;
         createData.prefix = data.prefix;
         createData.suffix = data.suffix;
-        createData.span = data.span;
         createData.width = data.width;
-        createData.relationIDList = data.relationID ? data.relationID.split(",").map(function (num:string) {return Number(num);}) : [];
-        createData.childrenIDList = data.childrenID ? data.childrenID.split(",").map(function (num:string) {return Number(num);}) : [];
+        createData.relationIDList = data.relationID ? data.relationID.split(",").map(function (num: string) { return Number(num); }) : [];
+        createData.childrenIDList = data.childrenID ? data.childrenID.split(",").map(function (num: string) { return Number(num); }) : [];
+        //createData.validationIDList = data.validationID ? data.validationID.split(",").map(function (num:string) {return Number(num);}) : [];
+        createData.validationIDList = data.validationIDList;
         createData.relationID = data.relationID;
         createData.childrenID = data.childrenID;
+        createData.validationID = data.validationID;
+        createData.template = data.template;
         createData.createTime = data.createTime;
-        console.log(createData);
+        //console.log("createData",createData);
     }
     catch (err) {
         Modal.alert('获取数据错误');
@@ -156,7 +169,8 @@ onMounted(async () => {
     if (keyWordID.value) {
         fetchData();
     }
-    keyWordOption.value = await getOption();
+    keyWordOption.value = await getKeyWordOption();
+    validationOption.value = await getValidationOption();
 });
 
 
@@ -168,6 +182,7 @@ function handleSubmit() {
         if (valid) {
             createData.relationID = createData.relationIDList.join(",");
             createData.childrenID = createData.childrenIDList.join(",");
+            createData.validationID = createData.validationIDList.join(",");
             await postKeyWord(createData);
             emit('close');
         } else {

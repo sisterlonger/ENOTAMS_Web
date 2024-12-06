@@ -19,7 +19,7 @@
                 <tiny-button type="primary" @click="handleSubmit()">
                     提交
                 </tiny-button>
-                <tiny-button  @click="resetForm"> 重置 </tiny-button>
+                <tiny-button @click="resetForm"> 重置 </tiny-button>
             </tiny-form-item>
         </tiny-form>
     </div>
@@ -55,6 +55,7 @@ const createData = reactive({
     remark: '',
     editMask: '',
     dicType: "",
+    required: null,
 })
 const rules = ref({
     validationName: [{ required: true, message: '必填', trigger: 'change' }],
@@ -93,6 +94,7 @@ const fetchData = async () => {
         createData.remark = data.remark;
         createData.editMask = data.editMask;
         createData.dicType = data.dicType;
+        createData.required = data.required;
     }
     catch (err) {
         Modal.alert('获取数据错误');

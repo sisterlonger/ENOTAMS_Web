@@ -174,7 +174,7 @@ function dialogClose() {
 
 <style lang="less" scoped>
 .tiny-grid {
-    height: 60vh;
+    height: 50vh;
     overflow-y: auto;
 }
 

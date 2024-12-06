@@ -1,8 +1,11 @@
 <template>
   <div>
-    <tiny-form overflow-title label-width="100px" v-if="preCondition" :rules="rules" >
+    <tiny-form overflow-title label-width="100px" v-if="preCondition" :rules="rules">
       <tiny-collapse class="demo-collapse-wrap" v-model="activeNames">
         <tiny-collapse-item title="示例" name="0">
+          <tiny-form-item label="标准规范">
+            <tiny-input v-model="createData.template" type="textarea" autosize disabled> </tiny-input>
+          </tiny-form-item>
           <tiny-form-item label="示例文本">
             <tiny-input v-model="createData.example" type="textarea" autosize disabled> </tiny-input>
           </tiny-form-item>
@@ -14,16 +17,14 @@
           </tiny-form-item>
         </tiny-collapse-item>
         <tiny-collapse-item title="必填项" name="1">
-          <tiny-col v-for=" (item, index) in matches.matchesRequiredLabel" :span="6" :key="'required' + index">
-            <tiny-form-item :label="item" required>
-              <tiny-input v-model="formData.requiredList[index]" placeholder="请输入" clearable ></tiny-input>
-            </tiny-form-item>
+          <tiny-col>
+            <formgenerator v-if="preCondition" :keyWord="keyWord" :keyWordLabel="keyWordLabel" ref="childRef" />
           </tiny-col>
         </tiny-collapse-item>
         <tiny-collapse-item title="选填项" name="2">
           <tiny-col v-for=" (item, index) in matches.matchesOptionalLabel" :span="6" :key="'optional' + index">
             <tiny-form-item :label="item">
-              <tiny-input v-model="formData.optionalList[index]" placeholder="请输入" clearable ></tiny-input>
+              <tiny-input v-model="formData.optionalList[index]" placeholder="请输入" clearable></tiny-input>
             </tiny-form-item>
           </tiny-col>
         </tiny-collapse-item>
@@ -40,7 +41,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, defineProps, toRefs, onMounted } from 'vue'
+import { ref, reactive, defineProps, toRefs, onMounted, toRaw } from 'vue'
 import {
   Collapse as TinyCollapse,
   CollapseItem as TinyCollapseItem,
@@ -63,7 +64,9 @@ import {
   Notify,
 } from '@opentiny/vue'
 import { queryTemplateDetail } from '@/api/template';
+import formgenerator from '@/components/formgenerator/index.vue';
 
+const childRef = ref<any>();
 const preCondition = ref(false);
 const url = ref(`https://res.hc-cdn.com/tiny-vue-saas/2.2.19.20240417162130/static/images/mountain.png`)
 const srcList = ref([
@@ -88,7 +91,7 @@ const activeNames = ref(['0', '1', '2', '3'])
 const formData = reactive({
   requiredList: [],
   optionalList: [],
-  rules :{},
+  rules: {},
   result: "",
 })
 const rules = ref({
@@ -101,6 +104,8 @@ onMounted(async () => {
   }
 });
 
+const keyWord = ref();
+const keyWordLabel = ref();
 function successClick() {
   Notify({
     type: 'success',
@@ -142,6 +147,7 @@ const fetchData = async () => {
     createData.state = data.state;
     createData.remark = data.remark;
     handleKeyWord();
+    //preCondition.value = true;
     preCondition.value = true;
   }
   catch (err) {
@@ -182,15 +188,19 @@ function extractContent(input: string): object {
   }
   // 不能用校验
   formData.requiredList = Array.from({ length: matchesRequiredLabel.length }).map((item, index) => "");
-  formData.optionalList = Array.from({ length: matchesOptionalLabel.length }).map((item, index) => "");
+  formData.optionalList = Array.from({ length: matchesOptionalLabel.length }).map((item, index) => matchesOptionalKeyWord[index]);
   console.log(matchesOptionalLabel, matchesRequiredLabel, matchesOptionalKeyWord, matchesRequiredKeyWord);
-  
+  keyWord.value = matchesRequiredKeyWord.join(",");
+  keyWordLabel.value = matchesRequiredLabel;
+  //console.log(keyWord.value);
+  //keyWord.value =  "距离范围组件,角度,高度";
   return { matchesOptionalLabel, matchesRequiredLabel, matchesOptionalKeyWord, matchesRequiredKeyWord };
 }
 let matches = reactive({});
 // 提取关键字事件
 const handleKeyWord = () => {
   matches = extractContent(createData.template);
+  console.log("matches", matches);
 }
 // 复制到粘贴板
 async function copyToClipboard() {
@@ -203,25 +213,18 @@ async function copyToClipboard() {
 }
 // 组装事件
 function onAssemble() {
+  let test = childRef.value.assembleStr();
+  formData.requiredList = Object.values(test);
+  //console.log(formData.requiredList);
   let assembleText = createData.template;
-  let validator = true;
-  formData.requiredList.forEach((item)=>{
-    if(item=== ""){
-      validator = false;
-    }
-  })
-  if(!validator){
-    Modal.alert('请确定必填项');
-    return;
-  }
-  matches.matchesRequiredLabel.forEach((item,index) => {
-    assembleText = assembleText.replace(`$${item}$【${matches.matchesRequiredKeyWord[index]}】`,formData.requiredList[index]);
+  matches.matchesRequiredLabel.forEach((item, index) => {
+    assembleText = assembleText.replace(`$${item}$【${matches.matchesRequiredKeyWord[index]}】`, formData.requiredList[index]);
   });
-  matches.matchesOptionalLabel.forEach((item,index) => {
-    assembleText = assembleText.replace(`$${item}$\{${matches.matchesOptionalKeyWord[index]}\}`,`${matches.matchesOptionalKeyWord[index]}${formData.optionalList[index]}`);
+  matches.matchesOptionalLabel.forEach((item, index) => {
+    assembleText = assembleText.replace(`$${item}$\{${matches.matchesOptionalKeyWord[index]}\}`, `${formData.optionalList[index]}`);
   });
   formData.result = assembleText;
-  console.log("result", formData.result);
+  //console.log("result", formData.result);
 
 }
 

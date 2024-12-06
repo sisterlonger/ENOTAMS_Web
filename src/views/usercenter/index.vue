@@ -3,12 +3,6 @@
     <div class="general-top">
         <headtop></headtop>
     </div>
-    <tiny-form ref="ruleFormRef" :model="formData" :label-width="'0px'">
-        <div :style="`display: flex;align-items: center;`"><span>tesdasdasdsadas</span><tiny-form-item v-if="true" v-model="preCondition"
-                :prop="preCondition"><tiny-input
-                    v-model="preCondition"></tiny-input></tiny-form-item><span>5555555555555555555</span>
-        </div>
-    </tiny-form>
 
     <div>
         <formgenerator v-if="preCondition" :formFields="formFields" />
@@ -32,16 +26,18 @@ import formgenerator from '@/components/formgenerator/index.vue';
 import headtop from './components/head.vue';
 
 const getKeyWord = async () => {
-    let test = await getKeyWordJSON({ model: "位置" });
-    formFields.value = test.data;
-    console.log(1, formFields);
+    let result = await getKeyWordJSON({ model: "距离,位置,范围,高度,时间,颜色,波道,频率,进近灯光类型,进近类型,频次或强度" });
+    //let result = await getKeyWordJSON({ model: "重量,道面类型,角度范围,PCN值,四字代码,三字代码" });
+    formFields.value = result.data;
     preCondition.value = true;
-
 }
 const formData = ref({});
-const formFields = ref([]);
+const formFields = ref([
+]);
 const preCondition = ref(false);
-
+const handleSubmit = () => {
+    console.log("xx");
+}
 // 初始化请求数据
 onMounted(async () => {
     await getKeyWord();
@@ -62,7 +58,8 @@ onMounted(async () => {
         height: 250px !important;
     }
 }
+
 .tiny-form-item {
-    margin:0px
+    margin: 0px
 }
 </style>
