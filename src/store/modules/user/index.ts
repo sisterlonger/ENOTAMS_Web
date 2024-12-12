@@ -34,6 +34,7 @@ const useUserStore = defineStore('user', {
     filterType: [],
     submit: false,
     reset: false,
+    menuPermissions:[],
   }),
 
   getters: {

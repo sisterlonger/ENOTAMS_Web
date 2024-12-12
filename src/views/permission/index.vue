@@ -1,6 +1,6 @@
 <template>
     <div>
-        <Breadcrumb :items="['menu.role']" />
+        <Breadcrumb :items="['menu.dictionary']" />
         
         <div class="content">
             <div class="content-main">
@@ -10,23 +10,13 @@
                         <tiny-form label-width="100px" label-position="right" class="filter-form" size="small">
                             <tiny-row>
                                 <tiny-col :span="4">
-                                    <tiny-form-item label="角色名">
-                                        <tiny-input v-model="formData.roleName" placeholder="请输入角色名" clearable></tiny-input>
+                                    <tiny-form-item label="权限名">
+                                        <tiny-input v-model="formData.permissionName" placeholder="请输入权限名" clearable></tiny-input>
                                     </tiny-form-item>
                                 </tiny-col>
                                 <tiny-col :span="4">
-                                    <tiny-form-item label="角色类型">
-                                        <tiny-input v-model="formData.roleType" placeholder="请输入角色类型" clearable></tiny-input>
-                                    </tiny-form-item>
-                                </tiny-col>
-                                <tiny-col :span="4">
-                                    <tiny-form-item label="角色等级">
-                                        <tiny-input v-model="formData.roleLevel" placeholder="请输入角色等级" clearable></tiny-input>
-                                    </tiny-form-item>
-                                </tiny-col>
-                                <tiny-col :span="4">
-                                    <tiny-form-item label="备注">
-                                        <tiny-input v-model="formData.remark" placeholder="请输入备注" clearable></tiny-input>
+                                    <tiny-form-item label="描述">
+                                        <tiny-input v-model="formData.desc" placeholder="请输入" clearable></tiny-input>
                                     </tiny-form-item>
                                 </tiny-col>
                                 <tiny-col :span="4">
@@ -50,10 +40,8 @@
                     </template>
                     <tiny-grid-column type="index" width="60"></tiny-grid-column>
                     <tiny-grid-column type="selection" width="60"></tiny-grid-column>
-                    <tiny-grid-column field="roleName" title="角色名" show-overflow></tiny-grid-column>
-                    <tiny-grid-column field="roleType" title="角色类型"></tiny-grid-column>
-                    <tiny-grid-column field="roleLevel" title="角色级别"></tiny-grid-column>
-                    <tiny-grid-column field="remark" title="备注"></tiny-grid-column>
+                    <tiny-grid-column field="permissionName" title="权限名" show-overflow></tiny-grid-column>
+                    <tiny-grid-column field="desc" title="描述"></tiny-grid-column>
                     <tiny-grid-column title="操作" width="200" align="center">
                         <template #default="data">
                             <tiny-button size="mini" type="primary"
@@ -61,8 +49,8 @@
                         </template>
                     </tiny-grid-column>
                 </tiny-grid>
-                <tiny-dialog-box v-if="boxVisibility" v-model:visible="boxVisibility" title="编辑" width="60%">
-                    <roleForm :roleID="roleID" @close="dialogClose" />
+                <tiny-dialog-box v-if="boxVisibility" v-model:visible="boxVisibility" title="编辑" width="30%">
+                    <dictionaryForm :permissionID="permissionID" @close="dialogClose" />
                 </tiny-dialog-box>
             </div>
         </div>
@@ -76,8 +64,8 @@ import {
     FormItem as TinyFormItem, Layout as TinyLayout, Row as TinyRow, Col as TinyCol, Modal, Collapse as TinyCollapse,
     CollapseItem as TinyCollapseItem,
 } from '@opentiny/vue';
-import { queryRoleList, deleteRole } from '@/api/role';
-import roleForm from './components/form.vue';
+import { queryPermissionList, deletePermission } from '@/api/permission';
+import dictionaryForm from './components/form.vue';
 
 
 const pagerConfig = ref({
@@ -96,12 +84,10 @@ const fetchData = ref({
 const tableData = ref([
 ])
 const boxVisibility = ref(false)
-const roleID = ref(0)
+const permissionID = ref(0)
 const formData = ref({
-    roleType: "",
-    roleName: "",
-    roleLevel: "",
-    remark: "",
+    desc: "",
+    permissionName: "",
 })
 const gridRef = ref()
 const activeNames = ref(['0'])
@@ -115,7 +101,7 @@ async function getData({ page }) {
     const { currentPage, pageSize } = page;
     formData.value.pageIndex = currentPage;
     formData.value.pageSize = pageSize;
-    let response = await queryRoleList(formData.value);
+    let response = await queryPermissionList(formData.value);
     tableData.value = response.data;
     return Promise.resolve({
         result: tableData.value,
@@ -124,7 +110,7 @@ async function getData({ page }) {
 }
 // 行操作
 const editRowEvent = (row) => {
-    roleID.value = row.roleID;
+    permissionID.value = row.permissionID;
     boxVisibility.value = true;
 }
 // 表操作
@@ -143,14 +129,13 @@ const toolbarButtons = ref([
 async function toolbarButtonClickEvent({ code, $grid }) {
     switch (code) {
         case 'addSelection': {
-            roleID.value = 0;
+            permissionID.value = 0;
             boxVisibility.value = true;
             break
         }
         case 'deleteSelection': {
-            let ids = $grid.getSelectRecords().map((item) => { return item.roleID });
-            console.log(ids);
-            await deleteRole(ids);
+            let ids = $grid.getSelectRecords().map((item) => { return item.permissionID });
+            await deletePermission(ids);
             Modal.message({
                 message: '删除成功!',
                 status: 'success',
@@ -163,7 +148,7 @@ async function toolbarButtonClickEvent({ code, $grid }) {
 }
 // 关闭弹窗
 function dialogClose() {
-    roleID.value = 0;
+    permissionID.value = 0;
     boxVisibility.value = false;
     queryClick();
 }

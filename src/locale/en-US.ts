@@ -32,6 +32,7 @@ export default {
   'menu.assemble': 'Assemble',
   'menu.department': 'Department Management',
   'menu.log': 'Log Management',
+  'menu.menu': 'Menu Management',
   ...localeSearchTable,
   ...localekanban,
   ...localeTheme,

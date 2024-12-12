@@ -14,6 +14,7 @@ export interface UserInfo {
   address?: string;
   status?: string;
   role: RoleType;
+  menuPermissions: Array<any>;
 }
 export interface UserFilterData {
   sort?: number;

@@ -160,6 +160,24 @@ const routerTitle = [
     icon: iconWriting,
     bold: 'main-title',
   },
+  {
+    value: 'Menu',
+    name: 'menu.menu',
+    icon: iconWriting,
+    bold: 'main-title',
+  },
+  {
+    value: 'Permission',
+    name: 'menu.permission',
+    icon: iconWriting,
+    bold: 'main-title',
+  },
+  {
+    value: 'Role',
+    name: 'menu.role',
+    icon: iconWriting,
+    bold: 'main-title',
+  },
 ];
 
 // 获取路由数据
