@@ -33,3 +33,10 @@ export function deleteRole(ids: []) {
 export function postRole(data: RoleVM) {
     return axios.post<RoleVM>(`/role/post`, data);
 }
+
+export function queryRoleMenu() {
+    return axios.get('/role/getmenu');
+}
+export function queryRolePermission() {
+    return axios.get('/role/getPermission');
+}

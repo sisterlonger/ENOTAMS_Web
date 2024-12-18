@@ -1,11 +1,10 @@
 <template>
-    <div>
-        <Breadcrumb :items="['menu.dictionary']" />
-        
+    <div class="container">
+        <Breadcrumb :items="['menu.dictionary']" />  
         <div class="content">
             <div class="content-main">
                 <!--查询组件、选择-->
-                <tiny-collapse class="demo-collapse-wrap" v-model="activeNames">
+                <tiny-collapse v-model="activeNames">
                     <tiny-collapse-item title="查询" name="0">
                         <tiny-form label-width="100px" label-position="right" class="filter-form" size="small">
                             <tiny-row>
@@ -156,8 +155,20 @@ function dialogClose() {
 
 <style lang="less" scoped>
 .tiny-grid {
-    height: 50vh;
     overflow-y: auto;
+}
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 98%;
+    height: inherit;
+    margin: 0 auto;
+    overflow: hidden;
+
+    :deep(.tiny-steps) {
+        margin-top: 10px;
+    }
 }
 
 .content {
@@ -171,7 +182,7 @@ function dialogClose() {
 }
 
 .content-main {
-    padding: 15px 15px;
+    padding: 15px 15px 50px;
 }
 
 .search-btn {

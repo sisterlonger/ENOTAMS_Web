@@ -5,26 +5,21 @@ function checkPermission(el: HTMLElement, binding: DirectiveBinding) {
   const { value } = binding;
   const userStore = useUserStore();
   const { menuPermissions } = userStore;
-
-  if (Array.isArray(value)) {
-    if (value.length > 0) {
-      const permissionValues = value;
-
-      const hasPermission = permissionValues.includes(menuPermissions);
-      if (!hasPermission && el.parentNode) {
-        el.parentNode.removeChild(el);
-      }
-    }
-  } else {
-    throw new Error(`need roles! Like v-permission="['admin','user']"`);
+  const permissionList = menuPermissions;
+  //console.log("value",value);
+  //console.log("permissionList",permissionList);
+  const hasPermission =
+    permissionList.filter((item) => {return (item.menuName === value[0] && item.permissionName === value[1])});
+  if (!hasPermission) {
+    el.remove();
   }
 }
 
 export default {
-  mounted(el: HTMLElement, binding: DirectiveBinding) {
+  mounted(el: HTMLElement, binding: any) {
     checkPermission(el, binding);
   },
-  updated(el: HTMLElement, binding: DirectiveBinding) {
+  updated(el: HTMLElement, binding: any) {
     checkPermission(el, binding);
   },
 };

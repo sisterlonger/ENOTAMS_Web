@@ -1,10 +1,10 @@
 <template>
-    <div>
+    <div class="container">
         <Breadcrumb :items="['menu.userlist']" />
         <div class="content">
             <div class="content-main">
                 <!--查询组件、选择-->
-                <tiny-collapse class="demo-collapse-wrap" v-model="activeNames">
+                <tiny-collapse v-model="activeNames">
                     <tiny-collapse-item title="查询" name="0">
                         <tiny-form label-width="100px" label-position="right" class="filter-form" size="small">
                             <tiny-row>
@@ -127,7 +127,6 @@ async function getData({ page }) {
 // 行操作
 const editRowEvent = (row) => {
     userID.value = row.userID;
-    console.log(userID.value);
     boxVisibility.value = true;
 }
 // 表操作
@@ -178,7 +177,7 @@ const getNodeDataSync = async () => {
 onMounted(async () => {
     departmentOptions.value = await getNodeDataSync();
     const apiUrl = import.meta.env;
-    console.log(apiUrl);
+    //console.log(apiUrl);
 });
 
 </script>
@@ -188,7 +187,19 @@ onMounted(async () => {
     height: 60vh;
     overflow-y: visible;
 }
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 98%;
+  height: inherit;
+  margin: 0 auto;
+  overflow: hidden;
 
+  :deep(.tiny-steps) {
+    margin-top: 10px;
+  }
+}
 .content {
     display: flex;
     flex-direction: column;
@@ -200,7 +211,7 @@ onMounted(async () => {
 }
 
 .content-main {
-    padding: 15px 15px;
+    padding: 15px 15px 50px;
 }
 
 .search-btn {

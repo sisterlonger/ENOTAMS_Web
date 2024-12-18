@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container">
     <Breadcrumb :items="['menu.log']" />
     <div class="content">
       <div class="content-main">
@@ -186,10 +186,21 @@ function dialogClose() {
 
 <style lang="less" scoped>
 .tiny-grid {
-  height: 60vh;
   overflow-y: auto;
 }
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 98%;
+    height: inherit;
+    margin: 0 auto;
+    overflow: hidden;
 
+    :deep(.tiny-steps) {
+        margin-top: 10px;
+    }
+}
 .content {
   display: flex;
   flex-direction: column;
@@ -201,7 +212,7 @@ function dialogClose() {
 }
 
 .content-main {
-  padding: 15px 15px;
+  padding: 15px 15px 50px;
 }
 
 .search-btn {

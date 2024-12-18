@@ -85,7 +85,6 @@
   
     onMounted(() => {
       userStore.info();
-      console.log("userStore.userInfo", userStore.userInfo.userCode, userStore.userInfo.userName, userStore.userInfo.role);
     });
   </script>
   

@@ -7,6 +7,7 @@ import {
   LoginData,
   LoginDataMail,
 } from '@/api/user';
+import { queryRolePermission,queryRoleMenu } from '@/api/role';
 import { setToken, clearToken } from '@/utils/auth';
 import { removeRouteListener } from '@/utils/route-listener';
 import { UserState, UserInfo } from './types';
@@ -27,6 +28,7 @@ const useUserStore = defineStore('user', {
     address: '',
     status: '',
     role: '',
+    roleID: 0,
     sort: 1,
     startTime: '',
     endTime: '',
@@ -70,9 +72,11 @@ const useUserStore = defineStore('user', {
     // Get user's information
     async info() {
       const res = await getUserInfo();
-      console.log("res",res);
-      console.log(res.data);
-      this.setInfo(res.data);
+      let userInfo = res.data;
+      //获取按钮权限
+      let rolePerMissions = await queryRolePermission();
+      userInfo.menuPermissions = rolePerMissions.data;
+      this.setInfo(userInfo);
     },
 
     async updateInfo(data: UserInfo) {
@@ -83,9 +87,14 @@ const useUserStore = defineStore('user', {
     // Login登录接口的逻辑写在这里
     async login(loginForm: LoginData) {
       try {
+        // 登录
         const res = await userLogin(loginForm);
         const { token, userInfo } = res.data;
+        // 设置token
         setToken(token);
+        // 获取按钮权限
+        let rolePerMissions = await queryRolePermission();
+        userInfo.menuPermissions = rolePerMissions.data;
         this.setInfo(userInfo);
       } catch (err) {
         clearToken();

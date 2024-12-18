@@ -2,9 +2,9 @@ import { RoleType } from '@/types/roleType';
 
 export default {
   path: 'exception',
-  name: 'Exception',
-  id: 'Exception',
-  label: 'Exception',
+  name: 'exception',
+  id: 'exception',
+  label: 'exception',
   component: () => import('@/views/exception/index.vue'),
   meta: {
     locale: 'menu.exception',

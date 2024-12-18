@@ -1,17 +1,17 @@
 <template>
-    <div>
+    <div class="container">
         <Breadcrumb :items="['menu.dictionary']" />
-        
         <div class="content">
             <div class="content-main">
                 <!--查询组件、选择-->
-                <tiny-collapse class="demo-collapse-wrap" v-model="activeNames">
+                <tiny-collapse v-model="activeNames">
                     <tiny-collapse-item title="查询" name="0">
                         <tiny-form label-width="100px" label-position="right" class="filter-form" size="small">
                             <tiny-row>
                                 <tiny-col :span="4">
                                     <tiny-form-item label="字典组">
-                                        <tiny-input v-model="formData.dicType" placeholder="请输入字典组" clearable></tiny-input>
+                                        <tiny-input v-model="formData.dicType" placeholder="请输入字典组"
+                                            clearable></tiny-input>
                                     </tiny-form-item>
                                 </tiny-col>
                                 <tiny-col :span="4">
@@ -21,12 +21,14 @@
                                 </tiny-col>
                                 <tiny-col :span="4">
                                     <tiny-form-item label="值">
-                                        <tiny-input v-model="formData.dicValue" placeholder="请输入值" clearable></tiny-input>
+                                        <tiny-input v-model="formData.dicValue" placeholder="请输入值"
+                                            clearable></tiny-input>
                                     </tiny-form-item>
                                 </tiny-col>
                                 <tiny-col :span="4">
                                     <tiny-form-item label="模块">
-                                        <tiny-input v-model="formData.moduleName" placeholder="请输入模块" clearable></tiny-input>
+                                        <tiny-input v-model="formData.moduleName" placeholder="请输入模块"
+                                            clearable></tiny-input>
                                     </tiny-form-item>
                                 </tiny-col>
                                 <tiny-col :span="4">
@@ -57,8 +59,7 @@
                     <tiny-grid-column field="moduleName" title="模块" show-overflow></tiny-grid-column>
                     <tiny-grid-column title="操作" width="200" align="center">
                         <template #default="data">
-                            <tiny-button size="mini" type="primary"
-                                @click="editRowEvent(data.row)">编辑</tiny-button>
+                            <tiny-button size="mini" type="primary" @click="editRowEvent(data.row)">编辑</tiny-button>
                         </template>
                     </tiny-grid-column>
                 </tiny-grid>
@@ -127,7 +128,6 @@ async function getData({ page }) {
 // 行操作
 const editRowEvent = (row) => {
     dicID.value = row.dicID;
-    console.log(dicID.value);
     boxVisibility.value = true;
 }
 // 表操作
@@ -152,7 +152,6 @@ async function toolbarButtonClickEvent({ code, $grid }) {
         }
         case 'deleteSelection': {
             let ids = $grid.getSelectRecords().map((item) => { return item.dicID });
-            console.log(ids);
             await deleteDictionary(ids);
             Modal.message({
                 message: '删除成功!',
@@ -174,8 +173,21 @@ function dialogClose() {
 
 <style lang="less" scoped>
 .tiny-grid {
-    height: 50vh;
     overflow-y: auto;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 98%;
+    height: inherit;
+    margin: 0 auto;
+    overflow: hidden;
+
+    :deep(.tiny-steps) {
+        margin-top: 10px;
+    }
 }
 
 .content {
@@ -189,7 +201,7 @@ function dialogClose() {
 }
 
 .content-main {
-    padding: 15px 15px;
+    padding: 15px 15px 50px;
 }
 
 .search-btn {

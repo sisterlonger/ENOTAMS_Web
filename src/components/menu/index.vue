@@ -1,12 +1,12 @@
 <template>
   <div class="menu-router">
-    <tiny-tree-menu ref="tree" :data="treeDataFilter" :show-filter="false" node-key="id" wrap
+    <tiny-tree-menu ref="tree" :data="MenuData" :show-filter="false" node-key="id" wrap
       :default-expanded-keys="expandeArr" @current-change="currentChange">
       <template #default="slotScope">
         <template v-for="(item, index) in routerTitle" :key="index">
           <span v-if="slotScope.label === item.value" class="menu-title">
             <component :is="item.icon"></component>
-            <span :class="item.bold">{{ $t(item.name) }}</span>
+            <span>{{ item.name }}</span>
           </span>
         </template>
       </template>
@@ -15,171 +15,24 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, watch, ref, onMounted } from 'vue';
+import { computed, watch, ref, onMounted, unref } from 'vue';
 import { RouteRecordNormalized } from 'vue-router';
-import {
-  IconAssociation,
-  IconCheckOut,
-  IconText,
-  IconCueL,
-  IconUser,
-  IconAdministrator,
-  IconWordType,
-  IconVersiontree,
-  IconGrade,
-  IconWriting,
-  IconApplication,
-  IconFiles
-} from '@opentiny/vue-icon';
 import { TreeMenu as tinyTreeMenu } from '@opentiny/vue';
+import { useMenuStore } from '@/store/modules/router';
 import router from '@/router';
+import { useRoute, useRouter } from 'vue-router';
 import { useUserStore } from '@/store';
 import { TabItem } from '@opentiny/vue';
+import * as icons from '@opentiny/vue-icon';
+import { useDeepClone } from '@/hooks/useDeepClone';
 
-// icon图标
-const iconAssociation = IconAssociation();
-const iconCheckOut = IconCheckOut();
-const iconText = IconText();
-const iconCueL = IconCueL();
-const iconUser = IconUser();
-const iconAdministrator = IconAdministrator();
-const iconWordType = IconWordType();
-const iconVersiontree = IconVersiontree();
-const iconGrade = IconGrade();
-const iconWriting = IconWriting();
-const iconApplication = IconApplication();
-const iconFiles = IconFiles();
+
+const route = useRoute();
+const menuStore = useMenuStore();
+menuStore.getMenuList();
 const tree = ref();
 const expandeArr = ref();
-const routerTitle = [
-{
-    value: 'UserList',
-    name: 'menu.userlist',
-    icon: iconAdministrator,
-    bold: 'main-title',
-  },
-  {
-    value: 'Board',
-    name: 'menu.board',
-    icon: iconApplication,
-    bold: 'main-title',
-  },
-  {
-    value: 'Home',
-    name: 'menu.home',
-    icon: null,
-    bold: 'title',
-  },
-  {
-    value: 'Work',
-    name: 'menu.work',
-    icon: null,
-    bold: 'title',
-  },
-  {
-    value: 'List',
-    name: 'menu.list',
-    icon: iconFiles,
-    bold: 'main-title',
-  },
-  {
-    value: 'Table',
-    name: 'menu.list.searchTable',
-    icon: null,
-    bold: 'title',
-  },
-  {
-    value: 'Exception',
-    name: 'menu.exception',
-    icon: iconCueL,
-    bold: 'main-title',
-  },
-  {
-    value: '403',
-    name: 'menu.exception.403',
-    icon: null,
-    bold: 'title',
-  },
-  {
-    value: '404',
-    name: 'menu.exception.404',
-    icon: null,
-    bold: 'title',
-  },
-  {
-    value: '500',
-    name: 'menu.exception.500',
-    icon: null,
-    bold: 'title',
-  },
-  {
-    value: 'UserCenter',
-    name: 'menu.usercenter',
-    icon: iconUser,
-    bold: 'main-title',
-  },
-  {
-    value: 'Node',
-    name: 'menu.node',
-    icon: iconVersiontree,
-    bold: 'main-title',
-  },
-  {
-    value: 'KeyWord',
-    name: 'menu.keyword',
-    icon: iconWordType,
-    bold: 'main-title',
-  },
-  {
-    value: 'Validation',
-    name: 'menu.validation',
-    icon: iconCheckOut,
-    bold: 'main-title',
-  },
-  {
-    value: 'Dictionary',
-    name: 'menu.dictionary',
-    icon: iconText,
-    bold: 'main-title',
-  },
-  {
-    value: 'Assemble',
-    name: 'menu.assemble',
-    icon: iconAssociation,
-    bold: 'main-title',
-  },
-  {
-    value: 'Department',
-    name: 'menu.department',
-    icon: iconGrade,
-    bold: 'main-title',
-  },
-  {
-    value: 'Log',
-    name: 'menu.log',
-    icon: iconWriting,
-    bold: 'main-title',
-  },
-  {
-    value: 'Menu',
-    name: 'menu.menu',
-    icon: iconWriting,
-    bold: 'main-title',
-  },
-  {
-    value: 'Permission',
-    name: 'menu.permission',
-    icon: iconWriting,
-    bold: 'main-title',
-  },
-  {
-    value: 'Role',
-    name: 'menu.role',
-    icon: iconWriting,
-    bold: 'main-title',
-  },
-];
-
+let routerTitle = [] as any;
 // 获取路由数据
 const appRoute = computed(() => {
   return router
@@ -194,33 +47,43 @@ copyRouter.sort((a: RouteRecordNormalized, b: RouteRecordNormalized) => {
 const userStore = useUserStore();
 const role = computed(() => userStore.role);
 let treeData = ref(copyRouter);
-const treeDataForEach = (arr: any[]) => {
+const filtter = (arr: any[]) => {
+  arr.forEach((item: any) => {
+    //console.log("item",item);
+    // 这部分是菜单的树，路径作为id，与点击事件串联起来
+    item.id = item.path;
+    item.label = item.menuName;
+    item.meta = { url: item.path };
+    // 这部分是菜单的template内容
+    routerTitle.push({
+      value: item.menuName,
+      name: item.menuName,
+      //name: item.meta.locale,
+      icon: item.icon ? icons[item.icon]() : "",
+      bold: 'main-title',
+    },);
+  });
+
   return arr.filter((e: { children: any[]; meta: { hideInMenu: any } }) => {
     if (e.children) {
       e.children = e.children.filter((v: { meta: { hideInMenu: any } }) => {
-        return !v.meta.hideInMenu;
+        return true;
       });
-      treeDataForEach(e.children);
+      filtter(e.children);
     }
-    return !e.meta.hideInMenu;
+    return true;
   });
 };
-let treeDataFilter = treeDataForEach(treeData.value);
 
-watch(
-  role,
-  (newValue: string) => {
-    treeData.value = copyRouter.filter(
-      (item: { name: string, meta: { roles: Array<string> } }) => item.meta.roles.includes(newValue)
-    );
-    treeDataFilter = treeDataForEach(treeData.value);
+const rawMenuData = computed(() => useDeepClone(unref(menuStore.menuList)));
+const MenuData = computed(() => {
+  routerTitle = [];
+  return filtter(rawMenuData.value);
+});
 
-  },
-  { immediate: true }
-);
 
 /**
- * 监听路由变化高亮当前菜单
+ * 监听路由变化高亮当前菜单,因为路径的值是唯一的，所以用路径作为id来对应
  */
 onMounted(() => {
   watch(
@@ -228,27 +91,18 @@ onMounted(() => {
     (newValue: string) => {
       const menuKey = newValue
         .replace(/^.*\//, '')
-        .replace(/^[a-z]/, (s: string) => s.toUpperCase());
+        .replace(/^[a-z]/, (s: string) => s);
       expandeArr.value = [menuKey];
       tree.value.setCurrentKey(menuKey);
     },
     { immediate: true },
   );
 });
-const currentChange = (data: any) => {
-  const filter = [
-    'Exception',
-    'Form',
-    'Board',
-    'List',
-    'Profile',
-    'Result',
-    'User',
-    'Cloud',
-  ];
-  if (filter.indexOf(data.id) === -1) {
-    router.push({ name: data.id });
+const currentChange = (data: any, node: any) => {
+  if (!node.isLeaf) {
+    return;
   }
+  router.push({ name: data.meta.url.split('/').pop()});
 };
 </script>
 

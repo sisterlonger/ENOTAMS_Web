@@ -5,7 +5,11 @@
                 <tiny-input v-model="createData.menuName"></tiny-input>
             </tiny-form-item>
             <tiny-form-item label="菜单类型" prop="menuType" :validate-icon="validateIcon">
-                <tiny-input v-model="createData.menuType"></tiny-input>
+                <tiny-select v-model="createData.menuType" :placeholder="'请选择菜单类型'" filterable>
+                    <tiny-option key="系统菜单" label="系统菜单" value="系统菜单"></tiny-option>
+                    <tiny-option key="业务菜单" label="业务菜单" value="业务菜单"></tiny-option>
+                    <tiny-option key="模块" label="模块" value="模块"></tiny-option>
+                </tiny-select>
             </tiny-form-item>
             <tiny-form-item label="组件" prop="component">
                 <tiny-input v-model="createData.component"></tiny-input>
@@ -46,7 +50,9 @@ import {
     Loading,
     Modal,
     Numeric as TinyNumeric,
-    TinyCheckboxGroup, TinyModal
+    TinyCheckboxGroup, TinyModal,
+    Select as TinySelect,
+    Option as TinyOption,
 } from '@opentiny/vue'
 import { iconWarning } from '@opentiny/vue-icon';
 import { queryMenuDetail, postMenu } from '@/api/menu';
@@ -81,7 +87,7 @@ const rules = ref({
     menuName: [{ required: true, message: '必填', trigger: 'change' }],
     menuType: [{ required: true, message: '必填', trigger: 'change' }],
     component: [
-        { required: true, message: '必填', trigger: 'blur' },
+        { required: false, message: '非必填', trigger: 'blur' },
     ],
     icon: [
         { required: true, message: '必填', trigger: 'blur' },
@@ -155,6 +161,9 @@ const fetchData = async () => {
 onMounted(async () => {
     if (menuID.value) {
         await fetchData();
+    }
+    else{
+        createData.parentID = parentID.value;
     }
     await fetPermissions();
 });

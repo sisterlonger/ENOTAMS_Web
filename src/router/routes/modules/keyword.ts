@@ -2,12 +2,12 @@ import { RoleType } from '@/types/roleType';
 
 export default {
   path: 'keyword',
-  name: 'KeyWord',
-  id: 'KeyWord',
-  label: 'KeyWord',
+  name: 'keyword',
+  id: 'keyword',
+  label: 'keyword',
   component: () => import('@/views/keyword/index.vue'),
   meta: {
-    locale: 'menu.keyword',
+    locale: '关键字管理',
     requiresAuth: true,
     order: 2,
     roles: [RoleType.admin, RoleType.user],

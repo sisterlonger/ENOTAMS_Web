@@ -1,30 +1,33 @@
 <template>
-  <div>
-    <general-layout :breadcrumb="['menu.systemManager', 'menu.menu']">
-      <tiny-button type="primary" @click="add()">新增根目录</tiny-button>
-      <div class="tiny-tree">
-        <tiny-tree ref="treeRef" :data="data" :props="props" node-key="id" highlight-current current-node-key="1"
-          :show-contextmenu="true" :indent="16" show-line size="medium" default-expand-all
-          :expand-on-click-node="false">
-          <template #operation="{ node }">
-            <tiny-link type="success" @click="editMenuEvent(node, 'add')">
-              新增子目录
-            </tiny-link>
-            &nbsp;
-            <tiny-link type="primary" @click="editMenuEvent(node, 'edit')">
-              修改
-            </tiny-link>
-            &nbsp;
-            <tiny-link cltypess="info" @click="editMenuEvent(node, 'delete')">
-              删除
-            </tiny-link>
-          </template>
-        </tiny-tree>
+  <div class="container">
+      <Breadcrumb :items="['menu.systemManager', 'menu.menu']" />
+      <div class="content">
+        <div class="content-main">
+          <tiny-button type="primary" @click="add()">新增根目录</tiny-button>
+          <div class="tiny-tree">
+            <tiny-tree ref="treeRef" :data="data" :props="props" node-key="id" highlight-current current-node-key="1"
+              :show-contextmenu="true" :indent="16" show-line size="medium" default-expand-all
+              :expand-on-click-node="false">
+              <template #operation="{ node }">
+                <tiny-link type="success" @click="editMenuEvent(node, 'add')">
+                  新增子目录
+                </tiny-link>
+                &nbsp;
+                <tiny-link type="primary" @click="editMenuEvent(node, 'edit')">
+                  修改
+                </tiny-link>
+                &nbsp;
+                <tiny-link cltypess="info" @click="editMenuEvent(node, 'delete')">
+                  删除
+                </tiny-link>
+              </template>
+            </tiny-tree>
+          </div>
+        </div>
+        <tiny-dialog-box v-if="boxVisibility" v-model:visible="boxVisibility" title="编辑" width="30%">
+          <dictionaryForm :menuID="menuID" :parentID="parentID" @close="dialogClose" />
+        </tiny-dialog-box>
       </div>
-      <tiny-dialog-box v-if="boxVisibility" v-model:visible="boxVisibility" title="编辑" width="30%">
-        <dictionaryForm :menuID="menuID" :parentID="parentID" @close="dialogClose" />
-      </tiny-dialog-box>
-    </general-layout>
   </div>
 </template>
 
@@ -70,6 +73,7 @@ const editMenuEvent = async (row, action) => {
   else if (action === 'add') {
     parentID.value = row.data.menuID;
     menuID.value = 0;
+    console.log(parentID.value);
     boxVisibility.value = true;
   }
   else {
@@ -94,9 +98,25 @@ onMounted(async () => {
 </script>
 
 <style lang="less" scoped>
+
 .tiny-tree {
+  height: 100%;
   overflow-y: auto;
 }
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 98%;
+  height: inherit;
+  margin: 0 auto;
+  overflow: hidden;
+
+  :deep(.tiny-steps) {
+    margin-top: 10px;
+  }
+}
+
 
 .content {
   display: flex;
@@ -107,6 +127,7 @@ onMounted(async () => {
   background: #fff;
   border-radius: 10px;
 }
+
 
 .content-main {
   padding: 15px 15px;

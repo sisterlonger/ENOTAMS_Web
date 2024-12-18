@@ -30,9 +30,6 @@
       <div class="login-form-options">
         <tiny-checkbox>{{ $t('login.form.rememberPassword') }}</tiny-checkbox>
         <div>
-          <tiny-link type="primary">
-            {{ $t('login.form.forgetPassword') }}
-          </tiny-link>
           <tiny-link type="primary" class="divide-line">|</tiny-link>
           <tiny-link type="primary" @click="typeChange">
             {{ $t('login.form.registration') }}
@@ -126,7 +123,7 @@
         });
         const { redirect, ...othersQuery } = router.currentRoute.value.query;
         router.push({
-          name: (redirect as string) || 'Node',
+          name: (redirect as string) || 'node',
           query: {
             ...othersQuery,
           },

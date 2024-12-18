@@ -2,9 +2,9 @@ import { RoleType } from '@/types/roleType';
 
 export default {
   path: 'board',
-  name: 'Board',
-  id: 'Board',
-  label: 'Board',
+  name: 'board',
+  id: 'board',
+  label: 'board',
   component: () => import('@/views/board/index.vue'),
   meta: {
     locale: 'menu.board',
@@ -15,12 +15,24 @@ export default {
   children: [
     {
       path: 'work',
-      name: 'Work',
-      id: 'Work',
-      label: 'Work',
+      name: 'work',
+      id: 'work',
+      label: 'work',
       component: () => import('@/views/board/work/index.vue'),
       meta: {
-        locale: 'menu.board.work',
+        locale: '工作台',
+        requiresAuth: true,
+        roles: [RoleType.admin],
+      },
+    },
+    {
+      path: 'home',
+      name: 'home',
+      id: 'home',
+      label: 'home',
+      component: () => import('@/views/board/home/index.vue'),
+      meta: {
+        locale: '首页',
         requiresAuth: true,
         roles: [RoleType.admin],
       },

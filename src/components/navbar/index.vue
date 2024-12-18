@@ -103,14 +103,6 @@ const userlist = [
   { label: 'messageBox.logout', value: 4 },
 ];
 
-const switchRoles = async () => {
-  const res = await userStore.switchRoles();
-
-  Modal.message({
-    message: res as string,
-    status: 'success',
-  });
-};
 
 const switchUser = (e: number) => {
   switch (e) {

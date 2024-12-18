@@ -2,12 +2,12 @@ import { RoleType } from '@/types/roleType';
 
 export default {
   path: 'menu',
-  name: 'Menu',
-  id: 'Menu',
-  label: 'Menu',
+  name: 'menu',
+  id: 'menu',
+  label: 'menu',
   component: () => import('@/views/menu/index.vue'),
   meta: {
-    locale: 'menu.menu',
+    locale: '菜单管理',
     requiresAuth: true,
     order: 10,
     roles: [RoleType.admin],

@@ -7,12 +7,17 @@ const proxyConfig = {
     target: loadEnv('', process.cwd()).VITE_SERVER_HOST,
     changeOrigin: true,
     logLevel: 'debug',
-    rewrite: (path) =>
+    rewrite: (path: string) =>
       path.replace(
         new RegExp(`${loadEnv('', process.cwd()).VITE_BASE_API}`),
         ''
       ),
   },
+  [loadEnv('', process.cwd()).VITE_MOCK_SERVER_HOST]: {
+    target: loadEnv('', process.cwd()).VITE_MOCK_HOST,
+    changeOrigin: true,
+    rewrite: (path:string) => path.replace(/^\/mock/, '')
+  }
 };
 export default mergeConfig(
   {

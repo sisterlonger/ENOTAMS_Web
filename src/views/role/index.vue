@@ -1,32 +1,35 @@
 <template>
-    <div>
+    <div class="container">
         <Breadcrumb :items="['menu.role']" />
-        
         <div class="content">
             <div class="content-main">
                 <!--查询组件、选择-->
-                <tiny-collapse class="demo-collapse-wrap" v-model="activeNames">
+                <tiny-collapse v-model="activeNames">
                     <tiny-collapse-item title="查询" name="0">
                         <tiny-form label-width="100px" label-position="right" class="filter-form" size="small">
                             <tiny-row>
                                 <tiny-col :span="4">
                                     <tiny-form-item label="角色名">
-                                        <tiny-input v-model="formData.roleName" placeholder="请输入角色名" clearable></tiny-input>
+                                        <tiny-input v-model="formData.roleName" placeholder="请输入角色名"
+                                            clearable></tiny-input>
                                     </tiny-form-item>
                                 </tiny-col>
                                 <tiny-col :span="4">
                                     <tiny-form-item label="角色类型">
-                                        <tiny-input v-model="formData.roleType" placeholder="请输入角色类型" clearable></tiny-input>
+                                        <tiny-input v-model="formData.roleType" placeholder="请输入角色类型"
+                                            clearable></tiny-input>
                                     </tiny-form-item>
                                 </tiny-col>
                                 <tiny-col :span="4">
                                     <tiny-form-item label="角色等级">
-                                        <tiny-input v-model="formData.roleLevel" placeholder="请输入角色等级" clearable></tiny-input>
+                                        <tiny-input v-model="formData.roleLevel" placeholder="请输入角色等级"
+                                            clearable></tiny-input>
                                     </tiny-form-item>
                                 </tiny-col>
                                 <tiny-col :span="4">
                                     <tiny-form-item label="备注">
-                                        <tiny-input v-model="formData.remark" placeholder="请输入备注" clearable></tiny-input>
+                                        <tiny-input v-model="formData.remark" placeholder="请输入备注"
+                                            clearable></tiny-input>
                                     </tiny-form-item>
                                 </tiny-col>
                                 <tiny-col :span="4">
@@ -56,8 +59,7 @@
                     <tiny-grid-column field="remark" title="备注"></tiny-grid-column>
                     <tiny-grid-column title="操作" width="200" align="center">
                         <template #default="data">
-                            <tiny-button size="mini" type="primary"
-                                @click="editRowEvent(data.row)">编辑</tiny-button>
+                            <tiny-button size="mini" type="primary" @click="editRowEvent(data.row)">编辑</tiny-button>
                         </template>
                     </tiny-grid-column>
                 </tiny-grid>
@@ -171,8 +173,21 @@ function dialogClose() {
 
 <style lang="less" scoped>
 .tiny-grid {
-    height: 50vh;
     overflow-y: auto;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 98%;
+    height: inherit;
+    margin: 0 auto;
+    overflow: hidden;
+
+    :deep(.tiny-steps) {
+        margin-top: 10px;
+    }
 }
 
 .content {
@@ -186,7 +201,7 @@ function dialogClose() {
 }
 
 .content-main {
-    padding: 15px 15px;
+    padding: 15px 15px 50px;
 }
 
 .search-btn {

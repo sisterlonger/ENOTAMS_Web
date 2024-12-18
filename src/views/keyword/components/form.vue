@@ -114,7 +114,6 @@ async function getKeyWordOption() {
     let response = await queryKeyWordList({ pageIndex: 1, pageSize: 10000 });
     let result = [];
     response.data.forEach((keyword) => { result.push({ value: keyword.keyWordID, label: keyword.keyWord, key: keyword.keyWordID }) });
-    console.log(result);
     return result;
 }
 // 获取校验组数据
@@ -122,7 +121,6 @@ async function getValidationOption() {
     let response = await queryValidationList({ pageIndex: 1, pageSize: 10000 });
     let result = [];
     response.data.forEach((validation) => { result.push({ value: validation.validationID, label: validation.validationName, key: validation.validationID }) });
-    console.log(result);
     return result;
 }
 

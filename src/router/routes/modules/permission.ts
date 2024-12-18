@@ -2,14 +2,13 @@ import { RoleType } from '@/types/roleType';
 
 export default {
   path: 'permission',
-  name: 'Permission',
-  id: 'Permission',
-  label: 'Permission',
+  name: 'permission',
+  id: 'permission',
+  label: 'permission',
   component: () => import('@/views/permission/index.vue'),
   meta: {
-    locale: 'menu.permission',
+    locale: '权限管理',
     requiresAuth: true,
     order: 11,
-    roles: [RoleType.admin],
   },
 };

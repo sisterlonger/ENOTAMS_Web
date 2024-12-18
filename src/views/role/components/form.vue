@@ -1,5 +1,6 @@
 <template>
     <div class="demo-form">
+        <div v-permission="['Home','新增']">test</div>
         <tiny-form ref="ruleFormRef" :model="createData" :rules="rules" label-width="100px">
             <tiny-form-item label="角色名" prop="roleName">
                 <tiny-input v-model="createData.roleName"></tiny-input>
@@ -37,11 +38,12 @@ import {
     Modal,
     Numeric as TinyNumeric,
 } from '@opentiny/vue'
+import { useRoute } from 'vue-router';
 import { iconWarning } from '@opentiny/vue-icon';
 import { queryRoleDetail, postRole } from '@/api/role';
 import permissionTree from '@/components/permissionTree/index.vue';
 
-
+const route = useRoute();
 const props = defineProps({
     roleID: Number,
 });
@@ -83,7 +85,6 @@ const getMenuPermission = (checkedData:any)=>{
         }
         return null;
     })
-    console.log(menuPermissions);
     createData.menuPermissions = menuPermissions.filter((item:any)=>{return item !== null});
 }
 

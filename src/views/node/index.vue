@@ -1,9 +1,9 @@
 <template>
-    <div>
+    <div class="container">
         <Breadcrumb :items="['menu.node']" />
         <div class="content">
             <div class="content-main">
-                <tiny-layout>
+                <tiny-layout style="width: 100%">
                     <tiny-row>
                         <tiny-col :span="3">
                             <tiny-tree-menu :get-menu-data-sync="getNodeDataSync" :props="mapField" wrap
@@ -35,8 +35,7 @@ const mapField = reactive({
 })
 const getNodeDataSync = async () => {
     const { data } = await queryNodeTree();
-    console.log(userStore.userInfo);
-    console.log("userStore.userInfo", userStore.userInfo.userCode, userStore.userInfo.userName, userStore.userInfo.role);
+    //console.log("userStore.userInfo", userStore.userInfo.userCode, userStore.userInfo.userName, userStore.userInfo.role);
     return data.children;
 }
 const handleNodeClick = async (data) => {
@@ -49,15 +48,31 @@ const handleNodeClick = async (data) => {
 <style lang="less" scoped>
 .tiny-tree-menu {
     width: 100%;
-    height: 70vh;
     overflow-y: auto;
 }
+
 :deep(.tiny-tree-menu .tiny-input) {
     margin: var(--tv-TreeMenu-padding-top) var(--tv-TreeMenu-padding-left);
     position: relative;
-    max-width: 1880px; 
+    max-width: 1880px;
     width: 90%;
 }
+
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 98%;
+    height: inherit;
+    margin: 0 auto;
+    overflow: hidden;
+
+    :deep(.tiny-steps) {
+        margin-top: 10px;
+    }
+}
+
+
 .content {
     display: flex;
     flex-direction: column;
@@ -68,7 +83,9 @@ const handleNodeClick = async (data) => {
     border-radius: 10px;
 }
 
+
 .content-main {
-    padding: 15px 15px;
+    padding: 30px 15px;
+    width: 100%;
 }
 </style>
