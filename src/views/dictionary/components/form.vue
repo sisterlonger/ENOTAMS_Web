@@ -23,7 +23,7 @@
                 <tiny-button type="primary" @click="handleSubmit()">
                     提交
                 </tiny-button>
-                <tiny-button  @click="resetForm"> 重置 </tiny-button>
+                <tiny-button @click="resetForm"> 重置 </tiny-button>
             </tiny-form-item>
         </tiny-form>
     </div>
@@ -51,7 +51,7 @@ const { dicID } = toRefs(props);
 
 const ruleFormRef = ref()
 const validateIcon = ref(iconWarning())
-const createData = reactive({
+const createData = reactive<any>({
     dicID: null,
     dicType: '',
     dicKey: '',
@@ -89,19 +89,21 @@ const fetchData = async () => {
         background: 'rgba(0, 0, 0, 0.7)',
     });
     try {
-        const { data } = await queryDictionaryDetail({ id: dicID.value });
-        createData.dicID = data.dicID;
-        createData.dicType = data.dicType;
-        createData.dicKey = data.dicKey;
-        createData.dicValue = data.dicValue;
-        createData.orderID = data.orderID;
-        createData.dicDescription = data.dicDescription;
-        createData.moduleName = data.moduleName;
-    } 
+        if (dicID && dicID.value !== 0) {
+            const { data } = await queryDictionaryDetail({ id: dicID.value || 0 });
+            createData.dicID = data.dicID;
+            createData.dicType = data.dicType;
+            createData.dicKey = data.dicKey;
+            createData.dicValue = data.dicValue;
+            createData.orderID = data.orderID;
+            createData.dicDescription = data.dicDescription;
+            createData.moduleName = data.moduleName;
+        }
+    }
     catch (err) {
         Modal.alert('获取数据错误');
         emit('close');
-      }
+    }
     finally {
         state.loading.close();
     }
@@ -109,7 +111,7 @@ const fetchData = async () => {
 
 // 初始化请求数据
 onMounted(async () => {
-    if (dicID.value) {
+    if (dicID && dicID.value) {
         fetchData();
     }
 });
@@ -119,7 +121,7 @@ onMounted(async () => {
 const emit = defineEmits(['close']);
 
 function handleSubmit() {
-    ruleFormRef.value.validate(async (valid) => {
+    ruleFormRef.value.validate(async (valid: any) => {
         if (valid) {
             await postDictionary(createData);
             emit('close');
