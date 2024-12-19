@@ -21,8 +21,8 @@ export function queryPermissionDetail(params: { id: number }) {
     });
 }
 export function deletePermission(ids: []) {
-    return axios.post(`/permission/delete`, ids);
+    return axios.post('/permission/delete', ids);
 }
 export function postPermission(data: PermissionVM) {
-    return axios.post<PermissionVM>(`/permission/post`, data);
+    return axios.post<PermissionVM>('/permission/post', data);
 }

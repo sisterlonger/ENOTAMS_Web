@@ -31,10 +31,10 @@ export function queryKeyWordDetail(params: { id: number }) {
     });
 }
 export function deleteKeyWord(ids: []) {
-    return axios.post(`/keyword/delete`, ids);
+    return axios.post('/keyword/delete', ids);
 }
 export function postKeyWord(data: KeyWordVM) {
-    return axios.post<KeyWordVM>(`/keyword/post`, data);
+    return axios.post<KeyWordVM>('/keyword/post', data);
 }
 export function getKeyWordJSON(params: {model:string}) {
     return axios.get('/keyword/getkeywordJSON', { params } );

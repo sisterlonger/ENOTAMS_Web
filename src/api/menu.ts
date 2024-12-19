@@ -26,10 +26,10 @@ export function queryMenuDetail(params: { id: number }) {
     });
 }
 export function deleteMenu(ids: []) {
-    return axios.post(`/menu/delete`,  ids );
+    return axios.post('/menu/delete',  ids );
 }
 export function postMenu(data: MenuVM) {
-    return axios.post<MenuVM>(`/menu/post`, data);
+    return axios.post<MenuVM>('/menu/post', data);
 }
 export function queryMenuTreeList(params?: MenuSearch) {
     return axios.get('/menu/treelist', { params });

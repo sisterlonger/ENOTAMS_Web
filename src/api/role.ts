@@ -28,10 +28,10 @@ export function queryRoleDetail(params: { id: number }) {
     });
 }
 export function deleteRole(ids: []) {
-    return axios.post(`/role/delete`, ids);
+    return axios.post('/role/delete', ids);
 }
 export function postRole(data: RoleVM) {
-    return axios.post<RoleVM>(`/role/post`, data);
+    return axios.post<RoleVM>('/role/post', data);
 }
 
 export function queryRoleMenu() {

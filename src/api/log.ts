@@ -25,8 +25,8 @@ export function queryLogsDetail(params: { id: number }) {
     });
 }
 export function deleteLogs(ids: []) {
-    return axios.post(`/log/delete`,  ids );
+    return axios.post('/log/delete',  ids );
 }
 export function postLogs(data: LogsVM) {
-    return axios.post<LogsVM>(`/log/post`, data);
+    return axios.post<LogsVM>('/log/post', data);
 }

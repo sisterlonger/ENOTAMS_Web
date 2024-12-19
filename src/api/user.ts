@@ -54,11 +54,11 @@ export function logout() {
 }
 
 export function getUserInfo() {
-  return axios.get<UserInfo>(`/user/info`);
+  return axios.get<UserInfo>('/user/info');
 }
 
 export function updateUserInfo(data: UserInfo) {
-  return axios.put<UserInfo>(`/api/user/userInfo`, data);
+  return axios.put<UserInfo>('/api/user/userInfo', data);
 }
 
 export function getUserData(data?: UserData) {
