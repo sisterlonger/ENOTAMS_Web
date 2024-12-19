@@ -12,8 +12,7 @@
 </template>
 
 <script lang="ts" setup>
-import { getKeyWordJSON } from '@/api/fetchInterface';
-import { ref, reactive, onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import {
     TinyForm,
     TinyFormItem,
@@ -27,12 +26,6 @@ import {
 import formgenerator from '@/components/formgenerator/index.vue';
 import headtop from './components/head.vue';
 
-const getKeyWord = async () => {
-    let result = await getKeyWordJSON({ model: "距离,位置,范围,高度,时间,颜色,波道,频率,进近灯光类型,进近类型,频次或强度" });
-    //let result = await getKeyWordJSON({ model: "重量,道面类型,角度范围,PCN值,四字代码,三字代码" });
-    formFields.value = result.data;
-    preCondition.value = true;
-}
 const formData = ref({});
 const formFields = ref([
 ]);
