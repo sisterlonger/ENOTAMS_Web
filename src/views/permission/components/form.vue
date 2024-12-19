@@ -29,7 +29,7 @@ import {
     Numeric as TinyNumeric,
 } from '@opentiny/vue'
 import { iconWarning } from '@opentiny/vue-icon';
-import { queryPermissionDetail, postPermission } from '@/api/permission';
+import { queryPermissionDetail, postPermission } from '@/api/fetchInterface';
 
 
 const props = defineProps({

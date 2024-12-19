@@ -291,7 +291,7 @@ import {
   queryEmployeeList,
   deleteEmployee,
   QueryTaskParmas,
-} from '@/api/list';
+} from '@/api/fetchInterface';
 
 // 初始化请求数据
 interface FilterOptions {

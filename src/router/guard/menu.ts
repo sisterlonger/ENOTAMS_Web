@@ -119,11 +119,12 @@ export const setupMenuGuard = (router: Router) => {
     }
     const data = await menuStore.getMenuList();
     const routes = toRoutes(data);
+    /* TODO 也要记得改constant和登录页的
     routes.forEach((route) => {
       if (!router.hasRoute(route.name)) {
         router.addRoute('root', route);
       }
-    });
+    });*/
     next({ ...to, replace: true });
   });
 };

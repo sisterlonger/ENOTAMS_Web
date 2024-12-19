@@ -56,8 +56,7 @@
                     <tiny-grid-column field="email" title="邮箱"></tiny-grid-column>
                     <tiny-grid-column title="操作" width="200" align="center">
                         <template #default="data">
-                            <tiny-button size="mini" type="primary"
-                                @click="editRowEvent(data.row)">编辑</tiny-button>
+                            <tiny-button size="mini" type="primary" @click="editRowEvent(data.row)">编辑</tiny-button>
                         </template>
                     </tiny-grid-column>
                 </tiny-grid>
@@ -74,10 +73,9 @@ import { ref, onMounted } from 'vue'
 import {
     Grid as TinyGrid, GridColumn as TinyGridColumn, Button as TinyButton, DialogBox as TinyDialogBox, GridToolbar as TinyGridToolbar, Input as TinyInput, Form as TinyForm,
     FormItem as TinyFormItem, Layout as TinyLayout, Row as TinyRow, Col as TinyCol, Modal, Collapse as TinyCollapse,
-    CollapseItem as TinyCollapseItem,Cascader as TinyCascader,
+    CollapseItem as TinyCollapseItem, Cascader as TinyCascader,
 } from '@opentiny/vue';
-import { queryUserList, deleteUser } from '@/api/user';
-import { queryDepartmentTreeList } from '@/api/department';
+import { queryUserList, deleteUser, queryDepartmentTreeList } from '@/api/fetchInterface';
 import userForm from './components/form.vue';
 
 
@@ -187,19 +185,21 @@ onMounted(async () => {
     height: 60vh;
     overflow-y: visible;
 }
-.container {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  width: 98%;
-  height: inherit;
-  margin: 0 auto;
-  overflow: hidden;
 
-  :deep(.tiny-steps) {
-    margin-top: 10px;
-  }
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 98%;
+    height: inherit;
+    margin: 0 auto;
+    overflow: hidden;
+
+    :deep(.tiny-steps) {
+        margin-top: 10px;
+    }
 }
+
 .content {
     display: flex;
     flex-direction: column;

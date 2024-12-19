@@ -78,7 +78,7 @@ import {
     FormItem as TinyFormItem, Layout as TinyLayout, Row as TinyRow, Col as TinyCol, Modal, Collapse as TinyCollapse,
     CollapseItem as TinyCollapseItem,
 } from '@opentiny/vue';
-import { queryDictionaryList, deleteDictionary } from '@/api/dictionary';
+import { queryDictionaryList, deleteDictionary } from '@/api/fetchInterface';
 import dictionaryForm from './components/form.vue';
 
 

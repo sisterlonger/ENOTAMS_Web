@@ -15,7 +15,7 @@ import {
   Grid as TinyGrid, GridColumn as TinyGridColumn, Button as TinyButton, DialogBox as TinyDialogBox, GridToolbar as TinyGridToolbar, Input as TinyInput, Form as TinyForm,
   FormItem as TinyFormItem, Layout as TinyLayout, Row as TinyRow, Col as TinyCol, Modal, Collapse as TinyCollapse, TinyTree, CollapseItem as TinyCollapseItem, TinyLink,
 } from '@opentiny/vue';
-import { queryMenuPermissionTreeList } from '@/api/menu';
+import { queryMenuPermissionTreeList } from '@/api/fetchInterface';
 
 const emit = defineEmits(['onChange']);
 const props = defineProps({

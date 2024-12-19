@@ -7,7 +7,7 @@ import setupInfoGuard from './info';
 
 function setupPageGuard(router: Router) {
   router.beforeEach(async (to) => {
-    console.log("to",to);
+    //console.log("to",to);
     // emit route change
     setRouteEmitter(to);
   });

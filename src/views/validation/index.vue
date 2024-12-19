@@ -63,7 +63,7 @@ import {
   FormItem as TinyFormItem, Layout as TinyLayout, Row as TinyRow, Col as TinyCol, Modal, Collapse as TinyCollapse,
   CollapseItem as TinyCollapseItem,
 } from '@opentiny/vue';
-import { queryValidationList, deleteValidation } from '@/api/validation';
+import { queryValidationList, deleteValidation } from '@/api/fetchInterface';
 import validationForm from './components/form.vue';
 
 

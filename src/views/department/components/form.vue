@@ -41,7 +41,7 @@ import {
     DialogBox as TinyDialogBox, Notify,
 } from '@opentiny/vue';
 import { iconWarning } from '@opentiny/vue-icon';
-import { queryDepartmentDetail, postDepartment, deleteDepartment } from '@/api/department';
+import { queryDepartmentDetail, postDepartment, deleteDepartment } from '@/api/fetchInterface';
 import Child from './child.vue';
 
 const props = defineProps({

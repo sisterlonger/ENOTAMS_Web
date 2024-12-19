@@ -1,5 +1,3 @@
-import { RoleType } from '@/types/roleType';
-
 export default {
   path: 'permission',
   name: 'permission',
@@ -8,7 +6,6 @@ export default {
   component: () => import('@/views/permission/index.vue'),
   meta: {
     locale: '权限管理',
-    requiresAuth: true,
     order: 11,
   },
 };

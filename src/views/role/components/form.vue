@@ -40,7 +40,7 @@ import {
 } from '@opentiny/vue'
 import { useRoute } from 'vue-router';
 import { iconWarning } from '@opentiny/vue-icon';
-import { queryRoleDetail, postRole } from '@/api/role';
+import { queryRoleDetail, postRole } from '@/api/fetchInterface';
 import permissionTree from '@/components/permissionTree/index.vue';
 
 const route = useRoute();

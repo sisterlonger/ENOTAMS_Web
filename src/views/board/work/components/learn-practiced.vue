@@ -61,7 +61,7 @@
     Loading,
   } from '@opentiny/vue';
   import { reactive, onMounted, watch, ref } from 'vue';
-  import { getUserPractic, getUserChange } from '@/api/board';
+  import { getUserPractic, getUserChange } from '@/api/fetchInterface';
 
   // 加载效果
   const state = reactive<{

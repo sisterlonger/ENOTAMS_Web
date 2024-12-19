@@ -40,7 +40,7 @@ import {
     Numeric as TinyNumeric,
 } from '@opentiny/vue'
 import { iconWarning } from '@opentiny/vue-icon';
-import { queryLogsDetail, postLogs } from '@/api/log';
+import { queryLogsDetail, postLogs } from '@/api/fetchInterface';
 
 
 const props = defineProps({

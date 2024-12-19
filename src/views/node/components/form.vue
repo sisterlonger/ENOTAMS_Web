@@ -35,7 +35,7 @@ import {
     Col as TinyCol,
 } from '@opentiny/vue'
 import { iconWarning } from '@opentiny/vue-icon';
-import { queryTemplateDetail, postTemplate } from '@/api/template';
+import { queryTemplateDetail, postTemplate } from '@/api/fetchInterface';
 
 
 const props = defineProps({

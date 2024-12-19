@@ -66,6 +66,8 @@
   import { useI18n } from 'vue-i18n';
   import { useUserStore } from '@/store';
   import useLoading from '@/hooks/loading';
+  import {sm2,sm3,sm4} from 'sm-crypto';
+
 
   const router = useRouter();
   const { t } = useI18n();
@@ -115,12 +117,13 @@
       try {
         await userStore.login({
           userCode: loginMail.userCode,
-          userPwd: loginMail.userPwd,
+          userPwd: sm3(loginMail.userPwd),
         });
         Modal.message({
           message: t('login.form.login.success'),
           status: 'success',
         });
+        // TODO 原登录逻辑，写上动态路由后，才能够回传到正确的路由，记得contant文件也要修改
         const { redirect, ...othersQuery } = router.currentRoute.value.query;
         router.push({
           name: (redirect as string) || 'node',

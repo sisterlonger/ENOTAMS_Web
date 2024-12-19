@@ -86,7 +86,7 @@ import {
   Grid as TinyGrid, GridColumn as TinyGridColumn, Button as TinyButton, DialogBox as TinyDialogBox, GridToolbar as TinyGridToolbar, Input as TinyInput, Form as TinyForm,
   FormItem as TinyFormItem, Layout as TinyLayout, Row as TinyRow, Col as TinyCol, Modal, Collapse as TinyCollapse, CollapseItem as TinyCollapseItem, Select as TinySelect,
 } from '@opentiny/vue';
-import { queryLogsList, deleteLogs } from '@/api/log';
+import { queryLogsList, deleteLogs } from '@/api/fetchInterface';
 import dictionaryForm from './components/form.vue';
 
 const pagerConfig = ref({

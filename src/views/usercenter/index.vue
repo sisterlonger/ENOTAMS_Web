@@ -1,16 +1,18 @@
 <template>
-    <Breadcrumb :items="['menu.usercenter']" />
-    <div class="general-top">
-        <headtop></headtop>
-    </div>
-
     <div>
-        <formgenerator v-if="preCondition" :formFields="formFields" />
+        <Breadcrumb :items="['menu.usercenter']" />
+        <div class="general-top">
+            <headtop></headtop>
+        </div>
+
+        <div>
+            <formgenerator v-if="preCondition" :formFields="formFields" />
+        </div>
     </div>
 </template>
 
 <script lang="ts" setup>
-import { getKeyWordJSON } from '@/api/keyword';
+import { getKeyWordJSON } from '@/api/fetchInterface';
 import { ref, reactive, onMounted } from 'vue';
 import {
     TinyForm,
@@ -40,7 +42,7 @@ const handleSubmit = () => {
 }
 // 初始化请求数据
 onMounted(async () => {
-    await getKeyWord();
+    //await getKeyWord();
 });
 
 </script>

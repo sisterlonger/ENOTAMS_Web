@@ -10,13 +10,13 @@
       </div>
     </div>
     <ul class="right-side">
-      <li>
+      <li v-if="false">
         <input id="navbar-search" class="input-icon" :placeholder="$t('setting.input.search')" />
       </li>
       <li>
         <div class="divider"></div>
       </li>
-      <li @click="changeLan">
+      <li v-if='false' @click="changeLan">
         <span v-if="i18.locale.value === 'zhCN'">中文</span>
         <span v-else>English</span>
         <img src="@/assets/images/lan.png" alt="lan" class="navbar-lan" />
@@ -40,9 +40,9 @@
     </tiny-user-head>
     <div class="trigger-user">
   <li v-for="(item, index) in userlist" :key="index" :value="item.label" @click="switchUser(item.value)">
-    <iconReplace v-if="item.value === 1"></iconReplace>
-    <iconUser v-if="item.value === 2"></iconUser>
-    <iconWriting v-if="item.value === 3"></iconWriting>
+    <iconPublicHome v-if="item.value === 1"></IconPublicHome>
+    <iconAssociation v-if="item.value === 2"></IconAssociation>
+    <iconUser v-if="item.value === 3"></iconUser>
     <iconCheckOut v-if="item.value === 4"></iconCheckOut>
     {{ $t(item.label) }}
   </li>
@@ -57,10 +57,10 @@ import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { UserHead as TinyUserHead, Modal } from '@opentiny/vue';
 import {
-  IconReplace,
+  IconAssociation,
   IconUser,
   IconCheckOut,
-  IconWriting,
+  IconPublicHome,
 } from '@opentiny/vue-icon';
 import { useAppStore, useUserStore } from '@/store';
 import router from '@/router';
@@ -69,10 +69,10 @@ import useLocale from '@/hooks/locale';
 import useUser from '@/hooks/user';
 
 const i18 = useI18n();
-const iconReplace = IconReplace();
+const iconAssociation = IconAssociation();
 const iconUser = IconUser();
 const iconCheckOut = IconCheckOut();
-const iconWriting = IconWriting();
+const iconPublicHome = IconPublicHome();
 const lan = ref(false);
 
 const appStore = useAppStore();
@@ -97,8 +97,8 @@ const setVisible = () => {
 
 // 用户设置
 const userlist = [
-  { label: 'messageBox.assemble', value: 1 },
-  { label: 'menu.node', value: 2 },
+  { label: 'menu.work', value: 1 },
+  { label: 'messageBox.assemble', value: 2 },
   { label: 'menu.usercenter', value: 3 },
   { label: 'messageBox.logout', value: 4 },
 ];
@@ -107,13 +107,13 @@ const userlist = [
 const switchUser = (e: number) => {
   switch (e) {
     case 1:
-      router.push({ name: 'Assemble' });
+      router.push({ name: 'work' });
       break;
     case 2:
-      router.push({ name: 'Node' });
+      router.push({ name: 'assemble' });
       break;
     case 3:
-      router.push({ name: 'UserCenter' });
+      router.push({ name: 'usercenter' });
 
       break;
     case 4:

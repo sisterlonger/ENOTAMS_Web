@@ -63,7 +63,7 @@ import {
     FormItem as TinyFormItem, Layout as TinyLayout, Row as TinyRow, Col as TinyCol, Modal, Collapse as TinyCollapse,
     CollapseItem as TinyCollapseItem,
 } from '@opentiny/vue';
-import { queryPermissionList, deletePermission } from '@/api/permission';
+import { queryPermissionList, deletePermission } from '@/api/fetchInterface';
 import dictionaryForm from './components/form.vue';
 
 

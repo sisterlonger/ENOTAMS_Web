@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // 获取select的option
-export function getUserData() {
+export function getUserData1() {
   return axios.get('/api/user/getdata');
 }
 

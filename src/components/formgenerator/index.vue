@@ -35,9 +35,7 @@
 
 <script setup>
 import { ref, reactive, onMounted, toRefs, watch, toRaw, defineExpose } from 'vue';
-import { queryDicType } from '@/api/dictionary';
-import { queryValidationDetail } from '@/api/validation';
-import { getKeyWordJSON } from '@/api/keyword';
+import { queryDicType,getKeyWordJSON } from '@/api/fetchInterface';
 import {
     TinyForm,
     TinyFormItem,

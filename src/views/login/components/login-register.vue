@@ -75,7 +75,7 @@
   } from '@opentiny/vue';
   import { useI18n } from 'vue-i18n';
   import useLoading from '@/hooks/loading';
-  import { registerUser } from '@/api/user';
+  import { registerUser } from '@/api/fetchInterface';
 
   // 注册
   const { t } = useI18n();

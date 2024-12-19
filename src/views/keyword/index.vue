@@ -70,7 +70,7 @@ import {
   FormItem as TinyFormItem, Layout as TinyLayout, Row as TinyRow, Col as TinyCol, Modal, Collapse as TinyCollapse,
   CollapseItem as TinyCollapseItem, Select as TinySelect,
 } from '@opentiny/vue';
-import { queryKeyWordList, deleteKeyWord } from '@/api/keyword';
+import { queryKeyWordList, deleteKeyWord } from '@/api/fetchInterface';
 import keywordForm from './components/form.vue';
 
 

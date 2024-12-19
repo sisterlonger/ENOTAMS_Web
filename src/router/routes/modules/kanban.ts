@@ -1,5 +1,3 @@
-import { RoleType } from '@/types/roleType';
-
 export default {
   path: 'board',
   name: 'board',
@@ -8,9 +6,7 @@ export default {
   component: () => import('@/views/board/index.vue'),
   meta: {
     locale: 'menu.board',
-    requiresAuth: true,
     order: 1,
-    roles: [RoleType.admin],
   },
   children: [
     {
@@ -21,8 +17,6 @@ export default {
       component: () => import('@/views/board/work/index.vue'),
       meta: {
         locale: '工作台',
-        requiresAuth: true,
-        roles: [RoleType.admin],
       },
     },
     {
@@ -33,8 +27,6 @@ export default {
       component: () => import('@/views/board/home/index.vue'),
       meta: {
         locale: '首页',
-        requiresAuth: true,
-        roles: [RoleType.admin],
       },
     },
   ],

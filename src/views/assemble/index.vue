@@ -23,7 +23,7 @@
 import { reactive, ref } from 'vue';
 import { TreeMenu as TinyTreeMenu, Layout as TinyLayout, Row as TinyRow, Col as TinyCol } from '@opentiny/vue';
 import { useUserStore } from '@/store';
-import { queryNodeTree, queryNodeTemplate } from '@/api/node';
+import { queryNodeTree, queryNodeTemplate } from '@/api/fetchInterface';
 import templateTable from './components/templateTable.vue';
 
 

@@ -64,7 +64,7 @@
 
 <script setup>
 import { ref, reactive, onMounted, defineProps, defineEmits, toRefs, watch } from 'vue';
-import { queryDicType } from '@/api/dictionary';
+import { queryDicType } from '@/api/fetchInterface';
 import {
     TinyForm,
     TinyFormItem,

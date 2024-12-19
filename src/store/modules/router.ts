@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { queryRoleMenu } from '@/api/role';
+import { queryRoleMenu } from '@/api/fetchInterface';
 import useUserStore from './user';
 
 export const useMenuStore = defineStore('menu', {

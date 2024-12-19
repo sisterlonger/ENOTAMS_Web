@@ -63,7 +63,7 @@ import {
   Loading,
   Notify,
 } from '@opentiny/vue'
-import { queryTemplateDetail } from '@/api/template';
+import { queryTemplateDetail } from '@/api/fetchInterface';
 import formgenerator from '@/components/formgenerator/index.vue';
 
 const childRef = ref<any>();

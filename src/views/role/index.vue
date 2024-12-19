@@ -78,7 +78,7 @@ import {
     FormItem as TinyFormItem, Layout as TinyLayout, Row as TinyRow, Col as TinyCol, Modal, Collapse as TinyCollapse,
     CollapseItem as TinyCollapseItem,
 } from '@opentiny/vue';
-import { queryRoleList, deleteRole } from '@/api/role';
+import { queryRoleList, deleteRole } from '@/api/fetchInterface';
 import roleForm from './components/form.vue';
 
 

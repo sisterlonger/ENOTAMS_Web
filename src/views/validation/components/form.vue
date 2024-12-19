@@ -38,8 +38,7 @@ import {
     Option as TinyOption,
 } from '@opentiny/vue'
 import { iconWarning } from '@opentiny/vue-icon';
-import { queryValidationDetail, postValidation } from '@/api/validation';
-import { queryDicType } from '@/api/dictionary';
+import { queryValidationDetail, postValidation, queryDicType } from '@/api/fetchInterface';
 
 
 const props = defineProps({

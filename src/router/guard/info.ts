@@ -1,4 +1,4 @@
-import { getUserInfo } from '@/api/user';
+import { getUserInfo } from '@/api/fetchInterface';
 //import { _i18 } from '@/locale';
 import { useUserStore } from '@/store';
 //import { useLocales } from '@/store/modules/locales';

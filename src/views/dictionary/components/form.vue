@@ -41,7 +41,7 @@ import {
     Numeric as TinyNumeric,
 } from '@opentiny/vue'
 import { iconWarning } from '@opentiny/vue-icon';
-import { queryDictionaryDetail, postDictionary } from '@/api/dictionary';
+import { queryDictionaryDetail, postDictionary } from '@/api/fetchInterface';
 
 
 const props = defineProps({

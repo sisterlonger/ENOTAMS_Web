@@ -25,7 +25,7 @@
 import { reactive, ref, watch } from 'vue';
 import { TreeMenu as TinyTreeMenu, Layout as TinyLayout, Row as TinyRow, Col as TinyCol, Guide as TinyGuide, Button as TinyButton, } from '@opentiny/vue';
 import { useUserStore } from '@/store';
-import { queryDepartmentTreeList, queryDepartmentDetail } from '@/api/department';
+import { queryDepartmentTreeList, queryDepartmentDetail } from '@/api/fetchInterface';
 import department from './components/department.vue';
 
 

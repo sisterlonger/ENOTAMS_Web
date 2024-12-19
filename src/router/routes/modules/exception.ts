@@ -1,5 +1,3 @@
-import { RoleType } from '@/types/roleType';
-
 export default {
   path: 'exception',
   name: 'exception',
@@ -8,9 +6,7 @@ export default {
   component: () => import('@/views/exception/index.vue'),
   meta: {
     locale: 'menu.exception',
-    requiresAuth: true,
     order: 6,
-    roles: [RoleType.admin, RoleType.user],
   },
   children: [
     {
@@ -21,8 +17,6 @@ export default {
       component: () => import('@/views/exception/403/index.vue'),
       meta: {
         locale: 'menu.exception.403',
-        requiresAuth: true,
-        roles: [RoleType.admin, RoleType.user],
       },
     },
     {
@@ -33,8 +27,6 @@ export default {
       component: () => import('@/views/exception/404/index.vue'),
       meta: {
         locale: 'menu.exception.404',
-        requiresAuth: true,
-        roles: [RoleType.admin, RoleType.user],
       },
     },
     {
@@ -45,8 +37,6 @@ export default {
       component: () => import('@/views/exception/500/index.vue'),
       meta: {
         locale: 'menu.exception.500',
-        requiresAuth: true,
-        roles: [RoleType.admin, RoleType.user],
       },
     },
   ],

@@ -48,8 +48,7 @@ import {
     Cascader as TinyCascader,
 } from '@opentiny/vue'
 import { iconWarning } from '@opentiny/vue-icon';
-import { queryUserDetail, postUser } from '@/api/user';
-import { queryDepartmentTreeList } from '@/api/department';
+import { queryUserDetail, postUser,queryDepartmentTreeList } from '@/api/fetchInterface';
 
 const props = defineProps({
     userID: Number,

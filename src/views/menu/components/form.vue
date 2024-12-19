@@ -55,8 +55,7 @@ import {
     Option as TinyOption,
 } from '@opentiny/vue'
 import { iconWarning } from '@opentiny/vue-icon';
-import { queryMenuDetail, postMenu } from '@/api/menu';
-import { queryPermissionList } from '@/api/permission';
+import { queryMenuDetail, postMenu, queryPermissionList } from '@/api/fetchInterface';
 import components from '@/components';
 import permission from '@/directive/permission';
 
@@ -162,7 +161,7 @@ onMounted(async () => {
     if (menuID.value) {
         await fetchData();
     }
-    else{
+    else {
         createData.parentID = parentID.value;
     }
     await fetPermissions();

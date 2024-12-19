@@ -58,8 +58,7 @@ import {
     Numeric as TinyNumeric,
 } from '@opentiny/vue'
 import { iconWarning } from '@opentiny/vue-icon';
-import { queryKeyWordDetail, postKeyWord, queryKeyWordList } from '@/api/keyword';
-import { queryValidationList } from '@/api/validation';
+import { queryKeyWordDetail, postKeyWord, queryKeyWordList, queryValidationList } from '@/api/fetchInterface';
 
 
 const props = defineProps({

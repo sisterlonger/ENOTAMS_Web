@@ -6,8 +6,8 @@ import {
   updateUserInfo,
   LoginData,
   LoginDataMail,
-} from '@/api/user';
-import { queryRolePermission,queryRoleMenu } from '@/api/role';
+  queryRolePermission,
+} from '@/api/fetchInterface';
 import { setToken, clearToken } from '@/utils/auth';
 import { removeRouteListener } from '@/utils/route-listener';
 import { UserState, UserInfo } from './types';

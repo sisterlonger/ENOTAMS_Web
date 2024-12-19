@@ -32,7 +32,7 @@ import {
     Numeric as TinyNumeric,
 } from '@opentiny/vue'
 import { iconWarning } from '@opentiny/vue-icon';
-import {  postDepartment } from '@/api/department';
+import {  postDepartment } from '@/api/fetchInterface';
 
 
 const props = defineProps({
