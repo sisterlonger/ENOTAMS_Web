@@ -43,7 +43,7 @@
     <iconPublicHome v-if="item.value === 1"></IconPublicHome>
     <iconAssociation v-if="item.value === 2"></IconAssociation>
     <iconUser v-if="item.value === 3"></iconUser>
-    <iconCheckOut v-if="item.value === 4"></iconCheckOut>
+    <iconEditorRedo v-if="item.value === 4"></iconEditorRedo>
     {{ $t(item.label) }}
   </li>
   </div>
@@ -59,7 +59,7 @@ import { UserHead as TinyUserHead, Modal } from '@opentiny/vue';
 import {
   IconAssociation,
   IconUser,
-  IconCheckOut,
+  IconEditorRedo,
   IconPublicHome,
 } from '@opentiny/vue-icon';
 import { useAppStore, useUserStore } from '@/store';
@@ -71,7 +71,7 @@ import useUser from '@/hooks/user';
 const i18 = useI18n();
 const iconAssociation = IconAssociation();
 const iconUser = IconUser();
-const iconCheckOut = IconCheckOut();
+const iconEditorRedo = IconEditorRedo();
 const iconPublicHome = IconPublicHome();
 const lan = ref(false);
 

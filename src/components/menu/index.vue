@@ -33,20 +33,9 @@ menuStore.getMenuList();
 const tree = ref();
 const expandeArr = ref();
 let routerTitle = [] as any;
-// 获取路由数据
-const appRoute = computed(() => {
-  return router
-    .getRoutes()
-    .find((el: { name: string; }) => el.name === 'root') as RouteRecordNormalized;
-});
-const copyRouter = JSON.parse(JSON.stringify(appRoute.value.children));
-copyRouter.sort((a: RouteRecordNormalized, b: RouteRecordNormalized) => {
-  return (a.meta.order || 0) - (b.meta.order || 0);
-});
 
 const userStore = useUserStore();
 const role = computed(() => userStore.role);
-let treeData = ref(copyRouter);
 const filtter = (arr: any[]) => {
   arr.forEach((item: any) => {
     //console.log("item",item);

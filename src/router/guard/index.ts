@@ -6,14 +6,15 @@ import { setupTabsGuard } from './tabs';
 import setupInfoGuard from './info';
 
 function setupPageGuard(router: Router) {
+  
   router.beforeEach(async (to) => {
     //console.log("to",to);
     // emit route change
     setRouteEmitter(to);
   });
   setupMenuGuard(router);
-  setupPermissionGuard(router);
   setupTabsGuard(router);
+  setupPermissionGuard(router);
 }
 
 export default function createRouteGuard(router: Router) {

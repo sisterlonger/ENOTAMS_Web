@@ -19,7 +19,7 @@ export const useMenuStore = defineStore('menu', {
       this.menuList = data;
 
       this.menuListFlat();
-      //console.log(data);
+      console.log("data",data);
       return data;
     },
     menuListFlat() {

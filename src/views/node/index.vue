@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <Breadcrumb :items="['menu.node']" />
+        <Breadcrumb :items="['menu.notam', 'menu.node']" />
         <div class="content">
             <div class="content-main">
                 <tiny-layout style="width: 100%">

@@ -15,7 +15,7 @@
 import router from '@/router';
 
 function goHome() {
-  router.push({ name: 'Work' });
+  router.push({ name: 'Home' });
 }
 </script>
 

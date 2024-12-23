@@ -126,7 +126,7 @@
         // TODO 原登录逻辑，写上动态路由后，才能够回传到正确的路由，记得contant文件也要修改
         const { redirect, ...othersQuery } = router.currentRoute.value.query;
         router.push({
-          name: (redirect as string) || 'node',
+          name: (redirect as string) || 'Home',
           query: {
             ...othersQuery,
           },

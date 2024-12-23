@@ -118,7 +118,7 @@
 
         const { redirect, ...othersQuery } = router.currentRoute.value.query;
         router.push({
-          name: (redirect as string) || 'Node',
+          name: (redirect as string) || 'Home',
           query: {
             ...othersQuery,
           },
@@ -139,7 +139,7 @@
         });
         const { redirect, ...othersQuery } = router.currentRoute.value.query;
         router.push({
-          name: (redirect as string) || 'Node',
+          name: (redirect as string) || 'Home',
           query: {
             ...othersQuery,
           },

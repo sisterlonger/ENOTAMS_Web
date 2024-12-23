@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <Breadcrumb :items="['menu.log']" />
+    <Breadcrumb :items="['menu.systemManager', 'menu.log']" />
     <div class="content">
       <div class="content-main">
         <!--查询组件、选择-->
@@ -15,7 +15,8 @@
                 </tiny-col>
                 <tiny-col :span="4">
                   <tiny-form-item label="日志级别">
-                    <tiny-select v-model="formData.level" :options="statusOptions" placeholder="请输入日志级别" clearable></tiny-select>
+                    <tiny-select v-model="formData.level" :options="statusOptions" placeholder="请输入日志级别"
+                      clearable></tiny-select>
                   </tiny-form-item>
                 </tiny-col>
                 <tiny-col :span="4">
@@ -67,8 +68,7 @@
           <tiny-grid-column field="exception" title="异常"></tiny-grid-column>
           <tiny-grid-column title="操作" width="200" align="center">
             <template #default="data">
-              <tiny-button size="mini" type="primary"
-                @click="editRowEvent(data.row)">查看</tiny-button>
+              <tiny-button size="mini" type="primary" @click="editRowEvent(data.row)">查看</tiny-button>
             </template>
           </tiny-grid-column>
         </tiny-grid>
@@ -188,19 +188,21 @@ function dialogClose() {
 .tiny-grid {
   overflow-y: auto;
 }
-.container {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    width: 98%;
-    height: inherit;
-    margin: 0 auto;
-    overflow: hidden;
 
-    :deep(.tiny-steps) {
-        margin-top: 10px;
-    }
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 98%;
+  height: inherit;
+  margin: 0 auto;
+  overflow: hidden;
+
+  :deep(.tiny-steps) {
+    margin-top: 10px;
+  }
 }
+
 .content {
   display: flex;
   flex-direction: column;

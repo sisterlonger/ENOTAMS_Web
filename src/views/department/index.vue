@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <Breadcrumb :items="['menu.department']" />
+    <Breadcrumb :items="['menu.systemManager', 'menu.department']" />
     <div class="content">
       <div class="content-main">
         <tiny-layout>
@@ -140,6 +140,7 @@ const getCurrentNode = () => {
 .content-main {
   padding: 30px 15px;
 }
+
 /*
 @import '@/assets/style/exception.less';
 /* 引入公共样式 */

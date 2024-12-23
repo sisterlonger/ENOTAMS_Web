@@ -1,7 +1,6 @@
 export * from "./board";
 export * from "./department";
 export * from "./dictionary";
-export * from "./interceptor";
 export * from "./keyword";
 export * from "./list";
 export * from "./log";

@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <Breadcrumb :items="['menu.validation']" />
+    <Breadcrumb :items="['menu.notam', 'menu.validation']" />
     <div class="content">
       <div class="content-main">
         <!--查询组件、选择-->

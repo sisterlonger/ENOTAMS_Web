@@ -32,34 +32,7 @@ export default function setupInfoGuard(router: Router) {
       NProgress.done();
       return;
     }
-    /*
-    if (localesStore.shouldFetch) {
-      await localesStore.fetchLang();
-      await localesStore.fetchLocalTable();
-    }
-    if (localesStore.shouldMerge) {
-      const entries = Object.entries(localesStore.localTable);
-      for (let i = 0; i < entries.length; i += 1) {
-        const lang = entries[i][0];
-        const value = entries[i][1];
-        _i18?.global.mergeLocaleMessage(lang, value);
-      }
-    }
-    localesStore.$patch({
-      shouldFetch: false,
-      shouldMerge: false,
-    });*/
-
     userStore.setInfo(data);
-    /*
-    userStore.setInfo({
-      role: data.role[0].name,
-      job: data.role[0].name,
-      roleId: data.role[0].id,
-    });
-    userStore.rolePermission = (data.role as unknown as Role[])
-      .flatMap((role) => role.permission)
-      .map((permission) => permission.name);*/
     next();
     NProgress.done();
   });

@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <Breadcrumb :items="['menu.dictionary']" />  
+        <Breadcrumb :items="['menu.systemManager', 'menu.permission']" />
         <div class="content">
             <div class="content-main">
                 <!--查询组件、选择-->
@@ -10,7 +10,8 @@
                             <tiny-row>
                                 <tiny-col :span="4">
                                     <tiny-form-item label="权限名">
-                                        <tiny-input v-model="formData.permissionName" placeholder="请输入权限名" clearable></tiny-input>
+                                        <tiny-input v-model="formData.permissionName" placeholder="请输入权限名"
+                                            clearable></tiny-input>
                                     </tiny-form-item>
                                 </tiny-col>
                                 <tiny-col :span="4">
@@ -43,8 +44,7 @@
                     <tiny-grid-column field="desc" title="描述"></tiny-grid-column>
                     <tiny-grid-column title="操作" width="200" align="center">
                         <template #default="data">
-                            <tiny-button size="mini" type="primary"
-                                @click="editRowEvent(data.row)">编辑</tiny-button>
+                            <tiny-button size="mini" type="primary" @click="editRowEvent(data.row)">编辑</tiny-button>
                         </template>
                     </tiny-grid-column>
                 </tiny-grid>
@@ -157,6 +157,7 @@ function dialogClose() {
 .tiny-grid {
     overflow-y: auto;
 }
+
 .container {
     display: flex;
     flex-direction: column;

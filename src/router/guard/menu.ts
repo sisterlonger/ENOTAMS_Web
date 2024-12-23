@@ -124,7 +124,10 @@ export const setupMenuGuard = (router: Router) => {
       if (!router.hasRoute(route.name)) {
         router.addRoute('root', route);
       }
-    });*/
-    next({ ...to, replace: true });
+    });
+    // 刷新后变空白的原因
+    //next({ ...to, replace: true });
+    */
+    next();
   });
 };
