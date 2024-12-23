@@ -88,13 +88,7 @@ const fetchData = async () => {
     });
     try {
         const { data } = await queryLogsDetail({ id: operationID.value });
-        createData.operationID = data.operationID;
-        createData.level = data.level;
-        createData.logger = data.logger;
-        createData.message = data.message;
-        createData.exception = data.exception;
-        createData.object = data.object;
-        createData.module = data.module;
+        Object.assign(createData, data);
     }
     catch (err) {
         Modal.alert('获取数据错误');

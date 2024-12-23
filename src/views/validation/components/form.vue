@@ -88,12 +88,7 @@ const fetchData = async () => {
     });
     try {
         const { data } = await queryValidationDetail({ id: validationID.value });
-        createData.validationID = data.validationID;
-        createData.validationName = data.validationName;
-        createData.remark = data.remark;
-        createData.editMask = data.editMask;
-        createData.dicType = data.dicType;
-        createData.required = data.required;
+        Object.assign(createData, data);
     }
     catch (err) {
         Modal.alert('获取数据错误');

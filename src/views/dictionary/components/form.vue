@@ -91,13 +91,7 @@ const fetchData = async () => {
     try {
         if (dicID && dicID.value !== 0) {
             const { data } = await queryDictionaryDetail({ id: dicID.value || 0 });
-            createData.dicID = data.dicID;
-            createData.dicType = data.dicType;
-            createData.dicKey = data.dicKey;
-            createData.dicValue = data.dicValue;
-            createData.orderID = data.orderID;
-            createData.dicDescription = data.dicDescription;
-            createData.moduleName = data.moduleName;
+            Object.assign(createData, data);
         }
     }
     catch (err) {

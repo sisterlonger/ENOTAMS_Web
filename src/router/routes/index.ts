@@ -14,5 +14,5 @@ Object.keys(modules).forEach((key) => {
   appRoutes.push(...moduleList);
 });
 //console.log(appRoutes);
-
+// TODO 添加动态路由的关键
 export default appRoutes;

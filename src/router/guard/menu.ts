@@ -117,17 +117,6 @@ export const setupMenuGuard = (router: Router) => {
       next();
       return;
     }
-    const data = await menuStore.getMenuList();
-    const routes = toRoutes(data);
-    /* TODO 也要记得改constant和登录页的
-    routes.forEach((route) => {
-      if (!router.hasRoute(route.name)) {
-        router.addRoute('root', route);
-      }
-    });
-    // 刷新后变空白的原因
-    //next({ ...to, replace: true });
-    */
     next();
   });
 };

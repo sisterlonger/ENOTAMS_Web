@@ -132,25 +132,9 @@ const fetchData = async () => {
     });
     try {
         const { data } = await queryKeyWordDetail({ id: keyWordID.value });
-        createData.keyWordID = data.keyWordID;
-        createData.keyWord = data.keyWord;
-        createData.inputType = data.inputType;
-        createData.state = data.state;
-        createData.placeholder = data.placeholder;
-        createData.dicType = data.dicType;
-        createData.prefix = data.prefix;
-        createData.suffix = data.suffix;
-        createData.width = data.width;
+        Object.assign(createData, data);
         createData.relationIDList = data.relationID ? data.relationID.split(",").map(function (num: string) { return Number(num); }) : [];
         createData.childrenIDList = data.childrenID ? data.childrenID.split(",").map(function (num: string) { return Number(num); }) : [];
-        //createData.validationIDList = data.validationID ? data.validationID.split(",").map(function (num:string) {return Number(num);}) : [];
-        createData.validationIDList = data.validationIDList;
-        createData.relationID = data.relationID;
-        createData.childrenID = data.childrenID;
-        createData.validationID = data.validationID;
-        createData.template = data.template;
-        createData.createTime = data.createTime;
-        //console.log("createData",createData);
     }
     catch (err) {
         Modal.alert('获取数据错误');

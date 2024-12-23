@@ -17,7 +17,7 @@ export const useMenuStore = defineStore('menu', {
       }
       const { data } = await queryRoleMenu();
       this.menuList = data;
-
+      // 在这里添加默认路由
       this.menuListFlat();
       console.log("data",data);
       return data;

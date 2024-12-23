@@ -79,10 +79,7 @@ const fetchData = async () => {
     });
     try {
         const { data } = await queryTemplateDetail({ id: templateID.value });
-        createData.templateID = data.templateID;
-        createData.template = data.template;
-        createData.example = data.example;
-        createData.remark = data.remark;
+        Object.assign(createData, data);
     }
     catch (err) {
         Modal.alert('获取数据错误');

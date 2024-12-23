@@ -6,11 +6,11 @@ function checkPermission(el: HTMLElement, binding: DirectiveBinding) {
   const userStore = useUserStore();
   const { menuPermissions } = userStore;
   const permissionList = menuPermissions;
-  //console.log("value",value);
-  //console.log("permissionList",permissionList);
+  //console.log("value", value);
+  //console.log("permissionList", permissionList);
   const hasPermission =
-    permissionList.filter((item) => {return (item.menuName === value[0] && item.permissionName === value[1])});
-  if (!hasPermission) {
+    permissionList.filter((item) => { return (item.menuName === value[0] && item.permissionName === value[1]) });
+  if (hasPermission.length === 0) {
     el.remove();
   }
 }

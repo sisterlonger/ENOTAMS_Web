@@ -116,15 +116,7 @@ const fetchData = async () => {
     });
     try {
         const { data } = await queryUserDetail({ id: userID.value });
-        createData.userID = data.userID;
-        createData.userCode = data.userCode;
-        createData.userName = data.userName;
-        createData.userPwd = data.userPwd;
-        createData.companySMSCode = data.companySMSCode;
-        createData.role = data.role;
-        createData.depID = data.depID;
-        createData.mobile = data.mobile;
-        createData.email = data.email;
+        Object.assign(createData, data);
     }
     catch (err) {
         Modal.alert('获取数据错误');

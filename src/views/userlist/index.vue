@@ -31,7 +31,9 @@
                                 <tiny-col :span="4">
                                     <tiny-form-item>
                                         <div>
-                                            <tiny-button class="search-btn" type="primary" @click="queryClick">
+                                            <tiny-button class="search-btn" type="primary"
+                                                v-permission="[router.currentRoute.value.meta.locale,'查询']"
+                                                @click="queryClick">
                                                 查询
                                             </tiny-button>
                                         </div>
@@ -75,6 +77,7 @@ import {
     FormItem as TinyFormItem, Layout as TinyLayout, Row as TinyRow, Col as TinyCol, Modal, Collapse as TinyCollapse,
     CollapseItem as TinyCollapseItem, Cascader as TinyCascader,
 } from '@opentiny/vue';
+import router from '@/router';
 import { queryUserList, deleteUser, queryDepartmentTreeList } from '@/api/fetchInterface';
 import userForm from './components/form.vue';
 

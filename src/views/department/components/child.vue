@@ -80,7 +80,6 @@ const state = reactive<{
 // 定义派发事件
 const emit = defineEmits(['close']);
 
-// TODO 新增节点有问题
 function handleSubmit() {
     ruleFormRef.value.validate(async (valid) => {
         if (valid) {

@@ -140,12 +140,7 @@ const fetchData = async () => {
   });
   try {
     const { data } = await queryTemplateDetail({ id: templateID.value });
-    createData.templateID = data.templateID;
-    createData.template = data.template;
-    createData.example = data.example;
-    createData.picturePath = data.picturePath;
-    createData.state = data.state;
-    createData.remark = data.remark;
+    Object.assign(createData, data);
     handleKeyWord();
     //preCondition.value = true;
     preCondition.value = true;

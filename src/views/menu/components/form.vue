@@ -135,16 +135,7 @@ const fetchData = async () => {
     });
     try {
         const { data } = await queryMenuDetail({ id: menuID.value });
-        createData.menuID = data.menuID;
-        createData.parentID = data.parentID;
-        createData.menuType = data.menuType;
-        createData.component = data.component;
-        createData.icon = data.icon;
-        createData.order = data.order;
-        createData.path = data.path;
-        createData.menuName = data.menuName;
-        createData.locale = data.locale;
-        createData.permissionIDs = data.permissionIDs;
+        Object.assign(createData, data);
         checked.value = data.permissionIDs.map((item) => (item.permissionID));
     }
     catch (err) {

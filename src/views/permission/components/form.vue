@@ -66,9 +66,7 @@ const fetchData = async () => {
     });
     try {
         const { data } = await queryPermissionDetail({ id: permissionID.value });
-        createData.permissionID = data.permissionID;
-        createData.desc = data.desc;
-        createData.permissionName = data.permissionName;
+        Object.assign(createData, data);
     } 
     catch (err) {
         Modal.alert('获取数据错误');

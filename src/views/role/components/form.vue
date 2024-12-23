@@ -1,15 +1,22 @@
 <template>
     <div class="demo-form">
-        <div v-permission="['Home','新增']">test</div>
         <tiny-form ref="ruleFormRef" :model="createData" :rules="rules" label-width="100px">
             <tiny-form-item label="角色名" prop="roleName">
                 <tiny-input v-model="createData.roleName"></tiny-input>
             </tiny-form-item>
             <tiny-form-item label="角色类型" prop="roleType" :validate-icon="validateIcon">
-                <tiny-input v-model="createData.roleType"></tiny-input>
+                <tiny-select v-model="createData.roleType" :placeholder="'请选择角色类型'" filterable>
+                    <tiny-option key="普通" label="普通" value="普通"></tiny-option>
+                    <tiny-option key="管理" label="管理" value="管理"></tiny-option>
+                </tiny-select>
             </tiny-form-item>
             <tiny-form-item label="角色等级" prop="roleLevel">
-                <tiny-input v-model="createData.roleLevel"></tiny-input>
+                <tiny-select v-model="createData.roleLevel" :placeholder="'请选择角色等级'" filterable>
+                    <tiny-option key="科室级" label="科室级" value="科室级"></tiny-option>
+                    <tiny-option key="处室级" label="处室级" value="处室级"></tiny-option>
+                    <tiny-option key="局级" label="局级" value="局级"></tiny-option>
+                    <tiny-option key="平台级" label="平台级" value="平台级"></tiny-option>
+                </tiny-select>
             </tiny-form-item>
             <tiny-form-item label="备注" prop="remark">
                 <tiny-input v-model="createData.remark"></tiny-input>
@@ -35,6 +42,8 @@ import {
     Input as TinyInput,
     Button as TinyButton,
     Loading,
+    Select as TinySelect,
+    Option as TinyOption,
     Modal,
     Numeric as TinyNumeric,
 } from '@opentiny/vue'
@@ -97,12 +106,7 @@ const fetchData = async () => {
     });
     try {
         const { data } = await queryRoleDetail({ id: roleID.value });
-        createData.roleID = data.roleID;
-        createData.roleType = data.roleType;
-        createData.roleName = data.roleName;
-        createData.roleLevel = data.roleLevel;
-        createData.remark = data.remark;
-        createData.menuPermissions = data.menuPermissions;
+        Object.assign(createData, data);
     } 
     catch (err) {
         Modal.alert('获取数据错误');

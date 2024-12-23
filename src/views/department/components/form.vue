@@ -89,15 +89,8 @@ const fetchData = async () => {
     });*/
     try {
         const { data } = await queryDepartmentDetail({ id: depID.value });
-        createData.depID = data.depID;
-        createData.depName = data.depName;
-        createData.field = data.field;
-        createData.parentDepID = data.parentDepID;
-        createData.depCode = data.depCode;
-        createData.parentDepCode = data.parentDepCode;
-        createData.grade = data.grade;
-        createData.fullName = data.fullName;
-        console.log(createData);
+        Object.assign(createData, data);
+        createData.fullName = data.fullName || data.depName;
     }
     catch (err) {
         Modal.alert('获取数据错误');
