@@ -3,7 +3,7 @@
     <div class="left-side">
       <div style="display: flex; align-items: center">
         <img src="@/assets/images/opentiny-logo.png" alt="logo" @click="jumpUrl" />
-        <h5 @click="jumpUrl">ENOTAMS</h5>
+        <h5 @click="jumpUrl">ENOTAMS:V1</h5>
         <div class="divider"></div>
         <!-- <img class="vue-icon" alt="logo" src="@/assets/images/pro.png" />
         <h4>TinyPro of Vue</h4> -->
@@ -126,7 +126,9 @@ const switchUser = (e: number) => {
 
 // 点击图标跳转首页
 const jumpUrl = () => {
-  window.location.href = `${window.location.protocol}//${window.location.host}`;
+  router.push({ name: 'home' });
+  // 这是回登录页
+  // window.location.href = `${window.location.protocol}//${window.location.host}`;
 };
 </script>
 

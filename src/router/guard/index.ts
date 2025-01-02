@@ -12,6 +12,7 @@ function setupPageGuard(router: Router) {
     // emit route change
     setRouteEmitter(to);
   });
+  console.log(router.getRoutes());
   setupMenuGuard(router);
   setupTabsGuard(router);
   setupPermissionGuard(router);

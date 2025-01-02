@@ -5,7 +5,7 @@
         <div class="login-header">
           <div class="login-logo">
             <img class="login-logo-img" alt="Tiny Design" src="@/assets/images/pro.png" />
-            <span class="login-logo-text">ENOTAMS</span>
+            <span class="login-logo-text">ENOTAMS:V1</span>
           </div>
           <div class="login-desc">{{ $t('login.main.text') }}</div>
         </div>

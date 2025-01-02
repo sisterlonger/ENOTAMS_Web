@@ -10,7 +10,6 @@ NProgress.configure({ showSpinner: false }); // NProgress Configuration
 const router = createRouter({
   history: createWebHistory(),
   routes: [
-    // 本地地址
     ...constant,
   ],
   scrollBehavior() {

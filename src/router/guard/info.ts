@@ -19,6 +19,7 @@ export default function setupInfoGuard(router: Router) {
     }
     const userStore = useUserStore();
     //const localesStore = useLocales();
+    /* 修复第一次登录无法正常登录的问题
     const { data } = (await getUserInfo()) ?? { data: null };
     if (!data) {
       next({
@@ -32,7 +33,7 @@ export default function setupInfoGuard(router: Router) {
       NProgress.done();
       return;
     }
-    userStore.setInfo(data);
+    userStore.setInfo(data);*/
     next();
     NProgress.done();
   });

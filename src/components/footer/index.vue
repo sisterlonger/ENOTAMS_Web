@@ -1,6 +1,6 @@
 <template>
   <div class="footer">
-    <a class="foot-link" @click="goHome">ENOTAMS</a>
+    <a class="foot-link" @click="goHome">ENOTAMS:V1</a>
     <div class="divider"></div>
     <a href="/">{{ $t('setting.foot.title') }}</a>
     <!-- 还未开源 先注释掉 -->

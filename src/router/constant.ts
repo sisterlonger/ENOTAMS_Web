@@ -2,7 +2,6 @@
 
 import DefaultLayout from '@/layout/default-layout.vue';
 import { RouteRecordRaw } from 'vue-router';
-import appRoutes from './routes';
 
 export default [
   {
@@ -22,12 +21,13 @@ export default [
       requiresAuth: false,
     },
   },
+  /*
   {
     name: 'root',
     path: import.meta.env.VITE_CONTEXT,
     component: DefaultLayout,
     children: appRoutes,
-  },
+  },*/
   {
     path: import.meta.env.VITE_CONTEXT + ':pathMatch(.*)*',
     name: 'notFound',
