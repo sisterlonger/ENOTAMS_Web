@@ -1,5 +1,6 @@
 /**
- * If you use the template method for development, you can use the unplugin-vue-components plugin to enable on-demand loading support.
+ * If you use the template method for development, you can use 
+ * the unplugin-vue-components plugin to enable on-demand loading support.
  * 按需引入
  * https://github.com/antfu/unplugin-vue-components
  * https://arco.design/vue/docs/start

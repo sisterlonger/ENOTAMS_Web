@@ -1,5 +1,6 @@
 /**
- * Used to package and output gzip. Note that this does not work properly in Vite, the specific reason is still being investigated
+ * Used to package and output gzip. Note that this does not work 
+ * properly in Vite, the specific reason is still being investigated
  * gzip压缩
  * https://github.com/anncwb/vite-plugin-compression
  */

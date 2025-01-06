@@ -9,12 +9,12 @@ export default [
     redirect: `${import.meta.env.VITE_CONTEXT}login`,
   },
   {
-    path: '/' + import.meta.env.VITE_CONTEXT,
+    path: `/${import.meta.env.VITE_CONTEXT}`,
     redirect: `${import.meta.env.VITE_CONTEXT}login`,
   },
   // 线上地址
   {
-    path: import.meta.env.VITE_CONTEXT + 'login',
+    path: `${import.meta.env.VITE_CONTEXT}login`,
     name: 'login',
     component: () => import('@/views/login/index.vue'),
     meta: {
@@ -29,13 +29,13 @@ export default [
     children: appRoutes,
   },*/
   {
-    path: import.meta.env.VITE_CONTEXT + ':pathMatch(.*)*',
+    path: `${import.meta.env.VITE_CONTEXT}:pathMatch(.*)*`,
     name: 'notFound',
     component: () => import('@/views/not-found/index.vue'),
   },
   {
     name: 'redirect',
-    path: import.meta.env.VITE_CONTEXT + 'redirect',
+    path: `${import.meta.env.VITE_CONTEXT}redirect`,
     component: () => import('@/views/redirect.vue'),
   },
 ] as RouteRecordRaw[];
