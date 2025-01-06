@@ -24,7 +24,7 @@ export function queryDictionaryDetail(params: { id: number }) {
     });
 }
 export function deleteDictionary(ids: []) {
-    return axios.post(`/dictionary/delete`, ids);
+    return axios.post('/dictionary/delete', ids);
 }
 export function postDictionary(data: DictionaryVM) {
     return axios.post<DictionaryVM>('/dictionary/post', data);

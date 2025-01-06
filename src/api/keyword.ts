@@ -17,8 +17,8 @@ export interface KeyWordVM {
     width: string;
     childrenIDList: object;
     relationIDList: object;
-    childrenID: "",
-    relationID: "",
+    childrenID: '',
+    relationID: '',
     createTime: null,
 }
 

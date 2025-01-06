@@ -40,7 +40,7 @@ export default {
   'login.banner.subSlogan3': '实现灵活的区块式开发',
   'login.icon.language': '语言',
   'login.tip.info': '用户名：admin，密码 admin',
-  'login.tip.mail': "用户名：姓名全拼，默认密码 a000000@",
+  'login.tip.mail': '用户名：姓名全拼，默认密码 a000000@',
   'login.tip.right': '请输入正确的用户名密码',
   'login.main.text': '为实现航行通告和航空情报智能化服务提供解决方案',
 };

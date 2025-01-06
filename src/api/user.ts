@@ -80,9 +80,9 @@ export function queryUserList(params: UserSearch) {
 }
 
 export function deleteUser(ids: []) {
-  return axios.post(`/user/delete`, ids);
+  return axios.post('/user/delete', ids);
 }
 
 export function postUser(data: UserVM) {
-  return axios.post<UserVM>(`/user/post`, data);
+  return axios.post<UserVM>('/user/post', data);
 }

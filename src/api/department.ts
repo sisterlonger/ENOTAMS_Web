@@ -31,5 +31,5 @@ export function deleteDepartment(ids: []) {
     return axios.post('/department/delete',  ids );
 }
 export function postDepartment(data: DepartmentVM) {
-    return axios.post<DepartmentVM>(`/department/post`, data);
+    return axios.post<DepartmentVM>('/department/post', data);
 }

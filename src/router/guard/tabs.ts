@@ -1,5 +1,5 @@
-import { useTabStore } from "@/store";
-import { Router } from "vue-router";
+import { useTabStore } from '@/store';
+import { Router } from 'vue-router';
 
 export const setupTabsGuard = (router:Router) => {
   router.beforeEach((to, from, next) => {
