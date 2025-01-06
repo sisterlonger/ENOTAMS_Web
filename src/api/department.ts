@@ -28,7 +28,7 @@ export function queryDepartmentDetail(params: { id: number }) {
     });
 }
 export function deleteDepartment(ids: []) {
-    return axios.post('/department/delete', ids );
+    return axios.post('/department/delete', ids);
 }
 export function postDepartment(data: DepartmentVM) {
     return axios.post<DepartmentVM>('/department/post', data);

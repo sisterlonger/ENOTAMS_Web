@@ -21,7 +21,7 @@ export default function usePermission() {
             return el.includes('*') || el.includes(role);
           })
         )
-          return { name: firstElement.name };
+        return { name: firstElement.name };
         if (firstElement?.children) {
           cloneRouters.push(...firstElement.children);
         }

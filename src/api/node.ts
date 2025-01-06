@@ -21,7 +21,7 @@ export function queryNodeDetail(params: { id: number }) {
     });
 }
 export function deleteNode(ids: []) {
-    return axios.post('/node/delete', ids );
+    return axios.post('/node/delete', ids);
 }
 export function postNode(data: NodeVM) {
     return axios.post<NodeVM>('/node/post', data);
