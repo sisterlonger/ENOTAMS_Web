@@ -36,6 +36,6 @@ export function deleteKeyWord(ids: []) {
 export function postKeyWord(data: KeyWordVM) {
     return axios.post<KeyWordVM>('/keyword/post', data);
 }
-export function getKeyWordJSON(params: {model:string}) {
-    return axios.get('/keyword/getkeywordJSON', { params } );
+export function getKeyWordJSON(params: { model: string }) {
+    return axios.get('/keyword/getkeywordJSON', { params });
 }

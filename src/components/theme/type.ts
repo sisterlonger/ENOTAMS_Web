@@ -37,7 +37,7 @@ const DarkTheme = {
     'ti-base-common-title-color': '#272727',
     'ti-base-icon-color': '#fff'
   },
-}
+};
 
 const PeachesTheme = {
   id: 'tiny-peaches-theme',

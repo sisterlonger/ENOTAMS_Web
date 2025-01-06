@@ -2,7 +2,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import NProgress from 'nprogress'; // progress bar
 
-import createRouteGuard from './guard'
+import createRouteGuard from './guard';
 import constant from './constant';
 
 NProgress.configure({ showSpinner: false }); // NProgress Configuration

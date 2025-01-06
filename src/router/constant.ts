@@ -1,6 +1,6 @@
 /* eslint-disable prefer-template */
 
-import DefaultLayout from '@/layout/default-layout.vue';
+//import DefaultLayout from '@/layout/default-layout.vue';
 import { RouteRecordRaw } from 'vue-router';
 
 export default [

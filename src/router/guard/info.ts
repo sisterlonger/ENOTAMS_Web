@@ -3,11 +3,9 @@ import { getUserInfo } from '@/api/fetchInterface';
 import { useUserStore } from '@/store';
 //import { useLocales } from '@/store/modules/locales';
 //import { Role } from '@/store/modules/user/types';
-import { isLogin, setToken } from '@/utils/auth';
+//import { isLogin, setToken } from '@/utils/auth';
 import NProgress from 'nprogress';
-import { getCurrentInstance } from 'vue';
-import { useI18n } from 'vue-i18n';
-import { LocationQueryRaw, Router } from 'vue-router';
+import {  Router } from 'vue-router';
 
 export default function setupInfoGuard(router: Router) {
   router.beforeEach(async (to, from, next) => {

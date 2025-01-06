@@ -1,4 +1,4 @@
-import { number } from 'fp-ts';
+//import { number } from 'fp-ts';
 
 export interface AppState {
   theme: string;

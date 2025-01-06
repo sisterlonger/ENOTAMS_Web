@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { useRoute, useRouter } from 'vue-router';
+import { useRouter } from 'vue-router';
 
 type Tab = {
     name: string;

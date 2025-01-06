@@ -33,7 +33,7 @@ const useAppStore = defineStore('app', {
       this.hideMenu = value;
     },
     setthemeLightColors(themeLightColors: any) {
-      this.themeLightColors = themeLightColors
+      this.themeLightColors = themeLightColors;
     }
   },
 });

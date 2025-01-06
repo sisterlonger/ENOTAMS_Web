@@ -12,5 +12,5 @@ export const setupTabsGuard = (router:Router) => {
     tabStore.add({name: to.meta.locale!, link: to.fullPath});
     tabStore.set(to.meta.locale!);
     next();
-  })
-}
+  });
+};

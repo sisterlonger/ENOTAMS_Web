@@ -53,5 +53,5 @@ const config = {
       },
     },
   },
-}
+};
 export default defineConfig(config);
