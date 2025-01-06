@@ -72,9 +72,9 @@ const useUserStore = defineStore('user', {
     // Get user's information
     async info() {
       const res = await getUserInfo();
-      let userInfo = res.data;
+      const userInfo = res.data;
       //获取按钮权限
-      let rolePerMissions = await queryRolePermission();
+      const rolePerMissions = await queryRolePermission();
       userInfo.menuPermissions = rolePerMissions.data;
       this.setInfo(userInfo);
     },
@@ -93,7 +93,7 @@ const useUserStore = defineStore('user', {
         // 设置token
         setToken(token);
         // 获取按钮权限
-        let rolePerMissions = await queryRolePermission();
+        const rolePerMissions = await queryRolePermission();
         userInfo.menuPermissions = rolePerMissions.data;
         this.setInfo(userInfo);
       } catch (err) {

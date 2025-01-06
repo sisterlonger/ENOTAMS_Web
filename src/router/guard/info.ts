@@ -5,7 +5,7 @@ import { useUserStore } from '@/store';
 //import { Role } from '@/store/modules/user/types';
 //import { isLogin, setToken } from '@/utils/auth';
 import NProgress from 'nprogress';
-import {  Router } from 'vue-router';
+import { Router } from 'vue-router';
 
 export default function setupInfoGuard(router: Router) {
   router.beforeEach(async (to, from, next) => {

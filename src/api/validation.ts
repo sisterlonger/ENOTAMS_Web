@@ -23,7 +23,7 @@ export function queryValidationDetail(params: { id: number }) {
     });
 }
 export function deleteValidation(ids: []) {
-    return axios.post('/validation/delete',  ids );
+    return axios.post('/validation/delete', ids );
 }
 export function postValidation(data: ValidationVM) {
     return axios.post<ValidationVM>('/validation/post', data);

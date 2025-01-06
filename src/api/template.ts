@@ -24,7 +24,7 @@ export function queryTemplateDetail(params: { id: number }) {
     });
 }
 export function deleteTemplate(ids: []) {
-    return axios.post('/template/delete',  ids );
+    return axios.post('/template/delete', ids );
 }
 export function postTemplate(data: TemplateVM) {
     return axios.post<TemplateVM>('/template/post', data);

@@ -7,4 +7,3 @@ export default {
       order: 5,
     },
   };
-  
