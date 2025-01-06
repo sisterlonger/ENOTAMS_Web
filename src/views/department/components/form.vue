@@ -134,12 +134,11 @@ onMounted(async () => {
 const emit = defineEmits(['close', 'query']);
 
 function handleSubmit() {
-    ruleFormRef.value.validate(async (valid) => {
+    ruleFormRef.value.validate(async (valid: any) => {
         if (valid) {
             if (createData.fullName.split("-").pop() !== createData.depName) {
                 let strArr = createData.fullName.split("-");
                 let font = strArr.slice(0, strArr.length - 1).join("-");
-                console.log(font);
                 createData.fullName = `${font}-${createData.depName}`;
             }
             await postDepartment(createData);

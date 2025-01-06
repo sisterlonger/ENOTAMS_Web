@@ -1,6 +1,7 @@
 <template>
   <div class="menu-router">
-    <tiny-tree-menu ref="tree" :data="MenuData" :show-filter="false" node-key="id" wrap
+    <tiny-tree-menu
+      ref="tree" :data="MenuData" :show-filter="false" node-key="id" wrap
       :default-expanded-keys="expandeArr" @current-change="currentChange">
       <template #default="slotScope">
         <template v-for="(item, index) in routerTitle" :key="index">
@@ -20,14 +21,11 @@ import { RouteRecordNormalized } from 'vue-router';
 import { TreeMenu as tinyTreeMenu } from '@opentiny/vue';
 import { useMenuStore } from '@/store/modules/router';
 import router from '@/router';
-import { useRoute, useRouter } from 'vue-router';
 import { useUserStore } from '@/store';
-import { TabItem } from '@opentiny/vue';
 import * as icons from '@opentiny/vue-icon';
 import { useDeepClone } from '@/hooks/useDeepClone';
 
 
-const route = useRoute();
 const menuStore = useMenuStore();
 menuStore.getMenuList();
 const tree = ref();
@@ -38,7 +36,6 @@ const userStore = useUserStore();
 const role = computed(() => userStore.role);
 const filtter = (arr: any[]) => {
   arr.forEach((item: any) => {
-    //console.log("item",item);
     // 这部分是菜单的树，路径作为id，与点击事件串联起来
     item.id = item.path;
     item.label = item.menuName;

@@ -35,7 +35,6 @@ const templateID = ref(0)
 
 const selectRowEvent = (row) => {
   templateID.value = row.templateID;
-  console.log(templateID.value)
   boxVisibility.value = true;
 }
 

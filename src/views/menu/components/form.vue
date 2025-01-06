@@ -103,7 +103,7 @@ const state = reactive<{
     loading: null,
 });
 const valueChange = async (value: any) => {
-    console.log(value);
+    console.log("value", value);
 }
 // 请求权限列表
 const fetPermissions = async () => {
@@ -114,7 +114,7 @@ const fetPermissions = async () => {
     });
     try {
         const { data } = await queryPermissionList({ pageIndex: 1, pageSize: 10000 });
-        data.forEach((item) => {
+        data.forEach((item:any) => {
             options.value.push({ label: item.permissionID, text: item.permissionName });
         });
     }

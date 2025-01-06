@@ -19,7 +19,6 @@ export const useMenuStore = defineStore('menu', {
       this.menuList = data;
       // 在这里添加默认路由
       this.menuListFlat();
-      console.log("data",data);
       return data;
     },
     menuListFlat() {

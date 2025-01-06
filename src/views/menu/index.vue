@@ -73,7 +73,6 @@ const editMenuEvent = async (row, action) => {
   else if (action === 'add') {
     parentID.value = row.data.menuID;
     menuID.value = 0;
-    console.log(parentID.value);
     boxVisibility.value = true;
   }
   else {

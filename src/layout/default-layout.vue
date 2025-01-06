@@ -17,7 +17,8 @@
       </template>
       <tiny-layout class="layout-content">
         <Tabs :key="tabsRefreshKey" v-model="currentTabName" with-close @click="onClick" @close="onClose">
-          <tab-item v-for="(history, idx) of tabsHistory" :key="idx" :title="history.name"
+          <tab-item 
+            v-for="(history, idx) of tabsHistory" :key="idx" :title="history.name"
             :name="history.link"></tab-item>
         </Tabs>
         <PageLayout />
@@ -34,7 +35,8 @@
       <img src="@/assets/images/theme.png" />
     </div>
     <div v-if="disTheme">
-      <tiny-modal v-model="disTheme" :lock-scroll="true" show-header show-footer :title="$t('theme.title.main')"
+      <tiny-modal 
+        v-model="disTheme" :lock-scroll="true" show-header show-footer :title="$t('theme.title.main')"
         mask-closable="true" height="922" width="748">
         <template #default>
           <Theme />
@@ -74,7 +76,7 @@ const changefooter = ref('#fff');
 
 const tabStore = useTabStore();
 
-const tabsHistory = computed(() => { console.log(tabStore.data); return tabStore.data });
+const tabsHistory = computed(() => { return tabStore.data });
 const currentTabName = ref();
 // 切换简约模式，图标按钮
 const top = ref('10px');

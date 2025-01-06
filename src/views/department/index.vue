@@ -95,7 +95,6 @@ const refresh = async () => {
 const getCurrentNode = () => {
   currentNode.value = treeMenu.value.getCurrentNode();
   expandedKeys.value = [currentNode.value];
-  console.log(expandedKeys.value);
 }
 
 </script>

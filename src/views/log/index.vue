@@ -4,7 +4,7 @@
     <div class="content">
       <div class="content-main">
         <!--查询组件、选择-->
-        <tiny-collapse class="demo-collapse-wrap" v-model="activeNames">
+        <tiny-collapse v-model="activeNames" class="demo-collapse-wrap">
           <tiny-collapse-item title="查询" name="0">
             <tiny-form label-width="100px" label-position="right" class="filter-form" size="small">
               <tiny-row>
@@ -15,8 +15,9 @@
                 </tiny-col>
                 <tiny-col :span="4">
                   <tiny-form-item label="日志级别">
-                    <tiny-select v-model="formData.level" :options="statusOptions" placeholder="请输入日志级别"
-                      clearable></tiny-select>
+                    <tiny-select
+                      v-model="formData.level" :options="statusOptions" placeholder="请输入日志级别" clearable>
+                    </tiny-select>
                   </tiny-form-item>
                 </tiny-col>
                 <tiny-col :span="4">
@@ -54,8 +55,7 @@
         </tiny-collapse>
 
 
-        <tiny-grid ref="gridRef" :fetch-data="fetchData" seq-serial :pager="pagerConfig"
-          @toolbar-button-click="toolbarButtonClickEvent">
+        <tiny-grid ref="gridRef" :fetch-data="fetchData" seq-serial :pager="pagerConfig">
           <template #toolbar>
             <tiny-grid-toolbar :buttons="toolbarButtons"></tiny-grid-toolbar>
           </template>
@@ -73,7 +73,7 @@
           </tiny-grid-column>
         </tiny-grid>
         <tiny-dialog-box v-if="boxVisibility" v-model:visible="boxVisibility" title="查看" width="30%">
-          <dictionaryForm :operationID="operationID" @close="dialogClose" />
+          <dictionaryForm :id="operationID" @close="dialogClose" />
         </tiny-dialog-box>
       </div>
     </div>
@@ -86,7 +86,7 @@ import {
   Grid as TinyGrid, GridColumn as TinyGridColumn, Button as TinyButton, DialogBox as TinyDialogBox, GridToolbar as TinyGridToolbar, Input as TinyInput, Form as TinyForm,
   FormItem as TinyFormItem, Layout as TinyLayout, Row as TinyRow, Col as TinyCol, Modal, Collapse as TinyCollapse, CollapseItem as TinyCollapseItem, Select as TinySelect,
 } from '@opentiny/vue';
-import { queryLogsList, deleteLogs } from '@/api/fetchInterface';
+import { queryLogsList } from '@/api/fetchInterface';
 import dictionaryForm from './components/form.vue';
 
 const pagerConfig = ref({
@@ -152,29 +152,6 @@ async function getData({ page }) {
 const editRowEvent = (row) => {
   operationID.value = row.operationID;
   boxVisibility.value = true;
-}
-// 表操作
-const toolbarButtons = ref([
-  {
-    code: 'deleteSelection',
-    name: '删除',
-    type: "danger",
-  },
-])
-async function toolbarButtonClickEvent({ code, $grid }) {
-  switch (code) {
-    case 'deleteSelection': {
-      let ids = $grid.getSelectRecords().map((item) => { return item.operationID });
-      await deleteLogs(ids);
-      Modal.message({
-        message: '删除成功!',
-        status: 'success',
-      });
-      await queryClick();
-      break
-    }
-    default: { console.log("test"); }
-  }
 }
 // 关闭弹窗
 function dialogClose() {

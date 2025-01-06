@@ -59,9 +59,6 @@ axios.interceptors.response.use(
   },
   (error) => {
     const { status, data } = error.response;
-    // console.log(status);
-    // console.log(data.errMsg || data.msg);
-    // console.log(data);
     if (status === 401) {
       clearToken();
       router.replace({ name: 'login' });

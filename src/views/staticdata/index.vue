@@ -35,7 +35,6 @@ const mapField = reactive({
 })
 const getNodeDataSync = async () => {
     const { data } = await queryNodeTree();
-    //console.log("userStore.userInfo", userStore.userInfo.userCode, userStore.userInfo.userName, userStore.userInfo.role);
     return data.children;
 }
 const handleNodeClick = async (data) => {

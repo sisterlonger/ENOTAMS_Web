@@ -18,7 +18,6 @@ const initTabs = () => {
     const routes = useRouter()
         .getRoutes()
         .map((route) => route.path);
-    //console.log(useRouter().getRoutes());
     const i18n = useRouter().getRoutes();
     return tabs
         .filter((tab) => routes.includes(tab.link))

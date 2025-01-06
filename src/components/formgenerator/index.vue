@@ -5,19 +5,22 @@
                 <div v-for="(item, index) in formFields" :key="'field' + index">
                     <tiny-form-item v-if="!item.hidden" :label="keyWordLabel[index]" :prop="item.prop">
                         <!--输入组件-->
-                        <tiny-input v-model="formData[item.prop]" v-if="item.type.includes('input')"
+                        <tiny-input 
+                            v-if="item.type.includes('input')" v-model="formData[item.prop]"
                             :placeholder="item.placeholder" clearable
                             :style="`width:${item.width !== null ? item.width : '200px'}`"
                             :type="item.type === 'inputtextarea' ? 'textarea' : 'text'" autosize
                             :maxlength="item.maxLength" @change="getOption(formData[item.prop], item)"></tiny-input>
                         <!--选择组件-->
-                        <tiny-select v-model="formData[item.prop]" v-if="item.type === 'select'"
+                        <tiny-select 
+                            v-if="item.type === 'select'" v-model="formData[item.prop]"
                             :placeholder="item.placeholder" :options="item.options" clearable
                             :style="`width:${item.width !== null ? item.width : '200px'}`"
                             @change="getOption(formData[item.prop], item)"></tiny-select>
                         <!--chilren组件-->
                         <div v-if="item.type === 'children'">
-                            <children :item="item" :formData="formData" :formFields="formFields"
+                            <children 
+                                :item="item" :formData="formData" :formFields="formFields"
                                 @update:formData="val => parentFormData = val"
                                 @update:formFields="val => parentFormData = val" @getOption="getOption"></children>
                         </div>
@@ -75,10 +78,8 @@ const preCondition = ref(false);
 
 // 通用的校验函数
 const validate = (rule, value, callback, data, options) => {
-    //console.log(rule);
     // 报错原因，未能获取到rule（因为子没有暴露出来）
     const regex = new RegExp(rule.validators);
-    //console.log(regex);
     if (!regex.test(value)) {
         callback(new Error(rule.validatortext));
     } else {
@@ -87,7 +88,6 @@ const validate = (rule, value, callback, data, options) => {
 };
 // 某选项变化时，触发naip或者上下游选择器获取option
 const getOption = async (data, field) => {
-    //console.log(data, field);
     // 非初始化
     if (data) {
         // 是NAIP相关的,预留位置
@@ -119,7 +119,6 @@ const getOption = async (data, field) => {
     }
 };
 function replaceDollarSequentially(str, replacements) {
-    //console.log("str, replacements", str, replacements);
     let regex = /\$/g; // 匹配所有的$
     let matchCount = 0; // 记录已经替换的$的数量
     return str.replace(regex, () => {
@@ -133,12 +132,10 @@ function replaceDollarSequentially(str, replacements) {
 // 按formFields中，children组件的所有变量顺序组装合成变成children组件变量值
 const handleFormData = (formFieldList) => {
     let result = [];
-    //console.log(formFieldList);
     // 如果是children就不行,得根据template
     formFieldList.forEach((field) => {
         // 如果是子组件则递归，递归返回多个
         if (field.type === "children") {
-            //console.log("field.template", field.template);
             // template算法
             let template = "";
             if (field.template) {
@@ -152,7 +149,6 @@ const handleFormData = (formFieldList) => {
             if (field.prop.split("-").length === 2) {
                 submitFormData[field.prop] = template;
             }
-            //console.log("children", result, field.prop);
         }
         // 单个
         else if (field.type === "selectChildren") {
@@ -176,14 +172,11 @@ const handleFormData = (formFieldList) => {
             }
         }
     })
-    //console.log(result);
     return result;
 }
 const assembleStr = () => {
     // 组装函数
-    ///console.log(formFields.value);
     handleFormData(formFields.value);
-    //console.log(submitFormData);
     return toRaw(submitFormData);
 }
 defineExpose({ assembleStr });
@@ -197,8 +190,6 @@ const initOption = (fieldList) => {
                     formRules[field.prop] = [];
                 }
                 formRules[field.prop].push({ validator: validate, trigger: rule.trigger, required: rule.required, validatortext: rule.validatortext, validators: rule.validators });
-                //console.log(rule);
-                //console.log(rule.maxLength);
                 field.maxLength = rule.maxLength;
             });
 
@@ -227,7 +218,6 @@ onMounted(async () => {
     formFields.value = result.data;
     await initOption(formFields.value);
     preCondition.value = true;
-    //console.log(formRules);
 });
 </script>
 

@@ -151,7 +151,6 @@ async function toolbarButtonClickEvent({ code, $grid }) {
         }
         case 'deleteSelection': {
             let ids = $grid.getSelectRecords().map((item) => { return item.roleID });
-            console.log(ids);
             await deleteRole(ids);
             Modal.message({
                 message: '删除成功!',
@@ -160,7 +159,7 @@ async function toolbarButtonClickEvent({ code, $grid }) {
             await queryClick();
             break
         }
-        default: { console.log("test"); }
+        default:
     }
 }
 // 关闭弹窗

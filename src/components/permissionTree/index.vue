@@ -46,7 +46,6 @@ const treeRef = ref(null);
 const onChange = function (data, node, vm) {
   let checkedData = treeRef.value.getCheckedNodes(true);
   emit('onChange', checkedData);
-  //console.log("checkedData", checkedData);
 
 }
 // 

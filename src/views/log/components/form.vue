@@ -44,14 +44,14 @@ import { queryLogsDetail, postLogs } from '@/api/fetchInterface';
 
 
 const props = defineProps({
-    operationID: Number,
+    id: Number,
 });
-const { operationID } = toRefs(props);
+const { id } = toRefs(props);
 
 const ruleFormRef = ref()
 const validateIcon = ref(iconWarning())
 const createData = reactive({
-    operationID: null,
+    id: null,
     level: '',
     logger: '',
     message: '',
@@ -87,7 +87,7 @@ const fetchData = async () => {
         background: 'rgba(0, 0, 0, 0.7)',
     });
     try {
-        const { data } = await queryLogsDetail({ id: operationID.value });
+        const { data } = await queryLogsDetail({ id: id.value });
         Object.assign(createData, data);
     }
     catch (err) {
@@ -101,7 +101,7 @@ const fetchData = async () => {
 
 // 初始化请求数据
 onMounted(async () => {
-    if (operationID.value) {
+    if (id.value) {
         fetchData();
     }
 });

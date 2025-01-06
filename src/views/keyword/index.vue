@@ -131,7 +131,6 @@ async function getData({ page }) {
 // 行操作
 const editRowEvent = (row) => {
   keyWordID.value = row.keyWordID;
-  console.log(row);
   boxVisibility.value = true;
 }
 // 表操作
@@ -164,7 +163,7 @@ async function toolbarButtonClickEvent({ code, $grid }) {
       await submitClick();
       break
     }
-    default: { console.log("test"); }
+    default:
   }
 }
 // 关闭弹窗

@@ -8,11 +8,8 @@ import setupInfoGuard from './info';
 function setupPageGuard(router: Router) {
   
   router.beforeEach(async (to) => {
-    //console.log("to",to);
-    // emit route change
     setRouteEmitter(to);
   });
-  console.log(router.getRoutes());
   setupMenuGuard(router);
   setupTabsGuard(router);
   setupPermissionGuard(router);

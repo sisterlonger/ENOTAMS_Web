@@ -31,9 +31,7 @@
                                 <tiny-col :span="4">
                                     <tiny-form-item>
                                         <div>
-                                            <tiny-button class="search-btn" type="primary"
-                                                
-                                                @click="queryClick">
+                                            <tiny-button class="search-btn" type="primary" @click="queryClick">
                                                 查询
                                             </tiny-button>
                                         </div>
@@ -152,7 +150,6 @@ async function toolbarButtonClickEvent({ code, $grid }) {
         }
         case 'deleteSelection': {
             let ids = $grid.getSelectRecords().map((item) => { return item.userID });
-            console.log(ids);
             await deleteUser(ids);
             Modal.message({
                 message: '删除成功!',
@@ -161,7 +158,7 @@ async function toolbarButtonClickEvent({ code, $grid }) {
             await queryClick();
             break
         }
-        default: { console.log("test"); }
+        default:
     }
 }
 // 关闭弹窗
@@ -178,7 +175,7 @@ const getNodeDataSync = async () => {
 onMounted(async () => {
     departmentOptions.value = await getNodeDataSync();
     const apiUrl = import.meta.env;
-    //console.log(apiUrl);
+    console.log("apiUrl", apiUrl);
 });
 
 </script>

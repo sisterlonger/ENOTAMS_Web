@@ -1,7 +1,7 @@
 <template>
   <div>
-    <tiny-form overflow-title label-width="100px" v-if="preCondition" :rules="rules">
-      <tiny-collapse class="demo-collapse-wrap" v-model="activeNames">
+    <tiny-form v-if="preCondition" overflow-title label-width="100px" :rules="rules">
+      <tiny-collapse v-model="activeNames" class="demo-collapse-wrap">
         <tiny-collapse-item title="示例" name="0">
           <tiny-form-item label="标准规范">
             <tiny-input v-model="createData.template" type="textarea" autosize disabled> </tiny-input>
@@ -18,11 +18,11 @@
         </tiny-collapse-item>
         <tiny-collapse-item title="必填项" name="1">
           <tiny-col>
-            <formgenerator v-if="preCondition" :keyWord="keyWord" :keyWordLabel="keyWordLabel" ref="childRef" />
+            <formgenerator v-if="preCondition" ref="childRef" :keyWord="keyWord" :keyWordLabel="keyWordLabel" />
           </tiny-col>
         </tiny-collapse-item>
         <tiny-collapse-item title="选填项" name="2">
-          <tiny-col v-for=" (item, index) in matches.matchesOptionalLabel" :span="6" :key="'optional' + index">
+          <tiny-col v-for=" (item, index) in matches.matchesOptionalLabel" :key="'optional' + index" :span="6">
             <tiny-form-item :label="item">
               <tiny-input v-model="formData.optionalList[index]" placeholder="请输入" clearable></tiny-input>
             </tiny-form-item>
@@ -184,18 +184,14 @@ function extractContent(input: string): object {
   // 不能用校验
   formData.requiredList = Array.from({ length: matchesRequiredLabel.length }).map((item, index) => "");
   formData.optionalList = Array.from({ length: matchesOptionalLabel.length }).map((item, index) => matchesOptionalKeyWord[index]);
-  console.log(matchesOptionalLabel, matchesRequiredLabel, matchesOptionalKeyWord, matchesRequiredKeyWord);
   keyWord.value = matchesRequiredKeyWord.join(",");
   keyWordLabel.value = matchesRequiredLabel;
-  //console.log(keyWord.value);
-  //keyWord.value =  "距离范围组件,角度,高度";
   return { matchesOptionalLabel, matchesRequiredLabel, matchesOptionalKeyWord, matchesRequiredKeyWord };
 }
 let matches = reactive({});
 // 提取关键字事件
 const handleKeyWord = () => {
   matches = extractContent(createData.template);
-  console.log("matches", matches);
 }
 // 复制到粘贴板
 async function copyToClipboard() {
@@ -210,7 +206,6 @@ async function copyToClipboard() {
 function onAssemble() {
   let test = childRef.value.assembleStr();
   formData.requiredList = Object.values(test);
-  //console.log(formData.requiredList);
   let assembleText = createData.template;
   matches.matchesRequiredLabel.forEach((item, index) => {
     assembleText = assembleText.replace(`$${item}$【${matches.matchesRequiredKeyWord[index]}】`, formData.requiredList[index]);
@@ -219,8 +214,6 @@ function onAssemble() {
     assembleText = assembleText.replace(`$${item}$\{${matches.matchesOptionalKeyWord[index]}\}`, `${formData.optionalList[index]}`);
   });
   formData.result = assembleText;
-  //console.log("result", formData.result);
-
 }
 
 </script>

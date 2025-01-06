@@ -142,7 +142,7 @@ async function toolbarButtonClickEvent({ code, $grid }) {
       await queryClick();
       break
     }
-    default: { console.log("test"); }
+    default:
   }
 }
 // 关闭弹窗
