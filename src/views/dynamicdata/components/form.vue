@@ -133,7 +133,4 @@ function resetForm() {
 </script>
 
 <style scoped>
-.demo-form {
-    width: 450px;
-}
 </style>

@@ -38,7 +38,7 @@ export default {
   'work.index.Period': '管理用户信息',
   'work.index.Hotline': '组织架构',
   'work.index.service': '管理管制、机场、通导和气象部门',
-  'work.index.Attendance': '日志管理',
+  'work.index.Attendance': '操作日志',
   'work.index.FAQs': '记录各类操作日志记录',
   'work.index.Payroll': '用户手册',
   'work.index.Tax': '系统操作教程及常见问题答疑',

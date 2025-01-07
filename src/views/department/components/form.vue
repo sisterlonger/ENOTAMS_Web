@@ -165,7 +165,4 @@ async function onDelete() {
 </script>
 
 <style scoped>
-.demo-form {
-    width: 450px;
-}
 </style>

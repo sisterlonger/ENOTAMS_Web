@@ -84,6 +84,7 @@
     const userStore = useUserStore();
   
     onMounted(() => {
+      console.log("2");
       userStore.info();
     });
   </script>

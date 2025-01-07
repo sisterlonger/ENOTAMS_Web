@@ -4,20 +4,11 @@
             <tiny-form-item label="模块" prop="module">
                 <tiny-input v-model="createData.module" disabled></tiny-input>
             </tiny-form-item>
-            <tiny-form-item label="日志级别" prop="level" :validate-icon="validateIcon">
-                <tiny-input v-model="createData.level" disabled></tiny-input>
-            </tiny-form-item>
             <tiny-form-item label="操作人" prop="logger">
                 <tiny-input v-model="createData.logger" disabled></tiny-input>
             </tiny-form-item>
-            <tiny-form-item label="对象" prop="object">
-                <tiny-input v-model="createData.object" disabled></tiny-input>
-            </tiny-form-item>
             <tiny-form-item label="日志内容" prop="message">
                 <tiny-input v-model="createData.message" disabled></tiny-input>
-            </tiny-form-item>
-            <tiny-form-item label="异常" prop="exception">
-                <tiny-input v-model="createData.exception" disabled></tiny-input>
             </tiny-form-item>
             <tiny-form-item>
                 <tiny-button type="primary" @click="handleSubmit()">
@@ -29,7 +20,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, onMounted, toRefs, watch, defineEmits } from 'vue'
+import { ref, reactive, onMounted, toRefs, defineEmits } from 'vue'
 import {
     Form as TinyForm,
     FormItem as TinyFormItem,
@@ -40,7 +31,7 @@ import {
     Numeric as TinyNumeric,
 } from '@opentiny/vue'
 import { iconWarning } from '@opentiny/vue-icon';
-import { queryLogsDetail, postLogs } from '@/api/fetchInterface';
+import { queryUserLogsDetail } from '@/api/fetchInterface';
 
 
 const props = defineProps({
@@ -52,22 +43,17 @@ const ruleFormRef = ref()
 const validateIcon = ref(iconWarning())
 const createData = reactive({
     id: null,
-    level: '',
     logger: '',
     message: '',
-    exception: 0,
-    object: '',
     module: '',
 })
 const rules = ref({
-    level: [{ required: true, message: '必填', trigger: 'change' }],
     logger: [
         { required: true, message: '必填', trigger: 'blur' },
     ],
     message: [
         { required: true, message: '必填', trigger: 'blur' },
     ],
-    object: [{ required: false, message: '非必填', trigger: 'change' }],
     module: [{ required: false, message: '非必填', trigger: 'change' }],
 })
 
@@ -87,7 +73,7 @@ const fetchData = async () => {
         background: 'rgba(0, 0, 0, 0.7)',
     });
     try {
-        const { data } = await queryLogsDetail({ id: id.value });
+        const { data } = await queryUserLogsDetail({ id: id.value });
         Object.assign(createData, data);
     }
     catch (err) {

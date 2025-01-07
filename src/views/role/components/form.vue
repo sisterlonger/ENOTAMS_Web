@@ -147,7 +147,4 @@ function resetForm() {
 </script>
 
 <style scoped>
-.demo-form {
-    width: 100%;
-}
 </style>

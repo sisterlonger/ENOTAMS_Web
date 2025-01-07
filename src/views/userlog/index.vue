@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <Breadcrumb :items="['menu.systemManager', 'menu.log']" />
+    <Breadcrumb :items="['menu.systemManager', 'menu.userlog']" />
     <div class="content">
       <div class="content-main">
         <!--查询组件、选择-->
@@ -14,30 +14,13 @@
                   </tiny-form-item>
                 </tiny-col>
                 <tiny-col :span="4">
-                  <tiny-form-item label="日志级别">
-                    <tiny-select
-                      v-model="formData.level" :options="statusOptions" placeholder="请输入日志级别" clearable>
-                    </tiny-select>
-                  </tiny-form-item>
-                </tiny-col>
-                <tiny-col :span="4">
                   <tiny-form-item label="操作人">
                     <tiny-input v-model="formData.logger" placeholder="请输入操作人" clearable></tiny-input>
                   </tiny-form-item>
                 </tiny-col>
                 <tiny-col :span="4">
-                  <tiny-form-item label="对象">
-                    <tiny-input v-model="formData.object" placeholder="请输入对象" clearable></tiny-input>
-                  </tiny-form-item>
-                </tiny-col>
-                <tiny-col :span="4">
                   <tiny-form-item label="日志内容">
                     <tiny-input v-model="formData.message" placeholder="请输入日志内容" clearable></tiny-input>
-                  </tiny-form-item>
-                </tiny-col>
-                <tiny-col :span="4">
-                  <tiny-form-item label="异常">
-                    <tiny-input v-model="formData.exception" placeholder="请输入异常" clearable></tiny-input>
                   </tiny-form-item>
                 </tiny-col>
                 <tiny-col :span="4">
@@ -61,14 +44,11 @@
           </template>
           <tiny-grid-column type="index" width="60"></tiny-grid-column>
           <tiny-grid-column field="module" title="模块" show-overflow></tiny-grid-column>
-          <tiny-grid-column field="level" title="日志级别"></tiny-grid-column>
           <tiny-grid-column field="logger" title="操作人"></tiny-grid-column>
-          <tiny-grid-column field="object" title="对象" show-overflow></tiny-grid-column>
           <tiny-grid-column field="message" title="日志内容"></tiny-grid-column>
-          <tiny-grid-column field="exception" title="异常"></tiny-grid-column>
           <tiny-grid-column title="操作" width="200" align="center">
             <template #default="data">
-              <tiny-button v-track="'系统日志'" size="mini" type="primary" @click="editRowEvent(data.row)">查看</tiny-button>
+              <tiny-button v-track="route.name" size="mini" type="primary" @click="editRowEvent(data.row)">查看</tiny-button>
             </template>
           </tiny-grid-column>
         </tiny-grid>
@@ -82,11 +62,12 @@
 
 <script setup lang="jsx">
 import { ref } from 'vue'
+import { useRoute } from 'vue-router';
 import {
   Grid as TinyGrid, GridColumn as TinyGridColumn, Button as TinyButton, DialogBox as TinyDialogBox, GridToolbar as TinyGridToolbar, Input as TinyInput, Form as TinyForm,
   FormItem as TinyFormItem, Layout as TinyLayout, Row as TinyRow, Col as TinyCol, Modal, Collapse as TinyCollapse, CollapseItem as TinyCollapseItem, Select as TinySelect,
 } from '@opentiny/vue';
-import { queryLogsList } from '@/api/fetchInterface';
+import { queryUserLogsList } from '@/api/fetchInterface';
 import dictionaryForm from './components/form.vue';
 
 const pagerConfig = ref({
@@ -99,6 +80,7 @@ const pagerConfig = ref({
     layout: 'total, prev, pager, next, jumper, sizes'
   }
 })
+const route = useRoute();
 const fetchData = ref({
   api: getData
 })
@@ -108,12 +90,8 @@ const boxVisibility = ref(false)
 const operationID = ref(0)
 const formData = ref({
   module: "",
-  thread: "",
-  level: "",
   logger: "",
   message: "",
-  exception: "",
-  object: "",
 })
 const gridRef = ref()
 const activeNames = ref(['0'])
@@ -142,7 +120,7 @@ async function getData({ page }) {
   const { currentPage, pageSize } = page
   formData.value.pageIndex = currentPage;
   formData.value.pageSize = pageSize;
-  let response = await queryLogsList(formData.value);
+  let response = await queryUserLogsList(formData.value);
   tableData.value = response.data;
   return Promise.resolve({
     result: tableData.value,

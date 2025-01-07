@@ -1,19 +1,33 @@
 import axios from 'axios';
 
 export interface LogsSearch {
-    Module: string;
+    module: string;
     pageIndex: number;
     pageSize: number;
 }
 export interface LogsVM {
-    OperationID: number;
-    Thread: string;
-    Level: string;
-    Logger: string;
-    Message: string;
-    Exception: number;
-    Module: string;
-    Object: string;
+    operationID: number;
+    thread: string;
+    level: string;
+    logger: string;
+    message: string;
+    exception: number;
+    module: string;
+    object: string;
+}
+export interface UserLogsSearch {
+    logger: string;
+    message: string;
+    module: string;
+    loggerID?:number
+}
+export interface UserLogsVM {
+    operationID: number;
+    logTime: Date;
+    logger: string;
+    message: string;
+    module: string;
+    loggerID?:number
 }
 
 export function queryLogsList(params: LogsSearch) {
@@ -27,6 +41,14 @@ export function queryLogsDetail(params: { id: number }) {
 export function deleteLogs(ids: []) {
     return axios.post('/log/delete', ids);
 }
-export function postLogs(data: LogsVM) {
-    return axios.post<LogsVM>('/log/post', data);
+export function queryUserLogsList(params: UserLogsSearch) {
+    return axios.get('/log/userlist', { params });
+}
+export function queryUserLogsDetail(params: { id: number }) {
+    return axios.get('/log/userget', {
+        params,
+    });
+}
+export function pushTrackLogs(data: UserLogsVM) {
+    return axios.post<UserLogsVM>('/log/pushtrack', data);
 }

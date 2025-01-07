@@ -31,7 +31,7 @@
                                 <tiny-col :span="4">
                                     <tiny-form-item>
                                         <div>
-                                            <tiny-button class="search-btn" type="primary" @click="queryClick">
+                                            <tiny-button v-permission="[router.currentRoute.value.meta.locale,'查询']" class="search-btn" type="primary" @click="queryClick">
                                                 查询
                                             </tiny-button>
                                         </div>

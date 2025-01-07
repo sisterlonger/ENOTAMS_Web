@@ -41,6 +41,7 @@ export default function setupPermissionGuard(router: Router) {
       } else {
         try {
           // 修复首次登录失败问题
+          console.log("1");
           await userStore.info();
           crossroads();
         } catch (error) {
