@@ -5,7 +5,7 @@
     <a href="/">{{ $t('setting.foot.title') }}</a>
     <!-- 还未开源 先注释掉 -->
     <div class="divider"></div>
-    <a href="https://baike.baidu.com/item/%E4%B8%AD%E5%9B%BD%E6%B0%91%E7%94%A8%E8%88%AA%E7%A9%BA%E4%B8%AD%E5%8D%97%E5%9C%B0%E5%8C%BA%E7%AE%A1%E7%90%86%E5%B1%80/2119643?fr=ge_ala" target="_blank">
+    <a href="https://www.msatmb.com/" target="_blank">
       <img src="@/assets/images/atclogo.png" alt="github" />
     </a>
   </div>

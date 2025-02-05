@@ -1,11 +1,11 @@
 import localeLogin from '@/views/login/locale/en-US';
 import localeTheme from '@/components/theme/locale/en-US';
-import locale403 from '@/views/exception/403/locale/en-US';
-import locale404 from '@/views/exception/404/locale/en-US';
-import locale500 from '@/views/exception/500/locale/en-US';
-import localeStepForm from '@/views/usercenter/locale/en-US';
-import localekanban from '@/views/board/locale/en-US';
-import localeSearchTable from '@/views/list/search-table/locale/en-US';
+import locale403 from '@/views/other/exception/403/locale/en-US';
+import locale404 from '@/views/other/exception/404/locale/en-US';
+import locale500 from '@/views/other/exception/500/locale/en-US';
+import localeStepForm from '@/views/kanban/usercenter/locale/en-US';
+import localekanban from '@/views/kanban/board/locale/en-US';
+import localeSearchTable from '@/views/kanban/list/search-table/locale/en-US';
 import localeSettings from './en-US/settings';
 import localeHttpError from './en-US/httpError';
 
@@ -33,6 +33,12 @@ export default {
   'menu.department': 'Department Management',
   'menu.log': 'Log Management',
   'menu.menu': 'Menu Management',
+  'menu.airspace':'飞行情报区',
+  'menu.airway':'航路',
+  'menu.airline':'航线',
+  'menu.airport':'机场',
+  'menu.airwaypoint':'航路点',
+  'menu.radionavigation':'无线电导航设施',
   ...localeSearchTable,
   ...localekanban,
   ...localeTheme,

@@ -1,11 +1,11 @@
 import localeLogin from '@/views/login/locale/zh-CN';
 import localeTheme from '@/components/theme/locale/zh-CN';
-import locale403 from '@/views/exception/403/locale/zh-CN';
-import locale404 from '@/views/exception/404/locale/zh-CN';
-import locale500 from '@/views/exception/500/locale/zh-CN';
-import localeStepForm from '@/views/usercenter/locale/zh-CN';
-import localeSearchTable from '@/views/list/search-table/locale/zh-CN';
-import localekanban from '@/views/board/locale/zh-CN';
+import locale403 from '@/views/other/exception/403/locale/zh-CN';
+import locale404 from '@/views/other/exception/404/locale/zh-CN';
+import locale500 from '@/views/other/exception/500/locale/zh-CN';
+import localeStepForm from '@/views/kanban/usercenter/locale/zh-CN';
+import localeSearchTable from '@/views/kanban/list/search-table/locale/zh-CN';
+import localekanban from '@/views/kanban/board/locale/zh-CN';
 import localeSettings from './zh-CN/settings';
 import localeHttpError from './zh-CN/httpError';
 
@@ -30,6 +30,7 @@ export default {
   'menu.department': '组织架构',
   'menu.log': '系统日志',
   'menu.userlog': '操作日志',
+  'menu.workflow': '流程管理',
   'menu.menu': '菜单管理',
   'menu.systemManager': '系统管理',
   'menu.notam': '航行通告',
@@ -39,6 +40,12 @@ export default {
   'menu.staticdata': '静态数据',
   'menu.dynamicdata': '业务数据',
   'menu.source': '原始资料',
+  'menu.airspace':'飞行情报区',
+  'menu.airway':'航路',
+  'menu.airline':'航线',
+  'menu.airport':'机场',
+  'menu.airwaypoint':'航路点',
+  'menu.radionavigation':'无线电导航设施',
   ...localeSearchTable,
   ...localekanban,
   ...localeTheme,

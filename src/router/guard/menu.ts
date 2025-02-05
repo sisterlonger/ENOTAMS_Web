@@ -1,7 +1,7 @@
 import { useMenuStore } from '@/store/modules/router';
 import { nextTick } from 'vue';
 import { Router, RouteRecordRaw } from 'vue-router';
-import NotFound from '@/views/not-found/404/index.vue';
+import NotFound from '@/views/other/not-found/404/index.vue';
 import constant from '../constant';
 
 export interface ITreeNodeData {
@@ -108,7 +108,7 @@ export const setupMenuGuard = (router: Router) => {
       router.addRoute({
         path: `${import.meta.env.VITE_CONTEXT}:pathMatch(.*)*`,
         name: 'notFound',
-        component: () => import('@/views/not-found/index.vue'),
+        component: () => import('@/views/other/not-found/index.vue'),
       });
     }
     await nextTick();
