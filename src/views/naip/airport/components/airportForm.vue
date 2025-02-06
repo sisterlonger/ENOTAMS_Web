@@ -89,6 +89,26 @@
                   title="跑道坡度"
                   show-overflow
                 ></tiny-grid-column>
+               <tiny-grid-column
+                  field="valSlipDistance"
+                  title="TORA"
+                  show-overflow
+                ></tiny-grid-column>
+                <tiny-grid-column
+                  field="valTakeoffDistance"
+                  title="TODA"
+                  show-overflow
+                ></tiny-grid-column>
+                <tiny-grid-column
+                  field="valLandingDistance"
+                  title="LDA"
+                  show-overflow
+                ></tiny-grid-column>
+                <tiny-grid-column
+                  field="valAsda"
+                  title="ASDA"
+                  show-overflow
+                ></tiny-grid-column>
                 <!-- <tiny-grid-column
                   field="valThrDisplace"
                   title="入口内移距离"

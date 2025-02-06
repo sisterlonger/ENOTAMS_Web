@@ -1,14 +1,9 @@
 <template>
   <div>
     <div class="demo-form">
-      <tiny-form
-        ref="ruleFormRef"
-        :model="formData.value"
-        :rules="rules"
-        label-suffix=":"
-        label-width="150px"
-        :display-only="true"
-      >
+      <tiny-form ref="ruleFormRef" :model="formData.value" :rules="rules" label-suffix=":" label-width="150px"
+        :display-only="true">
+        <tiny-row class="title">航路点信息</tiny-row>
         <tiny-row>
           <tiny-col :span="3">
             <tiny-form-item label="名称" prop="txtName">
@@ -77,4 +72,10 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.title {
+  font-size: 20px;
+  color: #000000;
+  font-weight: bold;
+  margin: 10px;
+}
 </style>
