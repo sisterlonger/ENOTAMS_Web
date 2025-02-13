@@ -6,7 +6,7 @@
   "author": "刘荣龙",
   "license": "MIT",
   "scripts": {
-    "start": "vite --config ./config/vite.config.dev.ts --port 8080",
+    "start": "vite --config ./config/vite.config.dev.ts --port 3030",
     "build": "vite build --config ./config/vite.config.prod.ts",
     "report": "cross-env REPORT=true npm run build",
     "lint-staged": "npx lint-staged",
@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "@opentiny/hwc-client": "^0.0.14",
-    "@opentiny/vue": "^3.19.0",
+    "@opentiny/vue": "^3.21.2",
     "@types/mockjs": "^1.0.10",
     "@vueuse/core": "^10.11.1",
     "@vueuse/head": "^2.0.0",

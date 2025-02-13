@@ -15,6 +15,11 @@ export function queryAirPortDetail(params: { id: string}) {
         params,
     });
 }
+export function queryAirPortConfig(params: { id: string}) {
+    return axios.get('/airport/getbycodeid', {
+        params,
+    });
+}
 export function queryRwyDirectionDetail(params: { id: string}) {
     return axios.get('/airport/getrwydirection', {
         params,

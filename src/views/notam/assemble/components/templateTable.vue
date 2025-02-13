@@ -12,8 +12,8 @@
         </template>
       </tiny-grid-column>
     </tiny-grid>
-    <tiny-dialog-box v-if="boxVisibility"  v-model:visible="boxVisibility" title="组装模版" width="80%" top="5%">
-      <assembleForm :templateID="templateID" @close="dialogClose" />
+    <tiny-dialog-box v-if="boxVisibility"  v-model:visible="boxVisibility" title="组装模版" width="80%" max-height="800px" top="5%" :close-on-click-modal="false">
+      <enotam :templateID="templateID" @close="dialogClose" />
     </tiny-dialog-box>
   </div>
 </template>
@@ -23,6 +23,7 @@
 import { ref, defineProps, toRefs } from 'vue'
 import { Grid as TinyGrid, GridColumn as TinyGridColumn, Button as TinyButton, DialogBox as TinyDialogBox } from '@opentiny/vue'
 import assembleForm from './assembleForm.vue';
+import enotam from './enotam.vue';
 
 const props = defineProps({
   // eslint-disable-next-line vue/require-prop-types

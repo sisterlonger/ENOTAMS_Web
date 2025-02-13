@@ -10,6 +10,9 @@
             <tiny-form-item v-if="createData.fullName" label="专业" prop="field">
                 <tiny-input v-model="createData.field"></tiny-input>
             </tiny-form-item>
+            <tiny-form-item v-if="createData.airSpace" label="情报区" prop="field">
+                <tiny-input v-model="createData.airSpace"></tiny-input>
+            </tiny-form-item>
             <tiny-form-item>
                 <tiny-button type="primary" @click="handleSubmit()">
                     提交
@@ -61,6 +64,7 @@ const createData = reactive({
     parentDepCode: "",
     grade: 0,
     fullName: "",
+    airSpace:'',
 })
 const rules = ref({
     depName: [

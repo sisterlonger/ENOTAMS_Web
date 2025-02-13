@@ -1,9 +1,9 @@
 import axios from 'axios';
 
 export interface AirSpaceSearch {
-    codeId: string;
-    txtLocalType: string;
-    txtName: string;
+    codeId?: string;
+    txtLocalType?: string;
+    txtName?: string;
     pageIndex: number;
     pageSize: number;
 }
@@ -14,4 +14,7 @@ export function queryAirSpaceDetail(params: { id: string}) {
     return axios.get('/airspace/get', {
         params,
     });
+}
+export function queryAirPortAndAirSpace() {
+    return axios.get('/airspace/getairportandairspace');
 }

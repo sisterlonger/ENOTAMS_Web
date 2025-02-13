@@ -17,6 +17,7 @@ const useUserStore = defineStore('user', {
     userId: '10000',
     userName: '',
     userCode: '',
+    airSpace:'',
     department: 'Tiny-Vue-Pro',
     employeeType: 'social recruitment',
     job: 'Front end',
