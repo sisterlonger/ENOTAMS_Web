@@ -78,16 +78,18 @@ const preCondition = ref(false);
 
 // 静态数据发生变化时触发的函数，函数将会动态调整对应的关键字里选择器中的选项值
 const updateOptions = async (newValue, fieldList) => {
-    // 遍历formFields
-    for (let i = 0; i < fieldList.length; i += 1) {
-        // 如果找到对应的字段，则更新该字段的选项配置
-        console.log(fieldList[i]);
-        if (fieldList[i].dicType != null && fieldList[i].dicType.includes('$')) {
-            fieldList[i].options = newValue[fieldList[i].dicType.replace("$","")];
-        }
-        console.log(fieldList[i].children);
-        if (fieldList[i].type.includes('hildren') && fieldList[i].children && fieldList[i].children.length > 0) {
-            updateOptions(newValue, fieldList[i].children);
+    if (fieldList) {
+        // 遍历formFields
+        for (let i = 0; i < fieldList.length; i += 1) {
+            // 如果找到对应的字段，则更新该字段的选项配置
+            console.log(fieldList[i]);
+            if (fieldList[i].dicType != null && fieldList[i].dicType.includes('$')) {
+                fieldList[i].options = newValue[fieldList[i].dicType.replace("$", "")];
+            }
+            console.log(fieldList[i].children);
+            if (fieldList[i].type.includes('hildren') && fieldList[i].children && fieldList[i].children.length > 0) {
+                updateOptions(newValue, fieldList[i].children);
+            }
         }
     }
 }
@@ -95,7 +97,7 @@ watch(
     staticData,
     (newValue) => {
         console.log(newValue);
-        console.log("formFields",formFields.value);
+        console.log("formFields", formFields.value);
         updateOptions(newValue, formFields.value);
 
     },
@@ -111,7 +113,7 @@ const validate = (rule, value, callback, data, options) => {
         callback();
     }
 };
-// 某选项变化时，触发naip或者上下游选择器获取option,data是该选项的值，field是该选项的配置
+// E-E，某选项变化时，触发naip或者上下游选择器获取option,data是该选项的值，field是该选项的配置
 const getOption = async (data, field) => {
     console.log(data, field);
     // 非初始化

@@ -37,6 +37,8 @@ export default {
   'menu.permission': '权限管理',
   'menu.userlist': '用户管理',
   'menu.role': '角色管理',
+  'menu.feedback': '反馈记录',
+  'menu.version': '版本管理',
   'menu.staticdata': '静态数据',
   'menu.dynamicdata': '业务数据',
   'menu.source': '原始资料',

@@ -33,6 +33,8 @@ export default {
   'menu.department': 'Department Management',
   'menu.log': 'Log Management',
   'menu.menu': 'Menu Management',
+  'menu.feedback': 'Feedback',
+  'menu.version': 'Version Management',
   'menu.airspace':'飞行情报区',
   'menu.airway':'航路',
   'menu.airline':'航线',

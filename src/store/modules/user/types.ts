@@ -1,6 +1,6 @@
 export type RoleType = '' | '*' | 'admin' | 'user';
 export interface UserInfo {
-  userId: string;
+  userID: string;
   userName: string;
   userCode: string;
   airSpace?: string;

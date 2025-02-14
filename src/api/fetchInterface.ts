@@ -17,3 +17,5 @@ export * from './role';
 export * from './template';
 export * from './user';
 export * from './validation';
+export * from './feedback';
+export * from './version';

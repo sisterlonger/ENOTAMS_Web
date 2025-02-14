@@ -14,7 +14,7 @@ import { UserState, UserInfo } from './types';
 
 const useUserStore = defineStore('user', {
   state: (): UserState => ({
-    userId: '10000',
+    userID: '10000',
     userName: '',
     userCode: '',
     airSpace:'',
