@@ -2,10 +2,10 @@
     <div class="demo-form">
         <tiny-form ref="ruleFormRef" :model="createData" :rules="rules" label-width="100px">
             <tiny-form-item label="反馈内容" prop="content" :validate-icon="validateIcon">
-                <tiny-input v-model="createData.content" placeholder="请输入反馈内容" type="textarea"></tiny-input>
+                <tiny-input v-model="createData.content" placeholder="请输入反馈内容" type="textarea" :disabled="!(action ==='edit')"></tiny-input>
             </tiny-form-item>
             <tiny-form-item label="审批意见" prop="comment">
-                <tiny-input v-model="createData.comment" placeholder="请输入审批意见" type="textarea"></tiny-input>
+                <tiny-input v-model="createData.comment" placeholder="请输入审批意见" type="textarea" :disabled="!(action ==='audit')"></tiny-input>
             </tiny-form-item>
             <tiny-form-item>
                 <tiny-button type="primary" @click="handleSubmit()">
@@ -34,8 +34,10 @@ import { queryFeedbackDetail, postFeedback } from '@/api/fetchInterface';
 
 const props = defineProps({
     feedbackID: Number,
+    action: String,
 });
 const { feedbackID } = toRefs(props);
+const { action } = toRefs(props);
 
 const ruleFormRef = ref()
 const validateIcon = ref(iconWarning())
@@ -47,7 +49,7 @@ const createData = reactive<any>({
 const rules = ref({
     content: [{ required: true, message: '必填', trigger: 'change' }],
     comment: [
-        { required: true, message: '必填', trigger: 'blur' },
+        { required: false, message: '必填', trigger: 'blur' },
     ],
 })
 

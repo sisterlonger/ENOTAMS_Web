@@ -14,10 +14,18 @@ import { UserState, UserInfo } from './types';
 
 const useUserStore = defineStore('user', {
   state: (): UserState => ({
-    userID: '10000',
+    userID: '',
     userName: '',
     userCode: '',
     airSpace:'',
+    email:'',
+    mobile:'',
+    depName:'',
+    fullName:'',
+    field:'',
+    roleName:'',
+    rank:'',
+    companySMSCode:'',
     department: 'Tiny-Vue-Pro',
     employeeType: 'social recruitment',
     job: 'Front end',
@@ -74,6 +82,7 @@ const useUserStore = defineStore('user', {
     async info() {
       const res = await getUserInfo();
       const userInfo = res.data;
+      console.log("userInfo",userInfo);
       //获取按钮权限
       const rolePerMissions = await queryRolePermission();
       userInfo.menuPermissions = rolePerMissions.data;

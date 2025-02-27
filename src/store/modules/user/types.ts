@@ -4,6 +4,18 @@ export interface UserInfo {
   userName: string;
   userCode: string;
   airSpace?: string;
+  role: RoleType;
+  roleName?: string;
+  roleID: number;
+  depName?: string;
+  fullName?: string;
+  field?:string;
+  rank?: string;
+  menuPermissions: Array<any>;
+  mobile?: string;
+  email?: string;
+  companySMSCode?: string;
+  // 暂时没用上的
   department?: string;
   employeeType?: string;
   job?: string;
@@ -14,9 +26,6 @@ export interface UserInfo {
   protocolEnd?: string;
   address?: string;
   status?: string;
-  role: RoleType;
-  roleID: number;
-  menuPermissions: Array<any>;
 }
 export interface UserFilterData {
   sort?: number;

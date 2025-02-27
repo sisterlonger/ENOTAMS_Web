@@ -14,10 +14,10 @@
       </tiny-form-item>
 
       <div class="login-form-options">
-        <tiny-checkbox>{{ $t('login.form.rememberPassword') }}</tiny-checkbox>
+        <tiny-checkbox style="color:#fff">{{ $t('login.form.rememberPassword') }}</tiny-checkbox>
         <div>
-          <tiny-link type="primary" class="divide-line">|</tiny-link>
-          <tiny-link type="primary" @click="typeChange">
+          <tiny-link style="color:#fff" type="primary" class="divide-line">|</tiny-link>
+          <tiny-link style="color:#fff" type="primary" @click="typeChange">
             {{ $t('login.form.registration') }}
           </tiny-link>
         </div>
@@ -79,6 +79,7 @@ const rules = computed(() => {
 });
 
 const loginMail = reactive({
+  // TODO 上线要改
   userCode: 'admin',
   userPwd: 'admin',
   rememberPassword: true,

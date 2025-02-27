@@ -3,10 +3,24 @@
         <Breadcrumb :items="['menu.systemManager', 'menu.version']" />
         <div class="content">
             <div class="content-main">
-                <tiny-button v-if="userStore.userInfo.userName == 'admin'" type='primary' @click="onPublish">发布版本公告</tiny-button>
-                <tiny-time-line :data="data2" vertical shape="dot"></tiny-time-line>
+                <tiny-button v-if="userStore.userInfo.userName == 'admin'" type='primary'
+                    @click="onPublish">发布版本公告</tiny-button>
+                <tiny-time-line vertical shape="dot" name-field="title">
+                    <tiny-timeline-item v-for="(item, i) in lineData" :key="i" :node="item" :nodeIndex="i">
+                        <template #description>
+                            <!--时间-->
+                            <div class="timeline-time">
+                                {{ item.createTime.substring(0,10) }}
+                            </div>
+                            <!--内容-->
+                            <div class="timeline-content">
+                                {{ item.content }}
+                            </div>
+                        </template>
+                    </tiny-timeline-item>
+                </tiny-time-line>
                 <tiny-dialog-box v-if="boxVisibility" v-model:visible="boxVisibility" title="编辑" width="30%">
-                    <div :feedbackID="feedbackID" @close="dialogClose" />
+                    <versionForm @close="dialogClose" />
                 </tiny-dialog-box>
             </div>
         </div>
@@ -14,31 +28,43 @@
 </template>
 
 <script setup lang="jsx">
-import { ref ,reactive} from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import {
-    TinyTimeLine , DialogBox as TinyDialogBox, TinyButton
+    TinyTimeLine, DialogBox as TinyDialogBox, TinyButton, TinyTimelineItem
 } from '@opentiny/vue';
-import { queryFeedbackList } from '@/api/fetchInterface';
+import { queryVersionList } from '@/api/fetchInterface';
 import { useUserStore } from '@/store';
+import versionForm from './components/form.vue';
 
 const userStore = useUserStore();
 
-const data2 = reactive([
-  { name: '基本 / primary', time: '2019-11-10 00:00:00', type: 'primary' },
-  { name: '成功 / success', time: '2019-11-11 00:01:30', type: 'success' },
-  { name: '警告 / warning', time: '2019-11-12 14:20:15', type: 'warning' },
-  { name: '危险 / danger', time: '2019-11-13 20:45:50', type: 'danger' },
-  { name: '信息 / info', time: '2019-11-14 20:45:50', type: 'info' }
+const lineData = reactive([
 ])
 
 const boxVisibility = ref(false)
 
+function onPublish() {
+    boxVisibility.value = true;
+}
 // 关闭弹窗
-function dialogClose() {
+async function dialogClose() {
     boxVisibility.value = false;
     // 刷新函数
-    //queryClick();
+    await getData();
 }
+// 获取列表数据
+async function getData() {
+    let response = await queryVersionList();
+    lineData.length = 0;
+    response.data.reverse().forEach(item => {
+        item.type = 'success';
+        lineData.push(item);
+    });
+}
+// 初始化请求数据
+onMounted(async () => {
+    await getData();
+});
 </script>
 
 <style lang="less" scoped>
@@ -78,5 +104,10 @@ function dialogClose() {
     height: 30px;
     width: 100px;
     border-radius: 4px;
+}
+
+.timeline-time {
+    font-size: var(--tv-Steps-timeline-item-secondary-text-font-size);
+    color: var(--tv-Steps-timeline-item-secondary-text-color);
 }
 </style>

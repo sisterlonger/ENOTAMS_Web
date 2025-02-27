@@ -47,7 +47,8 @@ onMounted(() => {
   flex-direction: column;
   width: 100vw;
   height: 100vh;
-  background-image: url('@/assets/images/img_log.png');
+  // 登录背景图
+  background-image: url('@/assets/images/img_log2.png');
   background-size: 100% 100%;
 }
 
@@ -66,9 +67,11 @@ onMounted(() => {
   height: 550px;
   padding: 60px 40px;
   font-size: var(--ti-common-font-size-1);
-  background: #fff;
+  /*background: #fff;*/
+  /* 增加透明度 */
+  background: rgba(250, 250, 250, 0);
   box-shadow: 0 0 2px 2px var(--ti-common-color-bg-normal);
-
+  border-radius: 20px;
   &-header {
     display: flex;
     flex-direction: column;
@@ -86,7 +89,7 @@ onMounted(() => {
 
     &-text {
       display: inline-block;
-      color: rgba(0, 0, 0, 0.7);
+      color: rgba(255, 255, 255, 1);
       font-weight: bold;
       font-size: 30px;
       vertical-align: middle;
@@ -96,7 +99,7 @@ onMounted(() => {
   &-desc {
     margin-top: 12px;
     margin-bottom: 40px;
-    color: rgba(0, 0, 0, 0.5);
+    color: rgba(255, 255, 255, 0.7);
     font-size: 14px;
   }
 }

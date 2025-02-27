@@ -19,7 +19,7 @@ export default {
   'navbar.docs': '文档中心',
   'navbar.action.locale': '切换为中文',
   'messageBox.assemble': '组装报文',
-  'messageBox.usercenter': '用户中心',
+  'messageBox.usercenter': '个人中心',
   'messageBox.userSettings': '用户设置',
   'messageBox.logout': '退出登录',
   'menu.node': '节点管理',

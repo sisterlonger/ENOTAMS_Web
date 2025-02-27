@@ -16,7 +16,7 @@
       <li>
         <div class="divider"></div>
       </li>
-      <li v-if='false' @click="changeLan">
+      <li v-if="false" @click="changeLan">
         <span v-if="i18.locale.value === 'zhCN'">中文</span>
         <span v-else>English</span>
         <img src="@/assets/images/lan.png" alt="lan" class="navbar-lan" />
@@ -33,29 +33,31 @@
     <span @click="setVisible">{{ $t('settings.title') }}</span>
   </li>
   <li class="navbar-user">
-    <tiny-user-head type="icon" round min>
-      <div class="user-image">
-        <img src="@/assets/images/avatar.png" alt="user" />
-      </div>
-    </tiny-user-head>
+    <tiny-button type="info"> 快捷菜单</tiny-button>
     <div class="trigger-user">
   <li v-for="(item, index) in userlist" :key="index" :value="item.label" @click="switchUser(item.value)">
-    <iconPublicHome v-if="item.value === 1"></IconPublicHome>
-    <iconAssociation v-if="item.value === 2"></IconAssociation>
+    <iconPublicHome v-if="item.value === 1"></iconPublicHome>
+    <iconAssociation v-if="item.value === 2"></iconAssociation>
     <iconUser v-if="item.value === 3"></iconUser>
     <iconEditorRedo v-if="item.value === 4"></iconEditorRedo>
     {{ $t(item.label) }}
   </li>
   </div>
   </li>
+  <li><tiny-user-contact :data="data" :show-number="false"></tiny-user-contact></li>
   </ul>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { UserHead as TinyUserHead, Modal } from '@opentiny/vue';
+import {
+  UserHead as TinyUserHead,
+  Modal,
+  TinyUserContact,
+  Button as TinyButton,
+} from '@opentiny/vue';
 import {
   IconAssociation,
   IconUser,
@@ -81,6 +83,14 @@ const { logout } = useUser();
 const { changeLocale } = useLocale();
 const locales = [...LOCALE_OPTIONS];
 
+const data = reactive({
+  // TODO 图片
+  imgUrl: `https://res.hc-cdn.com/tiny-vue-web-doc/3.20.7.20250117141151/static/images/fruit.jpg`,
+  userName: '',
+  values: [
+  ],
+});
+
 // 切换语言
 const changeLan = () => {
   lan.value = !lan.value;
@@ -103,7 +113,6 @@ const userlist = [
   { label: 'messageBox.logout', value: 4 },
 ];
 
-
 const switchUser = (e: number) => {
   switch (e) {
     case 1:
@@ -123,6 +132,10 @@ const switchUser = (e: number) => {
     // eslint-disable-next-line no-console
   }
 };
+onMounted(() => {
+  data.userName = userStore.userInfo.userName;
+  data.values.push({ text: '部门', value: userStore.userInfo.fullName || '' }, { text: '电话', value: userStore.userInfo.mobile || '' }, { text: '邮箱', value: userStore.userInfo.email || '' },)
+});
 
 // 点击图标跳转首页
 const jumpUrl = () => {
@@ -263,7 +276,7 @@ const jumpUrl = () => {
     bottom: -102px;
     display: none;
     width: 100px;
-    margin-left: -43px;
+    //margin-left: -43px;
   }
 
   .trigger-user:hover {

@@ -44,14 +44,12 @@
             </tiny-col>
             <tiny-col :span="2" style="margin:2px">
               <tiny-form-item label-width="80px" label="下限">
-                <tiny-select v-model="createData.qLowerLimit" value-field="fl" text-field="fl" render-type="grid"
-                  :grid-op="limitOption" @change="onChangeFG('F')"></tiny-select>
+                <tiny-input v-model="createData.qLowerLimit" disabled></tiny-input>
               </tiny-form-item>
             </tiny-col>
             <tiny-col :span="2" style="margin:2px">
               <tiny-form-item label-width="80px" label="上限">
-                <tiny-select v-model="createData.qUpperLimit" value-field="fl" text-field="fl" render-type="grid"
-                  :grid-op="limitOption" @change="onChangeFG('G')"></tiny-select>
+                <tiny-input v-model="createData.qUpperLimit" disabled></tiny-input>
               </tiny-form-item>
             </tiny-col>
             <tiny-col :span="2" style="margin:2px">
@@ -143,7 +141,7 @@
                 </tiny-col>
               </tiny-collapse-item>
               <tiny-collapse-item title="选填项" name="选填项">
-                <tiny-col v-for=" (item, index) in matches.matchesOptionalLabel" :key="'optional' + index" :span="6">
+                <tiny-col v-for="(item, index) in matches.matchesOptionalLabel" :key="'optional' + index" :span="6">
                   <tiny-form-item :label="item">
                     <tiny-input v-model="eFormData.optionalList[index]" placeholder="请输入" clearable></tiny-input>
                   </tiny-form-item>
@@ -162,17 +160,26 @@
           </tiny-form-item>
         </tiny-col>
         <tiny-col :span="4">
+          <!--基准面格式-->
+          <tiny-form-item label="基准面格式">
+            <tiny-select v-model="createData.baseType" value-field="fg" text-field="fg" :grid-op="baseTypeOption"
+              render-type="grid" @change="onChangeBaseType()" placeholder="请选择基准面格式">
+            </tiny-select>
+          </tiny-form-item>
+        </tiny-col>
+        <tiny-col :span="4">
           <!--下限-->
           <tiny-form-item label="F项(下限)">
-            <tiny-input v-model="createData.f_lowerLimit" placeholder="请输入下限">
-            </tiny-input>
+            <tiny-input v-model="createData.f_lowerLimit" placeholder="请输入下限"
+              :disabled="createData.baseType.split('-')[0] == 'SFC' || createData.baseType.split('-')[0] == 'GND'"
+              @click="onFocusFG('F')"></tiny-input>
           </tiny-form-item>
         </tiny-col>
         <tiny-col :span="4">
           <!--上限-->
           <tiny-form-item label="G项(上限)">
-            <tiny-input v-model="createData.g_upperLimit" placeholder="请输入上限">
-            </tiny-input>
+            <tiny-input v-model="createData.g_upperLimit" placeholder="请输入上限"
+              :disabled="createData.baseType.split('-')[1] === 'UNL'" @click="onFocusFG('G')"></tiny-input>
           </tiny-form-item>
         </tiny-col>
         <tiny-col :span="12" v-if="false">
@@ -191,7 +198,15 @@
     </tiny-form>
     <tiny-dialog-box v-if="boxDVisibility" v-model:visible="boxDVisibility" append-to-body title="编辑时间段" width="35%"
       :close-on-click-modal="false">
-      <schedulePicker @scheduleChange="handleScheduleChange" @close="dialogCloseD" />
+      <schedulePicker @scheduleChange="handleScheduleChange" @close="dialogClose" />
+    </tiny-dialog-box>
+    <tiny-dialog-box v-show="boxFVisibility" v-model:visible="boxFVisibility" append-to-body title="编辑F项" width="35%"
+      :close-on-click-modal="false">
+      <fgInput :baseType='baseType' :fgType='fgType' @fgChange="changeFG" @close="dialogClose" />
+    </tiny-dialog-box>
+    <tiny-dialog-box v-show="boxGVisibility" v-model:visible="boxGVisibility" append-to-body title="编辑F/G项" width="35%"
+      :close-on-click-modal="false">
+      <fgInput :baseType='baseType' :fgType='fgType' @fgChange="changeFG" @close="dialogClose" />
     </tiny-dialog-box>
   </div>
 </template>
@@ -227,6 +242,7 @@ import {
 import { queryAirPortAndAirSpace, queryAirSpaceList, queryAirPortConfig } from '@/api/fetchInterface';
 import formgenerator from '@/components/formgenerator/index.vue';
 import schedulePicker from '@/components/schedulePicker/index.vue';
+import fgInput from '@/components/fginput/index.vue';
 import { useUserStore } from '@/store';
 import airport from '@/router/routes/modules/airport';
 import { limitOption } from '@/constants/limitOptions';
@@ -271,6 +287,8 @@ const createData = reactive({
   messageType: '',
   // 报文生效类型
   messageValidType: '',
+  // F/G项的基准面
+  baseType: "",
   // Q项
   qAirSpace: "",
   qCode: '',
@@ -300,6 +318,10 @@ const createData = reactive({
   h_coordinate: '',
 
 })
+// 基准面
+const baseType = ref<any>('');
+// 弹窗的f/g的类型
+const fgType = ref<any>('');
 // 折叠变量
 const activeNames = ref(['示例', '必填项', '选填项', '组装文本'])
 // e项的组装数据
@@ -323,10 +345,32 @@ const aOptions = ref([{
 }]);
 // D项弹窗显示变量
 const boxDVisibility = ref(false)
+// FG项弹窗显示变量
+const boxFVisibility = ref(false)
+const boxGVisibility = ref(false)
 // 报文类型
 const messageTypeOption = ref(['新报', '代替报', '取消报']);
 // 报文有效期类型
 const messageValidTypeOption = ref(['EST', 'PERM', 'NEITHER']);
+// 基准面类型
+const baseTypeOption = ref({
+  height: 400,
+  data: [
+    { fBase: 'SFC', gBase: "UNL", fg: "SFC-UNL" },
+    { fBase: 'GND', gBase: "UNL", fg: "GND-UNL" },
+    { fBase: 'SFC', gBase: 'XXX M AMSL', fg: "SFC-XXX M AMSL" },
+    { fBase: 'GND', gBase: 'XXX M AGL', fg: "GND-XXX M AGL" },
+    { fBase: 'XXX M AGL', gBase: 'XXX M AGL', fg: "XXX M AGL-XXX M AGL" },
+    { fBase: 'XXX M AMSL', gBase: 'XXX M AMSL', fg: "XXX M AMSL-XXX M AMSL" },
+    { fBase: 'FL XXX', gBase: "FL XXX", fg: "FL XXX-FL XXX" },
+  ],
+  columns: [
+    { type: 'radio', title: '', width: "10%" },
+    { field: 'fBase', title: 'F)项' },
+    { field: 'gBase', title: 'G)项' },
+    //{ field: 'fg', title: '', hidden: true },
+  ]
+});
 // 初始化请求数据
 onMounted(async () => {
   if (templateID.value) {
@@ -469,17 +513,59 @@ async function onChangeA() {
 function onFocus() {
   boxDVisibility.value = true;
 }
-// D项弹窗关闭事件
-function dialogCloseD() {
+// 弹窗关闭事件
+function dialogClose() {
   boxDVisibility.value = false;
+  boxFVisibility.value = false;
+  boxGVisibility.value = false;
+  fgType.value = "";
 }
-// 上下限改变时，触发FG项改变事件
-async function onChangeFG(data: string) {
+// FG项弹窗打开事件
+function onFocusFG(data: string) {
+  const [f, g] = createData.baseType.split("-")
   if (data === 'F') {
-    createData.f_lowerLimit = createData.qLowerLimit;
+    baseType.value = f
+    fgType.value = 'F';
+    boxFVisibility.value = true;
   }
   else {
-    createData.g_upperLimit = createData.qUpperLimit;
+    baseType.value = g
+    fgType.value = 'G';
+    boxGVisibility.value = true;
+  }
+}
+// FG改变事件,回传值并且更新Q项的上下限
+const changeFG = (type: string, data: any, fl: any) => {
+  if (type === 'F') {
+    createData.f_lowerLimit = data;
+    createData.qLowerLimit = fl;
+  }
+  else if (type === 'G') {
+    createData.g_upperLimit = data;
+    createData.qUpperLimit = fl;
+  }
+}
+// 上下限改变时，触发FG项改变事件
+function onChangeBaseType() {
+  // 基准面选择事件-规范F、G的选项
+  let fBase = createData.baseType.split("-")[0];
+  let gBase = createData.baseType.split("-")[1];
+  // 这些情况下，F、G项无需编辑，并且自动修改Q项的值
+  if (fBase === "SFC" || fBase === "GND") {
+    createData.f_lowerLimit = fBase;
+    createData.qLowerLimit = "000";
+  }
+  else {
+    createData.f_lowerLimit = "";
+    createData.qLowerLimit = "";
+  }
+  if (gBase === "UNL") {
+    createData.g_upperLimit = gBase;
+    createData.qUpperLimit = "999";
+  }
+  else {
+    createData.g_upperLimit = "";
+    createData.qUpperLimit = "";
   }
 }
 

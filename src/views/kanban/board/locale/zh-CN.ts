@@ -1,5 +1,5 @@
 export default {
-  'menu.user.info': '用户中心',
+  'menu.user.info': '个人中心',
   'work.mock.employees': '转岗员工',
   'work.mock.onboard': '新员工上岗',
   'work.mock.Test': '测试辅导',
@@ -34,7 +34,7 @@ export default {
   'work.index.prepare': '已办',
   'work.index.open': '失效',
   'work.index.classes': '结办',
-  'work.index.policy': '用户中心',
+  'work.index.policy': '个人中心',
   'work.index.Period': '管理用户信息',
   'work.index.Hotline': '组织架构',
   'work.index.service': '管理管制、机场、通导和气象部门',

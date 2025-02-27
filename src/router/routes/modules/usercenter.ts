@@ -3,7 +3,7 @@ export default {
   name: 'usercenter',
   component: () => import('@/views/kanban/usercenter/index.vue'),
   meta: {
-    locale: '用户中心',
+    locale: '个人中心',
     order: 7,
   },
 };

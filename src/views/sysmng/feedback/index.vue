@@ -51,14 +51,17 @@
                     <tiny-grid-column field="state" title="状态"></tiny-grid-column>
                     <tiny-grid-column title="操作" width="300" align="center">
                         <template #default="data">
-                            <tiny-button v-if="userStore.userInfo.userID == data.row.userID && data.row.state !='已处理'"  size="mini" type="primary" @click="editRowEvent(data.row)">编辑</tiny-button>
-                            <tiny-button v-permission="[router.currentRoute.value.meta.locale,'审批']" size="mini" type="info" @click="auditRowEvent(data.row)">审批</tiny-button>
-                            <tiny-button v-if="userStore.userInfo.userID == data.row.userID && data.row.state !='已处理'"  size="mini" type="danger" @click="deleteRowEvent(data.row)">删除</tiny-button>
+                            <tiny-button v-if="userStore.userInfo.userID == data.row.userID && data.row.state != '已处理'"
+                                size="mini" type="primary" @click="editRowEvent('edit', data.row)">编辑</tiny-button>
+                            <tiny-button v-permission="[router.currentRoute.value.meta.locale, '审批']" size="mini"
+                                type="info" @click="editRowEvent('audit', data.row)">审批</tiny-button>
+                            <tiny-button v-if="userStore.userInfo.userID == data.row.userID && data.row.state != '已处理'"
+                                size="mini" type="danger" @click="editRowEvent('delete', data.row)">删除</tiny-button>
                         </template>
                     </tiny-grid-column>
                 </tiny-grid>
                 <tiny-dialog-box v-if="boxVisibility" v-model:visible="boxVisibility" title="编辑" width="30%">
-                    <feedbackForm :feedbackID="feedbackID" @close="dialogClose" />
+                    <feedbackForm :feedbackID="feedbackID" :action="action" @close="dialogClose" />
                 </tiny-dialog-box>
             </div>
         </div>
@@ -96,6 +99,7 @@ const tableData = ref([
 ])
 const boxVisibility = ref(false)
 const feedbackID = ref(0)
+const action = ref('')
 const formData = ref({
     content: "",
     comment: "",
@@ -121,16 +125,24 @@ async function getData({ page }) {
     })
 }
 // 行操作
-const editRowEvent = (row) => {
-    feedbackID.value = row.feedbackID;
-    boxVisibility.value = true;
-}
-async function deleteRowEvent(row) {
-    await deleteFeedback([row.feedbackID]);
-    Modal.message({
-        message: '删除成功!',
-        status: 'success',
-    });
+const editRowEvent = async (flag, row) => {
+    if (flag === 'edit') {
+        feedbackID.value = row.feedbackID;
+        action.value = 'edit';
+        boxVisibility.value = true;
+    }
+    else if (flag === 'audit') {
+        feedbackID.value = row.feedbackID;
+        action.value = 'audit';
+        boxVisibility.value = true;
+    }
+    else if (flag === 'delete') {
+        await deleteFeedback([row.feedbackID]);
+        Modal.message({
+            message: '删除成功!',
+            status: 'success',
+        });
+    }
 }
 // 表操作
 const toolbarButtons = ref([
@@ -149,6 +161,7 @@ async function toolbarButtonClickEvent({ code, $grid }) {
     switch (code) {
         case 'addSelection': {
             feedbackID.value = 0;
+            action.value = 'edit';
             boxVisibility.value = true;
             break
         }
@@ -169,6 +182,7 @@ async function toolbarButtonClickEvent({ code, $grid }) {
 function dialogClose() {
     feedbackID.value = 0;
     boxVisibility.value = false;
+    action.value = '';
     queryClick();
 }
 </script>
