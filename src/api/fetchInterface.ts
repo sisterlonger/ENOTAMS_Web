@@ -19,3 +19,5 @@ export * from './user';
 export * from './validation';
 export * from './feedback';
 export * from './version';
+export * from './controlled';
+export * from './restricted';

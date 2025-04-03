@@ -38,4 +38,11 @@ export default [
     path: `${import.meta.env.VITE_CONTEXT}redirect`,
     component: () => import('@/views/redirect.vue'),
   },
+  /*
+  // 乾坤
+  {
+    path: '/', // 父项目路由映射到子项目
+    component: () => import('@/views/BWrapper.vue'), // 容器组件
+  },*/
+
 ] as RouteRecordRaw[];

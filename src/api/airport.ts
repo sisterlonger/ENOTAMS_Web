@@ -15,8 +15,15 @@ export function queryAirPortDetail(params: { id: string}) {
         params,
     });
 }
+// 选择A项后获取机场参数
 export function queryAirPortConfig(params: { id: string}) {
     return axios.get('/airport/getbycodeid', {
+        params,
+    });
+}
+// 选择跑道后获取跑道参数
+export function queryRwyConfig(params: { name: string}) {
+    return axios.get('/airport/getrwybyname', {
         params,
     });
 }

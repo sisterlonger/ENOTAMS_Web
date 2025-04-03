@@ -73,7 +73,7 @@
         </tiny-col>
       </tiny-row>
       <tiny-row>
-        <tiny-col :span="12">
+        <tiny-col :span="3">
           <!--情报区或者机场两大类选择器-->
           <tiny-form-item label="A项">
             <tiny-select v-model="createData.a_airSpace" filterable placeholder="请选择情报区/机场" value-field="codeId"
@@ -85,8 +85,6 @@
             </tiny-select>
           </tiny-form-item>
         </tiny-col>
-      </tiny-row>
-      <tiny-row>
         <tiny-col :span="2.5">
           <!--时间-->
           <tiny-form-item label="B项(开始时间)">
@@ -101,12 +99,6 @@
               value-format="yyMMddHHmm"></tiny-date-picker>
           </tiny-form-item>
         </tiny-col>
-        <tiny-col :span="3">
-          <!--时间段-->
-          <tiny-form-item label="D项(时间段)">
-            <tiny-input v-model="createData.d_time" placeholder="请输入D项" @focus="onFocus"> </tiny-input>
-          </tiny-form-item>
-        </tiny-col>
         <tiny-col :span="4">
           <!--生效时间-->
           <tiny-form-item label="有效期">
@@ -116,6 +108,14 @@
             </tiny-radio-group>
           </tiny-form-item>
         </tiny-col>
+        <tiny-row>
+          <tiny-col :span="5.5">
+            <!--时间段-->
+            <tiny-form-item label="D项(时间段)">
+              <tiny-input v-model="createData.d_time" placeholder="请输入D项" @focus="onFocus"> </tiny-input>
+            </tiny-form-item>
+          </tiny-col>
+        </tiny-row>
         <tiny-col :span="12">
           <!--E项-->
           <tiny-form-item label="E项">
@@ -204,7 +204,7 @@
       :close-on-click-modal="false">
       <fgInput :baseType='baseType' :fgType='fgType' @fgChange="changeFG" @close="dialogClose" />
     </tiny-dialog-box>
-    <tiny-dialog-box v-show="boxGVisibility" v-model:visible="boxGVisibility" append-to-body title="编辑F/G项" width="35%"
+    <tiny-dialog-box v-show="boxGVisibility" v-model:visible="boxGVisibility" append-to-body title="编辑G项" width="35%"
       :close-on-click-modal="false">
       <fgInput :baseType='baseType' :fgType='fgType' @fgChange="changeFG" @close="dialogClose" />
     </tiny-dialog-box>
@@ -239,7 +239,7 @@ import {
   TinyDivider,
   DialogBox as TinyDialogBox,
 } from '@opentiny/vue'
-import { queryAirPortAndAirSpace, queryAirSpaceList, queryAirPortConfig } from '@/api/fetchInterface';
+import { queryAirPortAndAirSpace, queryAirPortConfig, queryAirSpaceConfig } from '@/api/fetchInterface';
 import formgenerator from '@/components/formgenerator/index.vue';
 import schedulePicker from '@/components/schedulePicker/index.vue';
 import fgInput from '@/components/fginput/index.vue';
@@ -272,9 +272,8 @@ const props = defineProps({
 });
 const { templateID } = toRefs(props);
 const { templateData } = toRefs(props);
+// 机场、情报区数据
 const staticData = ref({
-  // 跑道号码
-  rwyTxtDesig: [],
 });
 const createData = reactive({
   templateID: null,
@@ -324,6 +323,8 @@ const baseType = ref<any>('');
 const fgType = ref<any>('');
 // 折叠变量
 const activeNames = ref(['示例', '必填项', '选填项', '组装文本'])
+// 情报区四字码
+const airSpaceCodes = ref(["ZBPE", "ZGZU", "ZHWH", "ZJSA", "ZLHW", "ZPKM", "ZSHA", "ZWUQ", "ZYSH",]);
 // e项的组装数据
 const eFormData = reactive({
   requiredList: [],
@@ -376,6 +377,7 @@ onMounted(async () => {
   if (templateID.value) {
     fetchData();
   }
+  // 用户只会发自己情报区的电报
   createData.qAirSpace = userStore.airSpace || "";
 });
 
@@ -493,20 +495,86 @@ function onAssemble() {
   });
   eFormData.result = assembleText;
 }
+
+// 处理config函数
+function createConfigItem<T>(data: T[], key: keyof T): { value: string; label: string }[] {
+  return uniqueByProperty(data, key).map((item: any) => ({
+    value: String(item[key]),
+    label: String(item[key]),
+  }));
+}
+// 去重函数
+function uniqueByProperty(array: any, key: any) {
+  const seen = new Set();
+  return array.filter((item: any) => {
+    const value = item[key];
+    if (seen.has(value)) return false;
+    seen.add(value);
+    return true;
+  });
+};
 // A-E、Q。A项改变事件，触发了静态数据变化。只有A项和Q项可以触发静态数据变化
 async function onChangeA() {
-  // TODO 加个if语句判断是否为机场，不然报错，前后端都可以实现
-  // 如果选择了机场，那么自动填写坐标和半径
-  const { data } = await queryAirPortConfig({ id: createData.a_airSpace });
-  if (data) {
-    createData.qLat = data.geoLat;
-    createData.qLong = data.geoLong;
-    staticData.value.rwyTxtDesig = data.rwyList.map((item: any) => { return { value: item.txtDesig, label: item.txtDesig } });
-  }
-  else {
+  // 例如选择了情报区，就能筛选出对应的NDB、VOR/DME。
+  // 选择情报区
+  console.log(createData.a_airSpace );
+  if (airSpaceCodes.value.includes(createData.a_airSpace)) {
+    const { data } = await queryAirSpaceConfig({ id: createData.a_airSpace });
     createData.qLat = "";
     createData.qLong = "";
-    staticData.value.rwyTxtDesig = [];
+    console.log(data);
+    if (data) {
+      /*
+      const rwyConfig: any = {};
+      const configKeys = [...new Set(data.rwys.flatMap(Object.keys))];
+      configKeys.forEach((key) => {
+        rwyConfig[key] = createConfigItem(data.rwys, key);
+      });
+      const keys = Object.keys(rwyConfig);
+      keys.forEach(key => {
+        if (rwyConfig[key].length === 1) {
+          staticData.value[key] = rwyConfig[key][0].value;
+        }
+        else {
+          staticData.value[key] = rwyConfig[key];
+        }
+      });*/
+    }
+    // 情报区信息为空
+    else {
+      staticData.value = {};
+    }
+  }
+  // 选择了机场
+  else {
+    // 例如选择了机场，那么跑道号就可以筛选出来，同时也可以获取到对应的跑道信息作为参考
+    // 如果选择了机场，那么自动填写坐标和半径
+    const { data } = await queryAirPortConfig({ id: createData.a_airSpace });
+    if (data) {
+      createData.qLat = data.geoLat;
+      createData.qLong = data.geoLong;
+      const rwyConfig: any = {};
+      const configKeys = [...new Set(data.rwys.flatMap(Object.keys))];
+      configKeys.forEach((key) => {
+        rwyConfig[`rwys${key}`] = createConfigItem(data.rwys, key);
+      });
+      const keys = Object.keys(rwyConfig);
+      keys.forEach(key => {
+        if (rwyConfig[key].length === 1) {
+          staticData.value[key] = rwyConfig[key][0].value;
+        }
+        else {
+          staticData.value[key] = rwyConfig[key];
+        }
+      });
+    }
+    // 机场信息为空
+    else {
+      createData.qLat = "";
+      createData.qLong = "";
+      staticData.value = {};
+    }
+
   }
 }
 // D项点击事件

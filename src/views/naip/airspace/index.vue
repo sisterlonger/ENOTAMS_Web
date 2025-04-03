@@ -3,121 +3,94 @@
         <Breadcrumb :items="['menu.source', 'menu.airspace']" />
         <div class="content">
             <div class="content-main">
-                <!--查询组件、选择-->
-                <tiny-collapse v-model="activeNames">
-                    <tiny-collapse-item title="查询" name="0">
-                        <tiny-form label-width="100px" label-position="right" class="filter-form" size="small">
-                            <tiny-row>
-                                <tiny-col :span="4">
-                                    <tiny-form-item label="四字代码">
-                                        <tiny-input v-model="formData.codeId" placeholder="请输入四字代码"
-                                            clearable></tiny-input>
-                                    </tiny-form-item>
-                                </tiny-col>
-                                <tiny-col :span="4">
-                                    <tiny-form-item label="情报区名称">
-                                        <tiny-input v-model="formData.txtName" placeholder="请输入情报区名称"
-                                            clearable></tiny-input>
-                                    </tiny-form-item>
-                                </tiny-col>
-                                <tiny-col :span="4">
-                                    <tiny-form-item>
-                                        <div>
-                                            <tiny-button class="search-btn" type="primary" @click="queryClick">
-                                                查询
-                                            </tiny-button>
-                                        </div>
-                                    </tiny-form-item>
-                                </tiny-col>
-                            </tiny-row>
-                        </tiny-form>
-                    </tiny-collapse-item>
-                </tiny-collapse>
-
-                <tiny-grid ref="gridRef" :fetch-data="fetchData" seq-serial :pager="pagerConfig"
-                    >
-                    <tiny-grid-column type="index" width="60"></tiny-grid-column>
-                    <tiny-grid-column type="selection" width="60"></tiny-grid-column>
-                    <tiny-grid-column field="codeType" title="代码类型"></tiny-grid-column>
-                    <tiny-grid-column field="codeId" title="四字代码"></tiny-grid-column>
-                    <tiny-grid-column field="txtName" title="情报区名称"></tiny-grid-column>
-                    <tiny-grid-column field="horizontalRange" title="水平距离" show-overflow></tiny-grid-column>
-                    <tiny-grid-column field="verticalRange" title="垂直距离" show-overflow></tiny-grid-column>
-                    <tiny-grid-column field="txtRmk" title="备注" show-overflow></tiny-grid-column>
-                </tiny-grid>
-                <tiny-dialog-box v-if="boxVisibility" v-model:visible="boxVisibility" title="编辑" width="30%">
-                    <airspaceForm :dicID="airspaceId" @close="dialogClose" />
-                </tiny-dialog-box>
+                <tiny-layout style="width: 100%">
+                    <tiny-row>
+                        <tiny-col :span="2">
+                            <tiny-tree-menu ref="treeMenu" :get-menu-data-sync="getNodeDataSync" wrap
+                                @node-click="handleNodeClick"></tiny-tree-menu>
+                        </tiny-col>
+                        <tiny-col :span="10">
+                            <airspaceForm :formData="formData" />
+                        </tiny-col>
+                    </tiny-row>
+                </tiny-layout>
             </div>
         </div>
     </div>
 </template>
 
-<script setup lang="jsx">
-import { ref } from 'vue'
-import {
-    Grid as TinyGrid, GridColumn as TinyGridColumn, Button as TinyButton, DialogBox as TinyDialogBox, GridToolbar as TinyGridToolbar, Input as TinyInput, Form as TinyForm,
-    FormItem as TinyFormItem, Layout as TinyLayout, Row as TinyRow, Col as TinyCol, Modal, Collapse as TinyCollapse,
-    CollapseItem as TinyCollapseItem,
-} from '@opentiny/vue';
-import { queryAirSpaceList } from '@/api/fetchInterface';
-import airspaceForm from './components/form.vue';
+<script lang='ts' setup>
+import { reactive, ref } from 'vue';
+import { TreeMenu as TinyTreeMenu, Layout as TinyLayout, Row as TinyRow, Col as TinyCol, Loading, Modal } from '@opentiny/vue';
+import { queryAirSpaceTree, queryRestrictedDetail, queryControlledDetail } from '@/api/fetchInterface';
+import airspaceForm from './components/airspaceForm.vue';
 
-
-const pagerConfig = ref({
-    attrs: {
-        currentPage: 1,
-        pageSize: 20,
-        pageSizes: [10, 20, 50, 100],
-        total: 0,
-        align: 'left', // 可选值：['left', 'center', 'right']
-        layout: 'total, prev, pager, next, jumper, sizes'
+const treeMenu = ref(null)
+const formData = reactive({});
+// 加载效果
+const state = reactive<{
+    loading: any,
+}>({
+    loading: null,
+});
+const getNodeDataSync = async () => {
+    const { data } = await queryAirSpaceTree();
+    return data;
+}
+const handleNodeClick = async (data: any) => {
+    if (data.children == null) {
+        fetchData(data.id, data.type);
     }
-})
-const fetchData = ref({
-    api: getData
-})
-const tableData = ref([
-])
-const boxVisibility = ref(false)
-const airspaceId = ref(0)
-const formData = ref({
-    codeId: "",
-    txtName: "",
-})
-const gridRef = ref()
-const activeNames = ref(['0'])
+}
+// 请求数据接口方法
+const fetchData = async (ID: string, type: string) => {
+    state.loading = Loading.service({
+        text: 'loading...',
+        target: document.getElementById('container'),
+        background: 'rgba(0, 0, 0, 0.7)',
+    });
+    try {
+        if (ID && ID !== '0') {
+            const { data } = type === "管制区" ? await queryControlledDetail({ id: ID }) : await queryRestrictedDetail({ id: ID });
+            data.class = { codeDistVerUpper: '', valDistVerUpper: '', isContainVerUpper: '', codeDistVerLower: '', valDistVerLower: '', isContainVerLower: '' };
+            // 二次处理垂直范围信息
+            if (data.controlledClass) {
+                data.class = data.controlledClass;
+            }
+            else if (data.restrictedClass) {
+                data.class = data.restrictedClass;
+            }
+            // 二次处理频率信息(管制区才有频率，限制区没有),而且管制区频率也有可能为空
+            if (data.controlledRadios && data.controlledRadios.length > 0) {
+                data.radios = data.controlledRadios;
+            }
+            else {
+                data.radios = [];
+            }
+            Object.assign(formData, data);
+        }
+    }
+    catch (err) {
+        Modal.alert('获取数据错误');
+    }
+    finally {
+        state.loading.close();
+    }
+};
 
-async function queryClick() {
-    //getData({ page: pagerConfig.value.attrs });
-    gridRef.value.handleFetch();
-}
-// 获取列表数据
-async function getData({ page }) {
-    const { currentPage, pageSize } = page;
-    formData.value.pageIndex = currentPage;
-    formData.value.pageSize = pageSize;
-    let response = await queryAirSpaceList(formData.value);
-    tableData.value = response.data;
-    return Promise.resolve({
-        result: tableData.value,
-        page: { total: response.count },
-    })
-}
-// 表操作
-const toolbarButtons = ref([
-])
-// 关闭弹窗
-function dialogClose() {
-    airspaceId.value = 0;
-    boxVisibility.value = false;
-    queryClick();
-}
 </script>
 
 <style lang="less" scoped>
-.tiny-grid {
+.tiny-tree-menu {
+    width: 100%;
     overflow-y: auto;
+}
+
+:deep(.tiny-tree-menu .tiny-input) {
+    margin: var(--tv-TreeMenu-padding-top) var(--tv-TreeMenu-padding-left);
+    position: relative;
+    max-width: 1880px;
+    width: 90%;
 }
 
 .container {
@@ -134,6 +107,7 @@ function dialogClose() {
     }
 }
 
+
 .content {
     display: flex;
     flex-direction: column;
@@ -144,13 +118,9 @@ function dialogClose() {
     border-radius: 10px;
 }
 
-.content-main {
-    padding: 15px 15px 50px;
-}
 
-.search-btn {
-    height: 30px;
-    width: 100px;
-    border-radius: 4px;
+.content-main {
+    padding: 30px 15px;
+    width: 100%;
 }
 </style>

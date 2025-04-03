@@ -55,7 +55,7 @@
         <tiny-row class="title">跑道信息</tiny-row>
         <tiny-grid
           ref="theGridRef"
-          :data="formData.rwyList"
+          :data="formData.rwys"
           seq-serial
           :stripe="true"
           :expand-config="expandConfigData"

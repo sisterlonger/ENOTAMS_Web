@@ -5,6 +5,7 @@ export default {
     meta: {
       locale: '操作日志',
       order: 9,
+      requiresAuth: false ,
     },
   };
   

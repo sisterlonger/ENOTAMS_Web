@@ -27,21 +27,21 @@ export default function setupPermissionGuard(router: Router) {
           appRoutes,
           userStore.role
         ) || {
-            name: 'notFound',
-          } || {
-            name: 'preview',
-          };
+          name: 'notFound',
+        } || {
+          name: 'preview',
+        };
         next(destination);
       }
       NProgress.done();
     }
+    // 已登录
     if (isLogin()) {
       if (userStore.role) {
         crossroads();
       } else {
         try {
           // 修复首次登录失败问题
-          console.log("1");
           await userStore.info();
           crossroads();
         } catch (error) {
@@ -55,7 +55,16 @@ export default function setupPermissionGuard(router: Router) {
           NProgress.done();
         }
       }
-    } else {
+    }
+    // TODO无需登录的页面
+    else if (to.meta.requiresAuth === false) {
+      next();
+      NProgress.done();
+      //return;
+    }
+    // 未登录 
+    else {
+
       if (to.name === 'login' || to.name === 'preview') {
         next();
         NProgress.done();

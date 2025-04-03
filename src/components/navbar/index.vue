@@ -44,7 +44,7 @@
   </li>
   </div>
   </li>
-  <li><tiny-user-contact :data="data" :show-number="false"></tiny-user-contact></li>
+  <li><tiny-user-contact v-if="false" :data="data" :show-number="false"></tiny-user-contact></li>
   </ul>
   </div>
 </template>
@@ -85,7 +85,7 @@ const locales = [...LOCALE_OPTIONS];
 
 const data = reactive({
   // TODO 图片
-  imgUrl: `https://res.hc-cdn.com/tiny-vue-web-doc/3.20.7.20250117141151/static/images/fruit.jpg`,
+  imgUrl: new URL('@/assets/images/user-head.png', import.meta.url).href,
   userName: '',
   values: [
   ],

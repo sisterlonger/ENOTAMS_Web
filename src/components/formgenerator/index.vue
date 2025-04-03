@@ -34,8 +34,8 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, toRefs, watch, toRaw, defineExpose } from 'vue';
-import { queryDicType, getKeyWordJSON } from '@/api/fetchInterface';
+import { ref, reactive, onMounted, toRefs, watch, toRaw, defineExpose, defineEmits } from 'vue';
+import { queryDicType, queryRwyConfig, getKeyWordJSON } from '@/api/fetchInterface';
 import {
     TinyForm,
     TinyFormItem,
@@ -56,12 +56,13 @@ defineProps({
     },
   },
 });*/
-
+//const emit = defineEmits(['onChangeE']);
 import children from './components/children.vue';
 
 const props = defineProps({
     keyWord: String,
     keyWordLabel: Object,
+    // 可以用于实时更新关联选项
     staticData: Object,
 });
 const { keyWord } = toRefs(props);
@@ -74,20 +75,57 @@ const submitFormData = reactive({});
 const keyList = reactive({});
 const formStyle = reactive({ width: '100px', span: 6 });
 const preCondition = ref(false);
+const eData = ref({
+    // ----逻辑跑道相关参数----
 
+});
+/*
+const rwyConfigKey = [
+    // 物理跑道长度
+    'valLen',
+    // 物理跑道宽度
+    'valWid',
+];
+// 物理和逻辑跑道参数
+const configKeys = [
+    // 逻辑跑道停止道宽
+    'valStwWidth',
+    // 逻辑跑道停止道长
+    'valStwLength',
+];*/
 
-// 静态数据发生变化时触发的函数，函数将会动态调整对应的关键字里选择器中的选项值
+// 1vn,静态数据发生变化时触发的函数，函数将会动态调整对应的关键字里选择器中的选项值
 const updateOptions = async (newValue, fieldList) => {
     if (fieldList) {
         // 遍历formFields
         for (let i = 0; i < fieldList.length; i += 1) {
+            const dicTypeKey = fieldList[i].dicType?.replace("$", "");
             // 如果找到对应的字段，则更新该字段的选项配置
-            console.log(fieldList[i]);
-            if (fieldList[i].dicType != null && fieldList[i].dicType.includes('$')) {
-                fieldList[i].options = newValue[fieldList[i].dicType.replace("$", "")];
+            if (fieldList[i].dicType?.includes("$")      // 确保 dicType 存在且包含 $
+                && typeof newValue[dicTypeKey] === "object") {
+                fieldList[i].options = newValue[dicTypeKey];
             }
-            console.log(fieldList[i].children);
-            if (fieldList[i].type.includes('hildren') && fieldList[i].children && fieldList[i].children.length > 0) {
+            if (fieldList[i].type.includes('hildren') && fieldList[i].children?.length > 0) {
+                updateOptions(newValue, fieldList[i].children);
+            }
+        }
+    }
+}
+// 1v1,静态数据发生变化时触发的函数，函数将会动态调整对应的关键字里选择器中的值
+const updateValue = async (newValue, fieldList) => {
+    if (fieldList) {
+        // 遍历formFields
+        for (let i = 0; i < fieldList.length; i += 1) {
+            const dicTypeKey = fieldList[i].dicType?.replace("$", "");
+            const targetValue = newValue[dicTypeKey];
+            // 如果找到对应的字段，则更新该字段的值
+            if (fieldList[i].dicType?.includes("$")        // 确保 dicType 存在且包含 $
+                && targetValue                             // 确保 targetValue 存在
+                && typeof targetValue === "string"         // 确保是字符串类型
+            ) {
+                formData[fieldList[i].prop] = targetValue;
+            }
+            if (fieldList[i].type.includes('hildren') && fieldList[i].children?.length > 0) {
                 updateOptions(newValue, fieldList[i].children);
             }
         }
@@ -96,9 +134,8 @@ const updateOptions = async (newValue, fieldList) => {
 watch(
     staticData,
     (newValue) => {
-        console.log(newValue);
-        console.log("formFields", formFields.value);
         updateOptions(newValue, formFields.value);
+        updateValue(newValue, formFields.value);
 
     },
     { immediate: true, deep: true, }
@@ -113,15 +150,55 @@ const validate = (rule, value, callback, data, options) => {
         callback();
     }
 };
+// 处理config函数
+function createConfigItem(data, key) {
+    return uniqueByProperty(data, key).map((item) => ({
+        value: String(item[key]),
+        label: String(item[key]),
+    }));
+}
+function uniqueByProperty(array, key) {
+    const seen = new Set();
+    return array.filter(item => {
+        const value = item[key];
+        if (seen.has(value)) return false;
+        seen.add(value);
+        return true;
+    });
+};
 // E-E，某选项变化时，触发naip或者上下游选择器获取option,data是该选项的值，field是该选项的配置
 const getOption = async (data, field) => {
-    console.log(data, field);
     // 非初始化
     if (data) {
-        // TODO 是NAIP相关的,预留位置
-        if (field.isNaip) {
-            let response = await queryDicType({ dicType: field.dicType, naipValue: data });
-            field.options = response.data;
+        // TODO,目前只有跑道，以后要多点其他。要灵活。是NAIP相关的,预留位置，关联其他选项来触发其他选项的可选项
+        if (field.label === "跑道") {
+            //let response = await queryDicType({ dicType: field.dicType, naipValue: data });
+            let response = await queryRwyConfig({ name: formData[field.prop] });
+            // 注意String化，可以分两批，第一批是机场参数(staticData)，第二批是跑道参数，跑道参数在这里初始化
+            // 将count=1的全部放出来，=n的就保持如下并去重。
+            // 1v多的就不回填，更新选项即可(去重)
+            const rwyConfigKey = Object.keys(response.data);
+            rwyConfigKey.forEach(key => {
+                eData.value[`rwys${key}`] = String(response.data[key]);
+            });
+            const rwyDirectionConfig = {};
+            const configKeys = [...new Set(response.data.rwyDirections.flatMap(Object.keys))];
+            configKeys.forEach((key) => {
+                rwyDirectionConfig[`rwyDirections${key}`] = createConfigItem(response.data.rwyDirections, key);
+            });
+            const keys = Object.keys(rwyDirectionConfig);
+            keys.forEach(key => {
+                // 1v1直接赋值
+                if (rwyDirectionConfig[key].length === 1) {
+                    eData.value[key] = rwyDirectionConfig[key][0].value;
+                }
+                else {
+                    eData.value[key] = rwyDirectionConfig[key];
+                }
+
+            });
+            updateOptions(eData.value, formFields.value);
+            updateValue(eData.value, formFields.value);
         }
         // 与NAIP不相关，只是上游选择器的数据决定下游选择器数据的选项
         // 有下游的prop才可以触发
@@ -247,7 +324,6 @@ onMounted(async () => {
     // 获取关键字配置
     let result = await getKeyWordJSON({ model: keyWord.value });
     formFields.value = result.data;
-    console.log(formFields.value);
     // 初始化所有组件
     await initOption(formFields.value);
     preCondition.value = true;

@@ -52,7 +52,7 @@ const fetchData = async (ID: string) => {
         if (ID && ID !== '0') {
             const { data } = await queryAirPortDetail({ id: ID || '0' });
             Object.assign(formData, data);
-            console.log('formData',formData);
+            console.log('formData', formData);
         }
     }
     catch (err) {
