@@ -495,7 +495,30 @@ function onAssemble() {
   });
   eFormData.result = assembleText;
 }
+// 获取配置项
+const airspaceConfigTypes = [
+  { key: 'ndbs', prefix: 'ndbs' },
+  { key: 'restricteds', prefix: 'restricteds' },
+  { key: 'vors', prefix: 'vors' },
+  { key: 'controlleds', prefix: 'controlleds' }
+];
+const airportConfigTypes = [
+  { key: 'rwys', prefix: 'rwys' },
+];
+// 处理config函数
+function processConfig(dataArray, prefix) {
+  const config = {};
+  // 提取唯一键集合
+  const configKeys = [...new Set(dataArray.flatMap(Object.keys))];
+  configKeys.forEach(key => {
+    const configKey = `${prefix}${key}`;
+    const items = createConfigItem(dataArray, key);
+    // 根据数组长度决定赋值方式
+    config[configKey] = items?.length === 1 ? items[0]?.value : items || [];
+  });
 
+  return config;
+}
 // 处理config函数
 function createConfigItem<T>(data: T[], key: keyof T): { value: string; label: string }[] {
   return uniqueByProperty(data, key).map((item: any) => ({
@@ -515,37 +538,30 @@ function uniqueByProperty(array: any, key: any) {
 };
 // A-E、Q。A项改变事件，触发了静态数据变化。只有A项和Q项可以触发静态数据变化
 async function onChangeA() {
-  // 例如选择了情报区，就能筛选出对应的NDB、VOR/DME。
-  // 选择情报区
-  console.log(createData.a_airSpace );
+  // 选择情报区-NDB、VOR/DME、限制区、管制区
   if (airSpaceCodes.value.includes(createData.a_airSpace)) {
     const { data } = await queryAirSpaceConfig({ id: createData.a_airSpace });
     createData.qLat = "";
     createData.qLong = "";
-    console.log(data);
     if (data) {
-      /*
-      const rwyConfig: any = {};
-      const configKeys = [...new Set(data.rwys.flatMap(Object.keys))];
-      configKeys.forEach((key) => {
-        rwyConfig[key] = createConfigItem(data.rwys, key);
-      });
-      const keys = Object.keys(rwyConfig);
-      keys.forEach(key => {
-        if (rwyConfig[key].length === 1) {
-          staticData.value[key] = rwyConfig[key][0].value;
+      const mergedConfig = airspaceConfigTypes.reduce((acc, { key, prefix }) => {
+        return Object.assign(acc, processConfig(data[key], prefix));
+      }, {});
+      Object.assign(staticData.value, mergedConfig);
+      // 最外层的情报区数据
+      const airspaceKeys = Object.keys(data);
+      airspaceKeys.forEach(key => {
+        if (typeof data[key] !== 'object') {
+          staticData.value[key] = String(data[key]);
         }
-        else {
-          staticData.value[key] = rwyConfig[key];
-        }
-      });*/
+      })
     }
     // 情报区信息为空
     else {
       staticData.value = {};
     }
   }
-  // 选择了机场
+  // 选择了机场-逻辑跑道、物理跑道
   else {
     // 例如选择了机场，那么跑道号就可以筛选出来，同时也可以获取到对应的跑道信息作为参考
     // 如果选择了机场，那么自动填写坐标和半径
@@ -553,20 +569,17 @@ async function onChangeA() {
     if (data) {
       createData.qLat = data.geoLat;
       createData.qLong = data.geoLong;
-      const rwyConfig: any = {};
-      const configKeys = [...new Set(data.rwys.flatMap(Object.keys))];
-      configKeys.forEach((key) => {
-        rwyConfig[`rwys${key}`] = createConfigItem(data.rwys, key);
-      });
-      const keys = Object.keys(rwyConfig);
-      keys.forEach(key => {
-        if (rwyConfig[key].length === 1) {
-          staticData.value[key] = rwyConfig[key][0].value;
+      const mergedConfig = airportConfigTypes.reduce((acc, { key, prefix }) => {
+        return Object.assign(acc, processConfig(data[key], prefix));
+      }, {});
+      Object.assign(staticData.value, mergedConfig);
+      // 最外层的机场参数
+      const airportKeys = Object.keys(data);
+      airportKeys.forEach(key => {
+        if (typeof data[key] !== 'object') {
+          staticData.value[key] = String(data[key]);
         }
-        else {
-          staticData.value[key] = rwyConfig[key];
-        }
-      });
+      })
     }
     // 机场信息为空
     else {

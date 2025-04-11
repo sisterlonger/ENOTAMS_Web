@@ -25,7 +25,7 @@
         <tiny-row class="title">航路数据</tiny-row>
         <tiny-grid
           ref="theGridRef"
-          :data="formData.segmentList"
+          :data="formData.segments"
           seq-serial
           :stripe="true"
         >

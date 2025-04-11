@@ -15,3 +15,9 @@ export function queryRadioNavigationDetail(params: { id: string}) {
         params,
     });
 }
+export function queryRadioNavigationConfig(params: { name: string}) {
+    return axios.get('/radionavigation/getbyname', {
+        params,
+    });
+}
+

@@ -35,7 +35,7 @@
 
 <script setup>
 import { ref, reactive, onMounted, toRefs, watch, toRaw, defineExpose, defineEmits } from 'vue';
-import { queryDicType, queryRwyConfig, getKeyWordJSON } from '@/api/fetchInterface';
+import { queryDicType, queryRwyConfig, queryRadioNavigationConfig, getKeyWordJSON, queryRestrictedConfig, queryControlledConfig } from '@/api/fetchInterface';
 import {
     TinyForm,
     TinyFormItem,
@@ -76,33 +76,19 @@ const keyList = reactive({});
 const formStyle = reactive({ width: '100px', span: 6 });
 const preCondition = ref(false);
 const eData = ref({
-    // ----逻辑跑道相关参数----
 
 });
-/*
-const rwyConfigKey = [
-    // 物理跑道长度
-    'valLen',
-    // 物理跑道宽度
-    'valWid',
-];
-// 物理和逻辑跑道参数
-const configKeys = [
-    // 逻辑跑道停止道宽
-    'valStwWidth',
-    // 逻辑跑道停止道长
-    'valStwLength',
-];*/
 
 // 1vn,静态数据发生变化时触发的函数，函数将会动态调整对应的关键字里选择器中的选项值
 const updateOptions = async (newValue, fieldList) => {
     if (fieldList) {
         // 遍历formFields
         for (let i = 0; i < fieldList.length; i += 1) {
-            const dicTypeKey = fieldList[i].dicType?.replace("$", "");
+            const dicTypeKey = fieldList[i].associationName?.replace("$", "");
             // 如果找到对应的字段，则更新该字段的选项配置
-            if (fieldList[i].dicType?.includes("$")      // 确保 dicType 存在且包含 $
+            if (fieldList[i].associationName?.includes("$")      // 确保 associationName 存在且包含 $
                 && typeof newValue[dicTypeKey] === "object") {
+                formData[fieldList[i].prop] = "";
                 fieldList[i].options = newValue[dicTypeKey];
             }
             if (fieldList[i].type.includes('hildren') && fieldList[i].children?.length > 0) {
@@ -116,17 +102,42 @@ const updateValue = async (newValue, fieldList) => {
     if (fieldList) {
         // 遍历formFields
         for (let i = 0; i < fieldList.length; i += 1) {
-            const dicTypeKey = fieldList[i].dicType?.replace("$", "");
-            const targetValue = newValue[dicTypeKey];
+            let targetValue = "";
+            // 如果包含 +，则表示需要组合多个字段的值
+            if (fieldList[i].associationName && fieldList[i].associationName.includes("+")) {
+                // 拆分变量名数组
+                let associationNameList = [];
+                // 标志位，用于判断是否有效
+                let flag = false;
+                associationNameList = fieldList[i].associationName.split("+");
+                associationNameList.forEach((item) => {
+                    let dicTypeKey = item?.replace("$", "");
+                    // 如果存在无效的字段，则这个字段都不组装了
+                    if (typeof newValue[dicTypeKey] !== "object") {
+                        targetValue += newValue[dicTypeKey];
+                    }
+                    else {
+                        flag = true;
+                    }
+                });
+                if (flag) {
+                    targetValue = "";
+                }
+            }
+            // 单个
+            else {
+                let dicTypeKey = fieldList[i].associationName?.replace("$", "");
+                targetValue = newValue[dicTypeKey];
+            }
             // 如果找到对应的字段，则更新该字段的值
-            if (fieldList[i].dicType?.includes("$")        // 确保 dicType 存在且包含 $
+            if (fieldList[i].associationName?.includes("$")        // 确保 associationName 存在且包含 $
                 && targetValue                             // 确保 targetValue 存在
                 && typeof targetValue === "string"         // 确保是字符串类型
             ) {
                 formData[fieldList[i].prop] = targetValue;
             }
             if (fieldList[i].type.includes('hildren') && fieldList[i].children?.length > 0) {
-                updateOptions(newValue, fieldList[i].children);
+                updateValue(newValue, fieldList[i].children);
             }
         }
     }
@@ -157,6 +168,7 @@ function createConfigItem(data, key) {
         label: String(item[key]),
     }));
 }
+// 去重
 function uniqueByProperty(array, key) {
     const seen = new Set();
     return array.filter(item => {
@@ -169,10 +181,12 @@ function uniqueByProperty(array, key) {
 // E-E，某选项变化时，触发naip或者上下游选择器获取option,data是该选项的值，field是该选项的配置
 const getOption = async (data, field) => {
     // 非初始化
+    console.log("field", field);
     if (data) {
         // TODO,目前只有跑道，以后要多点其他。要灵活。是NAIP相关的,预留位置，关联其他选项来触发其他选项的可选项
+        // 下周一优先处理这里，还有要新增动态+的功能
+        // 跑道、机场、情报区等等
         if (field.label === "跑道") {
-            //let response = await queryDicType({ dicType: field.dicType, naipValue: data });
             let response = await queryRwyConfig({ name: formData[field.prop] });
             // 注意String化，可以分两批，第一批是机场参数(staticData)，第二批是跑道参数，跑道参数在这里初始化
             // 将count=1的全部放出来，=n的就保持如下并去重。
@@ -197,9 +211,101 @@ const getOption = async (data, field) => {
                 }
 
             });
-            updateOptions(eData.value, formFields.value);
-            updateValue(eData.value, formFields.value);
         }
+        if (field.label === "NDB设备名称") {
+            let response = await queryRadioNavigationConfig({ name: formData[field.prop] });
+            const ndbConfigKey = Object.keys(response.data);
+            ndbConfigKey.forEach(key => {
+                eData.value[`ndbs${key}`] = String(response.data[key]);
+            });
+        }
+        if (field.label === "VOR/DME设备名称") {
+            let response = await queryRadioNavigationConfig({ name: formData[field.prop] });
+            const vorConfigKey = Object.keys(response.data);
+            vorConfigKey.forEach(key => {
+                eData.value[`vors${key}`] = String(response.data[key]);
+            });
+        }
+        if (field.label === "限制区名称") {
+            let response = await queryRestrictedConfig({ name: formData[field.prop] });
+            const restrictedConfigKey = Object.keys(response.data);
+            restrictedConfigKey.forEach(key => {
+                eData.value[`restricteds${key}`] = String(response.data[key]);
+            });
+            // 频率
+            const restrictedRadioConfig = {};
+            const restrictedRadioconfigKeys = [...new Set(response.data.restrictedRadios.flatMap(Object.keys))];
+            restrictedRadioconfigKeys.forEach((key) => {
+                restrictedRadioConfig[`restrictedRadios${key}`] = createConfigItem(response.data.restrictedRadios, key);
+            });
+            const restrictedRadioKeys = Object.keys(restrictedRadioConfig);
+            restrictedRadioKeys.forEach(key => {
+                // 1v1直接赋值
+                if (restrictedRadioConfig[key].length === 1) {
+                    eData.value[key] = restrictedRadioConfig[key][0].value;
+                }
+                else {
+                    eData.value[key] = restrictedRadioConfig[key];
+                }
+            });
+            // 垂直范围
+            const restrictedClassConfig = {};
+            const restrictedClassconfigKeys = [...new Set(response.data.restrictedClass.flatMap(Object.keys))];
+            restrictedClassconfigKeys.forEach((key) => {
+                restrictedClassConfig[`restrictedClass${key}`] = createConfigItem(response.data.restrictedClass, key);
+            });
+            const restrictedClassKeys = Object.keys(restrictedClassConfig);
+            restrictedClassKeys.forEach(key => {
+                // 1v1直接赋值
+                if (restrictedClassConfig[key].length === 1) {
+                    eData.value[key] = restrictedClassConfig[key][0].value;
+                }
+                else {
+                    eData.value[key] = restrictedClassConfig[key];
+                }
+            });
+        }
+        if (field.label === "管制区名称") {
+            let response = await queryControlledConfig({ name: formData[field.prop] });
+            const controlledConfigKey = Object.keys(response.data);
+            controlledConfigKey.forEach(key => {
+                eData.value[`controlleds${key}`] = String(response.data[key]);
+            });
+            // 频率
+            const controlledRadioConfig = {};
+            const controlledRadioconfigKeys = [...new Set(response.data.controlledRadios.flatMap(Object.keys))];
+            controlledRadioconfigKeys.forEach((key) => {
+                controlledRadioConfig[`controlledRadios${key}`] = createConfigItem(response.data.controlledRadios, key);
+            });
+            const controlledRadioKeys = Object.keys(controlledRadioConfig);
+            controlledRadioKeys.forEach(key => {
+                // 1v1直接赋值
+                if (controlledRadioConfig[key].length === 1) {
+                    eData.value[key] = controlledRadioConfig[key][0].value;
+                }
+                else {
+                    eData.value[key] = controlledRadioConfig[key];
+                }
+            });
+            // 垂直范围
+            const controlledClassConfig = {};
+            const controlledClassconfigKeys = [...new Set(response.data.controlledClass.flatMap(Object.keys))];
+            controlledClassconfigKeys.forEach((key) => {
+                controlledClassConfig[`controlledClass${key}`] = createConfigItem(response.data.controlledClass, key);
+            });
+            const controlledClassKeys = Object.keys(controlledClassConfig);
+            controlledClassKeys.forEach(key => {
+                // 1v1直接赋值
+                if (controlledClassConfig[key].length === 1) {
+                    eData.value[key] = controlledClassConfig[key][0].value;
+                }
+                else {
+                    eData.value[key] = controlledClassConfig[key];
+                }
+            });
+        }
+        updateOptions(eData.value, formFields.value);
+        updateValue(eData.value, formFields.value);
         // 与NAIP不相关，只是上游选择器的数据决定下游选择器数据的选项
         // 有下游的prop才可以触发
         if (field.nextProp) {

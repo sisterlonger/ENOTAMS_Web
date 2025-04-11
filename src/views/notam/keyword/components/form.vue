@@ -11,8 +11,11 @@
             <tiny-form-item label="备注" prop="placeholder">
                 <tiny-input v-model="createData.placeholder"></tiny-input>
             </tiny-form-item>
-            <tiny-form-item label="字典" prop="dicType">
+            <tiny-form-item label="静态字典" prop="dicType">
                 <tiny-input v-model="createData.dicType"></tiny-input>
+            </tiny-form-item>
+            <tiny-form-item label="动态字典" prop="dicType">
+                <tiny-input v-model="createData.associationName"></tiny-input>
             </tiny-form-item>
             <tiny-form-item label="宽度" prop="width">
                 <tiny-input v-model="createData.width"></tiny-input>
@@ -74,6 +77,7 @@ const createData = reactive({
     inputType: '',
     placeholder: "",
     dicType: "",
+    associationName:"",
     prefix: "",
     suffix: "",
     width: "",

@@ -60,12 +60,19 @@ const fetchData = async (ID: string, type: string) => {
             else if (data.restrictedClass) {
                 data.class = data.restrictedClass;
             }
+            // 二次处理水平范围信息
+            if (data.controlledBorderVertexs && data.controlledBorderVertexs.length > 0) {
+                data.borderVertexs = data.controlledBorderVertexs;
+            }
+            else if (data.restrictedBorderVertexs && data.restrictedBorderVertexs.length > 0) {
+                data.borderVertexs = data.restrictedBorderVertexs;
+            }
             // 二次处理频率信息(管制区才有频率，限制区没有),而且管制区频率也有可能为空
             if (data.controlledRadios && data.controlledRadios.length > 0) {
                 data.radios = data.controlledRadios;
             }
             else {
-                data.radios = [];
+                data.radios = null;
             }
             Object.assign(formData, data);
         }

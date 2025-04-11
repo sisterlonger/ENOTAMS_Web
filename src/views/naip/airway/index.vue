@@ -52,7 +52,7 @@ const fetchData = async (ID: string) => {
     try {
         if (ID && ID !== '0') {
             const { data } = await queryAirWayDetail({ id: ID || '0' });
-            data.segmentList.forEach((item: any) => {
+            data.segments.forEach((item: any) => {
                 item.codePointStartEnd = `${item.codePointStart}←→${item.codePointEnd}`
                 item.valMagTrackRadio = `${item.valMagTrack}/${item.valReversMagTrack}`
             });
