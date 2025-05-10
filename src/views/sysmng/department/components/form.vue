@@ -45,6 +45,8 @@ import {
 } from '@opentiny/vue';
 import { iconWarning } from '@opentiny/vue-icon';
 import { queryDepartmentDetail, postDepartment, deleteDepartment } from '@/api/fetchInterface';
+import { useWorkFlowStore } from '@/store';
+import workflowaxios from '@/views/workflow/components/workflow-axios';
 import Child from './child.vue';
 
 const props = defineProps({
@@ -54,7 +56,7 @@ const { depID } = toRefs(props);
 const ruleFormRef = ref();
 const boxVisibility = ref(false)
 const preCondition = ref(false);
-const validateIcon = ref(iconWarning())
+const userWorkFlowStore = useWorkFlowStore();
 const createData = reactive({
     depID: null,
     depName: '',
@@ -64,7 +66,7 @@ const createData = reactive({
     parentDepCode: "",
     grade: 0,
     fullName: "",
-    airSpace:'',
+    airSpace: '',
 })
 const rules = ref({
     depName: [
@@ -145,8 +147,33 @@ function handleSubmit() {
                 let font = strArr.slice(0, strArr.length - 1).join("-");
                 createData.fullName = `${font}-${createData.depName}`;
             }
-            await postDepartment(createData);
-            Modal.alert('提交成功!');
+            await postDepartment(createData).then(res => {
+                workflowaxios.defaults.headers.common = {
+                    'Flyflow-Tenant-Id': '1',
+                    'AuthUserId': userWorkFlowStore.user.loginId,
+                    "Authorization": userWorkFlowStore.user.tokenValue,
+                }
+                let deptData = {
+                    id: String(res.data),
+                    // 部门id路径，从根到当前叶
+                    //rootIdList: res.data.rootIdList,
+                    parentId: String(createData.parentDepID),
+                    name: createData.depName,
+                    // todo直属领导
+                    leaderUser: [],
+                    status: "1",
+                    sort: 1,
+                    weight: 1,
+                }
+                workflowaxios.put('/dept/update', deptData).then((res1) => {
+                    if (res1.data.ok === false) {
+                        Modal.alert('提交失败!');
+                    }
+                    else {
+                        Modal.alert('提交成功!');
+                    }
+                });
+            });
             fetchData();
         } else {
             Modal.alert('提交失败!');
@@ -160,7 +187,28 @@ function addChild() {
 async function onDelete() {
     Modal.confirm('您确定要删除吗？').then(async () => {
         let ids = [depID.value];
-        await deleteDepartment(ids);
+        await deleteDepartment(ids).then(res => {
+            workflowaxios.defaults.headers.common = {
+                'Flyflow-Tenant-Id': '1',
+                'AuthUserId': userWorkFlowStore.user.loginId,
+                "Authorization": userWorkFlowStore.user.tokenValue,
+            }
+            let flag = true;
+            ids.forEach((id) => {
+                workflowaxios.delete('/dept/delete', { data: { id: String(id) } }).then((res1) => {
+                    if (res1.data.ok === false) {
+                        Modal.alert('提交失败!');
+                        flag = false;
+                    }
+                })
+            });
+            if (flag) {
+                Modal.message({
+                    message: '删除成功!',
+                    status: 'success',
+                });
+            }
+        });
         emit('query');
     });
 }
@@ -168,5 +216,4 @@ async function onDelete() {
 
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

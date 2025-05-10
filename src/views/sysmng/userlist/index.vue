@@ -31,7 +31,8 @@
                                 <tiny-col :span="4">
                                     <tiny-form-item>
                                         <div>
-                                            <tiny-button v-permission="[router.currentRoute.value.meta.locale,'查询']" class="search-btn" type="primary" @click="queryClick">
+                                            <tiny-button v-permission="[router.currentRoute.value.meta.locale, '查询']"
+                                                class="search-btn" type="primary" @click="queryClick">
                                                 查询
                                             </tiny-button>
                                         </div>
@@ -77,6 +78,8 @@ import {
 } from '@opentiny/vue';
 import router from '@/router';
 import { queryUserList, deleteUser, queryDepartmentTreeList } from '@/api/fetchInterface';
+import { useWorkFlowStore } from '@/store';
+import workflowaxios from '@/views/workflow/components/workflow-axios';
 import userForm from './components/form.vue';
 
 
@@ -105,6 +108,7 @@ const activeNames = ref(['0'])
 
 const departmentOptions = ref([
 ])
+const userWorkFlowStore = useWorkFlowStore();
 
 
 async function queryClick() {
@@ -150,10 +154,27 @@ async function toolbarButtonClickEvent({ code, $grid }) {
         }
         case 'deleteSelection': {
             let ids = $grid.getSelectRecords().map((item) => { return item.userID });
-            await deleteUser(ids);
-            Modal.message({
-                message: '删除成功!',
-                status: 'success',
+            await deleteUser(ids).then(res => {
+                workflowaxios.defaults.headers.common = {
+                    'Flyflow-Tenant-Id': '1',
+                    'AuthUserId': userWorkFlowStore.user.loginId,
+                    "Authorization": userWorkFlowStore.user.tokenValue,
+                }
+                let flag = true;
+                ids.forEach((id) => {
+                    workflowaxios.delete('/user/delete', { data: { id: String(id) } }).then((res1) => {
+                        if (res1.data.ok === false) {
+                            Modal.alert('提交失败!');
+                            flag = false;
+                        }
+                    })
+                });
+                if (flag) {
+                    Modal.message({
+                        message: '删除成功!',
+                        status: 'success',
+                    });
+                }
             });
             await queryClick();
             break
@@ -176,6 +197,7 @@ onMounted(async () => {
     departmentOptions.value = await getNodeDataSync();
     const apiUrl = import.meta.env;
     console.log("apiUrl", apiUrl);
+    console.log(router.currentRoute.value.meta.locale);
 });
 
 </script>

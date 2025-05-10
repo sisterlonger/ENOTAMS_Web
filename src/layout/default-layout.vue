@@ -17,8 +17,7 @@
       </template>
       <tiny-layout class="layout-content">
         <Tabs :key="tabsRefreshKey" v-model="currentTabName" with-close @click="onClick" @close="onClose">
-          <tab-item 
-            v-for="(history, idx) of tabsHistory" :key="idx" :title="history.name"
+          <tab-item v-for="(history, idx) of tabsHistory" :key="idx" :title="history.name"
             :name="history.link"></tab-item>
         </Tabs>
         <PageLayout />
@@ -35,8 +34,7 @@
       <img src="@/assets/images/theme.png" />
     </div>
     <div v-if="disTheme">
-      <tiny-modal 
-        v-model="disTheme" :lock-scroll="true" show-header show-footer :title="$t('theme.title.main')"
+      <tiny-modal v-model="disTheme" :lock-scroll="true" show-header show-footer :title="$t('theme.title.main')"
         mask-closable="true" height="922" width="748">
         <template #default>
           <Theme />
@@ -59,7 +57,7 @@ import {
   Modal
 } from '@opentiny/vue';
 import TinyThemeTool from '@opentiny/vue-theme/theme-tool.js';
-import { useAppStore, useTabStore } from '@/store';
+import { useAppStore, useTabStore, useUserStore, useWorkFlowStore } from '@/store';
 // eslint-disable-next-line import/extensions
 import Footer from '@/components/footer/index.vue';
 import NavBar from '@/components/navbar/index.vue';
@@ -67,11 +65,14 @@ import Theme from '@/components/theme/index.vue';
 import Menu from '@/components/menu/index.vue';
 import { useRouter } from 'vue-router';
 import { DefaultTheme } from '@/components/theme/type';
+import workflowaxios from '@/views/workflow/components/workflow-axios';
 import PageLayout from './page-layout.vue';
 
 // 动态切换
 const appStore = useAppStore();
 const router = useRouter();
+const userStore = useUserStore();
+const userWorkFlowStore = useWorkFlowStore();
 const changefooter = ref('#fff');
 
 const tabStore = useTabStore();
@@ -191,11 +192,31 @@ watch(appStore.$state, (newValue, oldValue) => {
     changefooter.value = '#fff;';
   }
 });
+// 登录工作流
+const getFlyflowToken = async () => {
+  await workflowaxios.post('/login/login', {
+    phone: userStore.mobile,
+    password: '123456',
+    tenantId: "1"
+  }).then((res: any) => {
+    workflowaxios.defaults.headers.common = {
+      'Flyflow-Tenant-Id': '1',
+      'AuthUserId': res.data.data.loginId,
+      "Authorization": res.data.data.tokenValue,
+    }
+    workflowaxios.get('/user/getCurrentUserDetail', {
+    }).then((res1: any) => {
+      console.log("rest1", res1);
+      userWorkFlowStore.updateUserInfo({ loginId: res.data.data.loginId, tokenValue: res.data.data.tokenValue, depidId: res1.data.data.deptIdList[0] });
+    })
+  })
+};
 // 初始化默认主题
-onMounted(() => {
+onMounted(async () => {
   appStore.updateSettings({ theme: 'light' });
   theme.changeTheme(DefaultTheme);
   appStore.updateSettings({ themelist: 'default' });
+  await getFlyflowToken();
 });
 </script>
 

@@ -31,8 +31,9 @@ import {
     Modal,
     Numeric as TinyNumeric,
 } from '@opentiny/vue'
-import { iconWarning } from '@opentiny/vue-icon';
 import {  postDepartment } from '@/api/fetchInterface';
+import { useWorkFlowStore } from '@/store';
+import workflowaxios from '@/views/workflow/components/workflow-axios';
 
 
 const props = defineProps({
@@ -41,7 +42,7 @@ const props = defineProps({
 const { parentDep } = toRefs(props);
 
 const ruleFormRef = ref()
-const validateIcon = ref(iconWarning())
+const userWorkFlowStore = useWorkFlowStore();
 const createData = reactive({
     depID: null,
     depName: '',
@@ -84,7 +85,33 @@ function handleSubmit() {
     ruleFormRef.value.validate(async (valid) => {
         if (valid) {
             createData.fullName = fullName;
-            await postDepartment(createData);
+            await postDepartment(createData).then(res=>{
+                workflowaxios.defaults.headers.common = {
+                    'Flyflow-Tenant-Id': '1',
+                    'AuthUserId': userWorkFlowStore.user.loginId,
+                    "Authorization": userWorkFlowStore.user.tokenValue,
+                }
+                let deptData = {
+                    id: String(res.data),
+                    // 部门id路径，从根到当前叶的父级
+                    //rootIdList: res.data.rootIdList,
+                    parentId: String(createData.parentDepID),
+                    name: createData.depName,
+                    // todo直属领导
+                    leaderUser: [],
+                    status: "1",
+                    sort: 1,
+                    weight: 1,
+                }
+                workflowaxios.post('/dept/create',  deptData ).then((res1) => {
+                    if (res1.data.ok === false) {
+                        Modal.alert('提交失败!');
+                    }
+                    else {
+                        Modal.alert('提交成功!');
+                    }
+                });
+            });
             emit('close');
         } else {
             Modal.alert('提交失败!');

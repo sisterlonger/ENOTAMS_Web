@@ -50,6 +50,7 @@ import useLoading from '@/hooks/loading';
 import { sm2, sm3, sm4 } from 'sm-crypto';
 import appRoutes from '@/router/routes/index';
 import DefaultLayout from '@/layout/default-layout.vue';
+
 import { RouteRecordRaw } from 'vue-router';
 
 
@@ -90,7 +91,6 @@ const handle: any = inject('handle');
 const typeChange = () => {
   handle(true);
 };
-
 function handleSubmit() {
   loginFormMail.value?.validate(async (valid: boolean) => {
     if (!valid) {

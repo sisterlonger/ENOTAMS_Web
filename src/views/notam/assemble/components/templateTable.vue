@@ -12,7 +12,7 @@
         </template>
       </tiny-grid-column>
     </tiny-grid>
-    <tiny-dialog-box v-if="boxVisibility"  v-model:visible="boxVisibility" title="组装模版" width="80%" max-height="800px" top="5%" :close-on-click-modal="false">
+    <tiny-dialog-box v-if="boxVisibility"  v-model:visible="boxVisibility" title="组装模版" width="80%" max-height="1000px" top="5%" :close-on-click-modal="false">
       <enotam :templateID="templateID" @close="dialogClose" />
     </tiny-dialog-box>
   </div>

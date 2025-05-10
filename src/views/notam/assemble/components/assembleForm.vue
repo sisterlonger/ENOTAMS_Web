@@ -1,164 +1,184 @@
 <template>
   <div>
-    <tiny-divider v-if='false' content-position="left" offset="5%" font-size="20px" content-background-color="#1476ff"
-      content-color="#ffffff">基本信息</tiny-divider>
-    <tiny-divider content-position="left" offset="5%" font-size="20px" content-background-color="#1476ff"
-      content-color="#ffffff">报文内容</tiny-divider>
     <tiny-form v-if="preCondition" overflow-title label-width="120px" :rules="rules">
-      <tiny-row>
-        <tiny-form-item label="报文类型">
-          <!--单选框-->
-          <tiny-radio-group v-model="createData.messageType">
-            <tiny-radio-button v-for="(item, index) in messageTypeOption" :label="item" :value="item"
-              :key="index"></tiny-radio-button>
-          </tiny-radio-group>
-        </tiny-form-item>
-      </tiny-row>
-      <tiny-row>
-        <tiny-col :span="12">
-          <tiny-form-item label="Q项">
-            <tiny-col :span="2" style="margin:2px">
-              <tiny-form-item label-width="80px" label="情报区">
-                <tiny-input v-model="createData.qAirSpace" disabled> </tiny-input>
-              </tiny-form-item>
-            </tiny-col>
-            <tiny-col :span="2" style="margin:2px">
-              <tiny-form-item label-width="80px" label="通告代码">
-                <tiny-input v-model="createData.qCode" disabled> </tiny-input>
-              </tiny-form-item>
-            </tiny-col>
-            <tiny-col :span="2" style="margin:2px">
-              <tiny-form-item label-width="80px" label="飞行类型">
-                <tiny-input v-model="createData.qFlightType" disabled> </tiny-input>
-              </tiny-form-item>
-            </tiny-col>
-            <tiny-col :span="2" style="margin:2px">
-              <tiny-form-item label-width="80px" label="签发目的">
-                <tiny-input v-model="createData.qTarget" disabled> </tiny-input>
-              </tiny-form-item>
-            </tiny-col>
-            <tiny-col :span="2" style="margin:2px">
-              <tiny-form-item label-width="80px" label="范围">
-                <tiny-input v-model="createData.qReach" disabled> </tiny-input>
-              </tiny-form-item>
-            </tiny-col>
-            <tiny-col :span="2" style="margin:2px">
-              <tiny-form-item label-width="80px" label="下限">
-                <tiny-input v-model="createData.qLowerLimit" disabled></tiny-input>
-              </tiny-form-item>
-            </tiny-col>
-            <tiny-col :span="2" style="margin:2px">
-              <tiny-form-item label-width="80px" label="上限">
-                <tiny-input v-model="createData.qUpperLimit" disabled></tiny-input>
-              </tiny-form-item>
-            </tiny-col>
-            <tiny-col :span="2" style="margin:2px">
-              <tiny-form-item label-width="80px" label="纬度">
-                <tiny-input placeholder="请输入纬度" v-model="createData.qLat">
-                </tiny-input>
-              </tiny-form-item>
-            </tiny-col>
-            <tiny-col :span="2" style="margin:2px">
-              <tiny-form-item label-width="80px" label="经度">
-                <tiny-input placeholder="请输入经度" v-model="createData.qLong">
-                </tiny-input>
-              </tiny-form-item>
-            </tiny-col>
-            <tiny-col :span="2" style="margin:2px">
-              <tiny-form-item label-width="80px" label="半径">
-                <tiny-input placeholder="请输入半径" v-model="createData.qRadius"> </tiny-input>
-              </tiny-form-item>
-            </tiny-col>
-          </tiny-form-item>
-        </tiny-col>
-      </tiny-row>
-      <tiny-row>
-        <tiny-col :span="3">
-          <!--情报区或者机场两大类选择器-->
-          <tiny-form-item label="A项">
-            <tiny-select v-model="createData.a_airSpace" filterable placeholder="请选择情报区/机场" value-field="codeId"
-              text-field="txtName" clearable @change="onChangeA">
-              <tiny-option-group v-for="group in aOptions" :key="group.label" :label="group.label">
-                <tiny-option v-for="item in group.options" :key="item.value" :label="item.label"
-                  :value="item.value"></tiny-option>
-              </tiny-option-group>
-            </tiny-select>
-          </tiny-form-item>
-        </tiny-col>
-        <tiny-col :span="2.5">
-          <!--时间-->
-          <tiny-form-item label="B项(开始时间)">
-            <tiny-date-picker v-model="createData.b_time" type="datetime" placeholder="请选择时间" format="yyMMddHHmm"
-              value-format="yyMMddHHmm"></tiny-date-picker>
-          </tiny-form-item>
-        </tiny-col>
-        <tiny-col :span="2.5">
-          <!--时间-->
-          <tiny-form-item label="C项(结束时间)">
-            <tiny-date-picker v-model="createData.c_time" type="datetime" placeholder="请选择时间" format="yyMMddHHmm"
-              value-format="yyMMddHHmm"></tiny-date-picker>
-          </tiny-form-item>
-        </tiny-col>
-        <tiny-col :span="4">
-          <!--生效时间-->
-          <tiny-form-item label="有效期">
-            <tiny-radio-group v-model="createData.messageValidType" size="mini">
-              <tiny-radio-button v-for="(item, index) in messageValidTypeOption" :label="item" :value="item"
+      <tiny-floatbar v-if=false :style="floatSize">
+        <ul>
+          <li @click="onResizePdf">{{ pdfState }}</li>
+          <iframe src="/pdf/白云机场机场图.pdf" width="100%" :style="pdfSize" type="application/pdf" />
+        </ul>
+      </tiny-floatbar>
+      <tiny-button type="primary" @click="stepStart" :modal-overlay-opening-padding="100"
+        :modal-overlay-opening-radius="100">开始引导</tiny-button>
+      <tiny-guide :show-step="showStep" :dom-data="domData"></tiny-guide>
+      <tiny-row class="guide-box1">
+        <tiny-divider content-position="left" offset="5%" font-size="20px" content-background-color="#1476ff"
+          content-color="#ffffff">限定行</tiny-divider>
+        <tiny-row>
+          <tiny-form-item label="报文类型">
+            <!--单选框-->
+            <tiny-radio-group v-model="createData.messageType">
+              <tiny-radio-button v-for="(item, index) in messageTypeOption" :label="item" :value="item"
                 :key="index"></tiny-radio-button>
             </tiny-radio-group>
           </tiny-form-item>
-        </tiny-col>
+        </tiny-row>
         <tiny-row>
-          <tiny-col :span="5.5">
-            <!--时间段-->
-            <tiny-form-item label="D项(时间段)">
-              <tiny-input v-model="createData.d_time" placeholder="请输入D项" @focus="onFocus"> </tiny-input>
+          <tiny-col :span="12">
+            <tiny-form-item label="Q项(限定行)">
+              <tiny-col :span="2" style="margin:2px">
+                <tiny-form-item label-width="80px" label="情报区">
+                  <tiny-input v-model="createData.qAirSpace" disabled> </tiny-input>
+                </tiny-form-item>
+              </tiny-col>
+              <tiny-col :span="2" style="margin:2px">
+                <tiny-form-item label-width="80px" label="通告代码">
+                  <tiny-input v-model="createData.qCode" disabled> </tiny-input>
+                </tiny-form-item>
+              </tiny-col>
+              <tiny-col :span="2" style="margin:2px">
+                <tiny-form-item label-width="80px" label="飞行类型">
+                  <tiny-input v-model="createData.qFlightType" disabled> </tiny-input>
+                </tiny-form-item>
+              </tiny-col>
+              <tiny-col :span="2" style="margin:2px">
+                <tiny-form-item label-width="80px" label="签发目的">
+                  <tiny-input v-model="createData.qTarget" disabled> </tiny-input>
+                </tiny-form-item>
+              </tiny-col>
+              <tiny-col :span="2" style="margin:2px">
+                <tiny-form-item label-width="80px" label="范围">
+                  <tiny-input v-model="createData.qReach" disabled> </tiny-input>
+                </tiny-form-item>
+              </tiny-col>
+              <tiny-col :span="2" style="margin:2px">
+                <tiny-form-item label-width="80px" label="下限">
+                  <tiny-input v-model="createData.qLowerLimit" disabled></tiny-input>
+                </tiny-form-item>
+              </tiny-col>
+              <tiny-col :span="2" style="margin:2px">
+                <tiny-form-item label-width="80px" label="上限">
+                  <tiny-input v-model="createData.qUpperLimit" disabled></tiny-input>
+                </tiny-form-item>
+              </tiny-col>
+              <tiny-col :span="2" style="margin:2px">
+                <tiny-form-item label-width="80px" label="纬度">
+                  <tiny-input placeholder="请输入纬度" v-model="createData.qLat">
+                  </tiny-input>
+                </tiny-form-item>
+              </tiny-col>
+              <tiny-col :span="2" style="margin:2px">
+                <tiny-form-item label-width="80px" label="经度">
+                  <tiny-input placeholder="请输入经度" v-model="createData.qLong">
+                  </tiny-input>
+                </tiny-form-item>
+              </tiny-col>
+              <tiny-col :span="2" style="margin:2px">
+                <tiny-form-item label-width="80px" label="半径">
+                  <tiny-input placeholder="请输入半径" v-model="createData.qRadius"> </tiny-input>
+                </tiny-form-item>
+              </tiny-col>
             </tiny-form-item>
           </tiny-col>
         </tiny-row>
-        <tiny-col :span="12">
-          <!--E项-->
-          <tiny-form-item label="E项">
-            <tiny-collapse v-model="activeNames" class="demo-collapse-wrap">
-              <tiny-collapse-item title="示例" name="示例">
-                <tiny-form-item label="标准规范">
+      </tiny-row>
+      <tiny-row class="guide-box2">
+        <tiny-divider content-position="left" offset="5%" font-size="20px" content-background-color="#1476ff"
+          content-color="#ffffff">发生地与生效期</tiny-divider>
+        <tiny-row>
+          <tiny-col :span="3">
+            <!--情报区或者机场两大类选择器-->
+            <tiny-form-item label="A项(发生地)">
+              <tiny-select v-model="createData.a_airSpace" filterable placeholder="请选择情报区/机场" value-field="codeId"
+                text-field="txtName" clearable @change="onChangeA">
+                <tiny-option-group v-for="group in aOptions" :key="group.label" :label="group.label">
+                  <tiny-option v-for="item in group.options" :key="item.value" :label="item.label"
+                    :value="item.value"></tiny-option>
+                </tiny-option-group>
+              </tiny-select>
+            </tiny-form-item>
+          </tiny-col>
+          <tiny-col :span="2.5">
+            <!--时间-->
+            <tiny-form-item label="B项(开始时间)">
+              <tiny-date-picker v-model="createData.b_time" type="datetime" placeholder="请选择时间" format="yyMMddHHmm"
+                value-format="yyMMddHHmm"></tiny-date-picker>
+            </tiny-form-item>
+          </tiny-col>
+          <tiny-col :span="2.5">
+            <!--时间-->
+            <tiny-form-item label="C项(结束时间)">
+              <tiny-date-picker v-model="createData.c_time" type="datetime" placeholder="请选择时间" format="yyMMddHHmm"
+                value-format="yyMMddHHmm"></tiny-date-picker>
+            </tiny-form-item>
+          </tiny-col>
+          <tiny-col :span="4">
+            <!--生效时间-->
+            <tiny-form-item label="有效期">
+              <tiny-radio-group v-model="createData.messageValidType" size="mini">
+                <tiny-radio-button v-for="(item, index) in messageValidTypeOption" :label="item" :value="item"
+                  :key="index"></tiny-radio-button>
+              </tiny-radio-group>
+            </tiny-form-item>
+          </tiny-col>
+          <tiny-row>
+            <tiny-col :span="5.5">
+              <!--分段时间-->
+              <tiny-form-item label="D项(分段时间)">
+                <tiny-input v-model="createData.d_time" placeholder="请输入D项" @focus="onFocus"> </tiny-input>
+              </tiny-form-item>
+            </tiny-col>
+          </tiny-row>
+        </tiny-row>
+
+      </tiny-row>
+      <tiny-row class="guide-box3">
+        <tiny-divider content-position="left" offset="5%" font-size="20px" content-background-color="#1476ff"
+          content-color="#ffffff">航行通告正文</tiny-divider>
+        <!--E项-->
+        <tiny-form-item label="E项">
+          <tiny-collapse v-model="activeNames" class="demo-collapse-wrap">
+            <tiny-collapse-item title="示例" name="示例">
+              <tiny-col :span="3">
+                <tiny-form-item>
+                  <div>标准规范</div>
                   <tiny-input v-model="createData.template" type="textarea" autosize disabled> </tiny-input>
                 </tiny-form-item>
-                <tiny-form-item label="示例文本">
+                <tiny-form-item>
+                  <div>示例文本</div>
                   <tiny-input v-model="createData.example" type="textarea" autosize disabled> </tiny-input>
                 </tiny-form-item>
-                <tiny-form-item v-if="false" label="示例图片" class="demo-image__keep-style">
-                  <tiny-image :src="url" :preview-src-list="srcList" keep-style></tiny-image>
-                </tiny-form-item>
-                <tiny-form-item label="备注">
+                <tiny-form-item>
+                  <div>备注</div>
                   <tiny-input v-model="createData.remark" type="textarea" autosize disabled> </tiny-input>
                 </tiny-form-item>
-              </tiny-collapse-item>
-              <tiny-collapse-item title="必填项" name="必填项">
-                <tiny-col>
-                  <formgenerator v-if="preCondition" ref="childRef" :keyWord="keyWord" :keyWordLabel="keyWordLabel"
-                    :staticData="staticData" />
-                </tiny-col>
-              </tiny-collapse-item>
-              <tiny-collapse-item title="选填项" name="选填项">
-                <tiny-col v-for="(item, index) in matches.matchesOptionalLabel" :key="'optional' + index" :span="6">
-                  <tiny-form-item :label="item">
-                    <tiny-input v-model="eFormData.optionalList[index]" placeholder="请输入" clearable></tiny-input>
-                  </tiny-form-item>
-                </tiny-col>
-              </tiny-collapse-item>
-              <tiny-collapse-item title="组装文本" name="组装文本">
-                <tiny-form-item label="组装文本">
-                  <tiny-input v-model="eFormData.result" type="textarea" autosize> </tiny-input>
+              </tiny-col>
+              <tiny-col :span="9">
+                <tiny-form-item class="demo-image__keep-style">
+                  <div>示例附件</div>
+                  <tiny-image v-if="false" :src="url" :preview-src-list="srcList" keep-style></tiny-image>
+                  <iframe src="/pdf/白云机场机场图.pdf" width="100%" height="600px" type="application/pdf" />
                 </tiny-form-item>
-                <tiny-form-item style="margin: 15px;">
-                  <tiny-button type="primary" @click="onAssemble()"> 组装 </tiny-button>
-                  <tiny-button type="primary" @click="copyToClipboard()"> 复制规范到剪切板 </tiny-button>
+              </tiny-col>
+            </tiny-collapse-item>
+            <tiny-collapse-item title="必填项" name="必填项">
+              <tiny-col>
+                <formgenerator v-if="preCondition" ref="childRef" :keyWord="keyWord" :keyWordLabel="keyWordLabel"
+                  :staticData="staticData" />
+              </tiny-col>
+            </tiny-collapse-item>
+            <tiny-collapse-item title="选填项" name="选填项">
+              <tiny-col v-for="(item, index) in matches.matchesOptionalLabel" :key="'optional' + index" :span="6">
+                <tiny-form-item :label="item">
+                  <tiny-input v-model="eFormData.optionalList[index]" placeholder="请输入" clearable></tiny-input>
                 </tiny-form-item>
-              </tiny-collapse-item>
-            </tiny-collapse>
-          </tiny-form-item>
-        </tiny-col>
+              </tiny-col>
+            </tiny-collapse-item>
+          </tiny-collapse>
+        </tiny-form-item>
+      </tiny-row>
+      <tiny-row class="guide-box4">
+        <tiny-divider content-position="left" offset="5%" font-size="20px" content-background-color="#1476ff"
+          content-color="#ffffff">上下限与组装报文</tiny-divider>
         <tiny-col :span="4">
           <!--基准面格式-->
           <tiny-form-item label="基准面格式">
@@ -182,11 +202,10 @@
               :disabled="createData.baseType.split('-')[1] === 'UNL'" @click="onFocusFG('G')"></tiny-input>
           </tiny-form-item>
         </tiny-col>
-        <tiny-col :span="12" v-if="false">
+        <tiny-col :span="12">
           <!--报文-->
-          <tiny-form-item label="报文">
-            <tiny-input v-model="createData.g_upperLimit" type="textarea" autosize placeholder="请组装报文">
-            </tiny-input>
+          <tiny-form-item label="组装文本">
+            <tiny-input v-model="createData.telegramText" type="textarea" autosize> </tiny-input>
           </tiny-form-item>
         </tiny-col>
       </tiny-row>
@@ -194,9 +213,10 @@
         <tiny-button type="primary" @click="onAssemble()"> 生成报文 </tiny-button>
         <tiny-button type="primary" @click="onAssemble()"> 生成通知单 </tiny-button>
         <tiny-button type="primary" @click="onAssemble()"> 发送报文 </tiny-button>
+        <tiny-button type="primary" @click="copyToClipboard()"> 复制规范到剪切板 </tiny-button>
       </tiny-form-item>
     </tiny-form>
-    <tiny-dialog-box v-if="boxDVisibility" v-model:visible="boxDVisibility" append-to-body title="编辑时间段" width="35%"
+    <tiny-dialog-box v-if="boxDVisibility" v-model:visible="boxDVisibility" append-to-body title="编辑分段时间" width="35%"
       :close-on-click-modal="false">
       <schedulePicker @scheduleChange="handleScheduleChange" @close="dialogClose" />
     </tiny-dialog-box>
@@ -238,6 +258,8 @@ import {
   TinyOptionGroup,
   TinyDivider,
   DialogBox as TinyDialogBox,
+  TinyGuide,
+  TinyFloatbar,
 } from '@opentiny/vue'
 import { queryAirPortAndAirSpace, queryAirPortConfig, queryAirSpaceConfig } from '@/api/fetchInterface';
 import formgenerator from '@/components/formgenerator/index.vue';
@@ -272,6 +294,77 @@ const props = defineProps({
 });
 const { templateID } = toRefs(props);
 const { templateData } = toRefs(props);
+// 引导变量
+const showStep = ref(false);
+const domData = ref([
+  {
+    title: '限定行',
+    text: '请先选择报文类型,Q项内容无需填写(在A项填写后将自动填充)',
+    domElement: '.guide-box1',
+    button: [
+      {
+        text: '下一步',
+        action: 'next'
+      }
+    ]
+  },
+  {
+    title: '发生地和生效期',
+    text: '发生地只能单选机场或者情报区,填写后自动填充Q项,生效期',
+    domElement: '.guide-box2',
+    button: [
+      {
+        text: '上一步',
+        action: 'back',
+        secondary: true
+      },
+      {
+        text: '下一步',
+        action: 'next'
+      },
+    ]
+  },
+  {
+    title: '航行通告正文',
+    text: 'E项会根据A项内容自动生成,请根据实际情况填写E项',
+    domElement: '.guide-box3',
+    button: [
+      {
+        text: '上一步',
+        action: 'back',
+        secondary: true
+      },
+      {
+        text: '下一步',
+        action: 'next'
+      },
+    ]
+  },
+  {
+    title: '上下限与组装报文',
+    text: '上下限填写完毕以后,将点击按钮将生成报文(无收发电地址)',
+    domElement: '.guide-box4',
+    button: [
+      {
+        text: '上一步',
+        action: 'back',
+        secondary: true
+      },
+      {
+        text: '下一步',
+        action: 'next'
+      },
+      {
+        text: '完成',
+        action: 'complete'
+      }
+    ]
+  }
+])
+// pdf变量
+const floatSize = ref("width:20%;height:450px;top:10%");
+let pdfSize = ref("width:100%;height:400px;top:10%");
+const pdfState = ref("放大");
 // 机场、情报区数据
 const staticData = ref({
 });
@@ -315,6 +408,8 @@ const createData = reactive({
   g_upperLimit: '',
   // H项
   h_coordinate: '',
+  // 电报正文
+  telegramText: '',
 
 })
 // 基准面
@@ -322,7 +417,7 @@ const baseType = ref<any>('');
 // 弹窗的f/g的类型
 const fgType = ref<any>('');
 // 折叠变量
-const activeNames = ref(['示例', '必填项', '选填项', '组装文本'])
+const activeNames = ref(['示例', '必填项', '选填项'])
 // 情报区四字码
 const airSpaceCodes = ref(["ZBPE", "ZGZU", "ZHWH", "ZJSA", "ZLHW", "ZPKM", "ZSHA", "ZWUQ", "ZYSH",]);
 // e项的组装数据
@@ -493,7 +588,15 @@ function onAssemble() {
   matches.matchesOptionalLabel.forEach((item, index) => {
     assembleText = assembleText.replace(`$${item}$\{${matches.matchesOptionalKeyWord[index]}\}`, `${eFormData.optionalList[index]}`);
   });
+  // E项组装的文本
   eFormData.result = assembleText;
+  // TODO组装报文未完成
+  let qText = `Q)${createData.qAirSpace}/${createData.qCode}/${createData.qFlightType}/${createData.qTarget}/${createData.qReach}/${createData.qLowerLimit}/${createData.qUpperLimit}/${createData.qLat}/${createData.qLong}/${createData.qRadius}`;
+  let abcText = `A)${createData.a_airSpace} B)${createData.b_time} C)${createData.c_time}`;
+  let dText = `D)${createData.d_time}`;
+  let eText = `E)${eFormData.result}`;
+  let fgText = `F)${createData.f_lowerLimit} G)${createData.g_upperLimit}`;
+  createData.telegramText = `${qText}\n${abcText}\n${dText}\n${eText}\n${fgText}`;
 }
 // 获取配置项
 const airspaceConfigTypes = [
@@ -649,7 +752,23 @@ function onChangeBaseType() {
     createData.qUpperLimit = "";
   }
 }
-
+// 引导按钮事件
+function stepStart() {
+  showStep.value = !showStep.value
+}
+// 放大缩小PDF
+function onResizePdf() {
+  if (pdfState.value === "缩小") {
+    floatSize.value = "width:20%;height:450px;top:10%";
+    pdfSize.value = "width:100%;height:400px;top:10%";
+    pdfState.value = "放大";
+  }
+  else if (pdfState.value === "放大") {
+    floatSize.value = "width:90%;height:90vh;top:5%;left:5%";
+    pdfSize.value = "width:100%;height:90vh;top:5%;left:5%";
+    pdfState.value = "缩小";
+  }
+}
 </script>
 
 <style scoped lang="less">
@@ -660,6 +779,6 @@ function onChangeBaseType() {
 }
 
 .demo-image__keep-style {
-  width: 200px;
+  /*idth: 200px;*/
 }
 </style>
