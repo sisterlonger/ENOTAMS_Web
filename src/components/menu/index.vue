@@ -33,7 +33,6 @@ const expandeArr = ref();
 let routerTitle = [] as any;
 
 const userStore = useUserStore();
-const role = computed(() => userStore.role);
 const filtter = (arr: any[]) => {
   arr.forEach((item: any) => {
     // 这部分是菜单的树，路径作为id，与点击事件串联起来

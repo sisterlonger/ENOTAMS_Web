@@ -36,7 +36,6 @@ const useUserStore = defineStore('user', {
     protocolEnd: '2024-04-19',
     address: '',
     status: '',
-    role: '',
     roleID: 0,
     sort: 1,
     startTime: '',
@@ -54,12 +53,13 @@ const useUserStore = defineStore('user', {
     },
   },
   actions: {
+    /*
     switchRoles() {
       return new Promise((resolve) => {
-        this.role = this.role === 'user' ? 'user' : 'admin';
-        resolve(this.role);
+        this.roleName = this.roleName === 'user' ? 'user' : 'admin';
+        resolve(this.roleName);
       });
-    },
+    },*/
     // Set user's information
     setInfo(partial: Partial<UserState>) {
       this.$patch(partial);

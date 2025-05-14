@@ -1,11 +1,9 @@
-export type RoleType = '' | '*' | 'admin' | 'user';
 export interface UserInfo {
   userID: string;
   userName: string;
   userCode: string;
   airSpace?: string;
-  role: RoleType;
-  roleName?: string;
+  roleName: string;
   roleID: number;
   depName?: string;
   fullName?: string;

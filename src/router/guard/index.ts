@@ -11,7 +11,7 @@ function setupPageGuard(router: Router) {
   router.beforeEach(async (to) => {
     setRouteEmitter(to);
     // 页面埋点
-    trackEvent('路由跳转', { path: to.path, fullPath: to.fullPath, name: to.name });
+    //trackEvent('路由跳转', { path: to.path, fullPath: to.fullPath, name: to.name });
   });
   setupMenuGuard(router);
   setupTabsGuard(router);

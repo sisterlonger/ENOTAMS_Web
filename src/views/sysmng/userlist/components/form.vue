@@ -12,6 +12,7 @@
             </tiny-form-item>
             <tiny-form-item label="角色" prop="role" :validate-icon="validateIcon">
                 <tiny-input v-model="createData.role" clearable></tiny-input>
+                  <tiny-checkbox-group v-model="checkList" type="checkbox" :options="options"></tiny-checkbox-group>
             </tiny-form-item>
             <tiny-form-item label="部门" prop="depID" :validate-icon="validateIcon">
                 <tiny-cascader v-model="createData.depID" :options="departmentOptions" style="width:100%"
@@ -50,7 +51,7 @@ import {
 import { iconWarning } from '@opentiny/vue-icon';
 import { useWorkFlowStore } from '@/store';
 import workflowaxios from '@/views/workflow/components/workflow-axios';
-import { queryUserDetail, postUser, queryDepartmentTreeList } from '@/api/fetchInterface';
+import { queryUserDetail, postUser, queryDepartmentTreeList,queryRoleList } from '@/api/fetchInterface';
 import { Avatar } from '@opentiny/vue';
 
 const props = defineProps({
@@ -76,6 +77,7 @@ const createData = reactive({
     mobile: "",
     email: '',
 });
+const roleList = ref([])
 const userWorkFlowStore = useWorkFlowStore();
 
 const validateMobile = (
@@ -121,6 +123,8 @@ const fetchData = async () => {
     try {
         const { data } = await queryUserDetail({ id: userID.value });
         Object.assign(createData, data);
+        //const { data1 } = await queryRoleList();
+        //Object.assign(roleList, data1);
     }
     catch (err) {
         Modal.alert('获取数据错误');

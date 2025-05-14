@@ -109,6 +109,7 @@ function handleSubmit() {
         status: 'success',
       });
       const { redirect, ...othersQuery } = router.currentRoute.value.query;
+      console.log(redirect);
       // 获取动态路由
       router.addRoute({
         name: 'root',
@@ -116,6 +117,7 @@ function handleSubmit() {
         component: DefaultLayout,
         children: appRoutes,
       });
+      
       router.push({
         name: (redirect as string) || 'home',
         query: {
