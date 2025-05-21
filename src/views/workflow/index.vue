@@ -1,6 +1,6 @@
 <template>
     <div class="tiny-demo">
-        <BWrapper v-if="false"></BWrapper>
+        <BWrapper v-if="true"></BWrapper>
         <tiny-nav-menu :before-skip="handleSkip" prevent :data="menuData"></tiny-nav-menu>
         <iframe :src="bridgeUrl" width="100%" height="900px" id="workflow"
             sandbox="allow-scripts allow-same-origin allow-forms" frameborder="0">
@@ -19,7 +19,7 @@ import checkPermission from "@/utils/permission";
 
 import workflowaxios from './components/workflow-axios';
 
-const bridgeUrl = ref('http://localhost:3000?token'); // Flyflow桥接页面地址
+const bridgeUrl = ref(`${import.meta.env.VITE_API_WORKFLOW_URL}?token`); // Flyflow桥接页面地址
 const flyflowToken = ref(''); // 从后端获取的Flyflow临时Token
 const userWorkFlowStore = useWorkFlowStore();
 
@@ -94,7 +94,7 @@ function handleSkip({ url }) {
 }
 
 const getFlyflow = async () => {
-    bridgeUrl.value = `http://localhost:3000?token=${userWorkFlowStore.updateUserInfo.tokenValue}`;
+    bridgeUrl.value = `${import.meta.env.VITE_API_WORKFLOW_URL}?token=${userWorkFlowStore.updateUserInfo.tokenValue}`;
 };
 
 

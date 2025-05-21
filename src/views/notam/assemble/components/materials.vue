@@ -24,7 +24,7 @@ const { templateData } = toRefs(props);
 // 素材类型
 const materials = ref([]);
 // 上传地址
-const action = ref('http://localhost:3000/api/upload')
+const action = ref(`${import.meta.env.VITE_API_WORKFLOW_URL}/api/upload`)
 // 文件列表
 const fileList = reactive([
     {

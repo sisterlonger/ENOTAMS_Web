@@ -1,8 +1,7 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-  // TODO以后做成配置模式
-  baseURL: 'http://localhost:3000/api',
+  baseURL: `${import.meta.env.VITE_API_WORKFLOW_URL}/api`,
   timeout: 10000,
 });
 

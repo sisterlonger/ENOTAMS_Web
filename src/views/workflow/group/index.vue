@@ -53,7 +53,7 @@ const routeReadyHandler = (event) => {
 
 onMounted(() => {
     window.addEventListener('message', routeReadyHandler);
-    bridgeUrl.value = `http://localhost:3000?token=${userWorkFlowStore.updateUserInfo.tokenValue}`;
+    bridgeUrl.value = `${import.meta.env.VITE_API_WORKFLOW_URL}?token=${userWorkFlowStore.updateUserInfo.tokenValue}`;
     getFlyflow();
 });
 

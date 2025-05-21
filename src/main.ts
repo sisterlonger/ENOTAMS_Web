@@ -30,7 +30,7 @@ app.use(directive);
 // 接受子页面的传值
 window.addEventListener('message', (event) => {
   console.log("event",event);
-  if (event.origin !== 'http://localhost:3000') return;
+  if (event.origin !== import.meta.env.VITE_API_WORKFLOW_URL) return;
   if (event.data.type === 'CHILD_ROUTE_CHANGE') {
     // 可选：更新父项目UI或状态
   }
