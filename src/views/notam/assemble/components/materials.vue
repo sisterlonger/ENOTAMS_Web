@@ -23,8 +23,8 @@ const { templateID } = toRefs(props);
 const { templateData } = toRefs(props);
 // 素材类型
 const materials = ref([]);
-// 上传地址
-const action = ref(`${import.meta.env.VITE_API_WORKFLOW_URL}/api/upload`)
+// 上传地址TODO
+const action = ref(`${import.meta.env.VITE_API_BASE_URL}/api/upload`)
 // 文件列表
 const fileList = reactive([
     {

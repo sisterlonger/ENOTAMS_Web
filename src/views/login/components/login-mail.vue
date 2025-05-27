@@ -45,11 +45,13 @@ import {
   Notify,
 } from '@opentiny/vue';
 import { useI18n } from 'vue-i18n';
-import { useUserStore } from '@/store';
+import { useUserStore, useWorkFlowStore } from '@/store';
 import useLoading from '@/hooks/loading';
 import { sm2, sm3, sm4 } from 'sm-crypto';
+import workflowaxios from '@/views/workflow/components/workflow-axios';
 import appRoutes from '@/router/routes/index';
 import DefaultLayout from '@/layout/default-layout.vue';
+
 
 import { RouteRecordRaw } from 'vue-router';
 
@@ -58,6 +60,7 @@ const router = useRouter();
 const { t } = useI18n();
 const { loading, setLoading } = useLoading();
 const userStore = useUserStore();
+const userWorkFlowStore = useWorkFlowStore();
 const loginFormMail = ref();
 
 const rules = computed(() => {
@@ -91,6 +94,44 @@ const handle: any = inject('handle');
 const typeChange = () => {
   handle(true);
 };
+// 登录工作流
+const getFlyflowToken = async (mobile: string) => {
+  await workflowaxios.post('/login/login', {
+    phone: mobile,
+    password: '123456',
+    tenantId: "1"
+  }).then((res: any) => {
+    workflowaxios.defaults.headers.common = {
+      'Flyflow-Tenant-Id': '1',
+      'AuthUserId': res.data.data.loginId,
+      "Authorization": res.data.data.tokenValue,
+    }
+    console.log("rest", res);
+
+    /*
+    workflowaxios.get('/login/loginByToken', {
+      params: {
+        token: res.data.data.tokenValue
+      }
+    }).then((res2: any) => {
+      userWorkFlowStore.updateUserInfo({ loginId: res.data.data.loginId, tokenValue: res2.data.data.tokenValue, });
+      workflowaxios.get('/user/getCurrentUserDetail', {
+      }).then((res1: any) => {
+        console.log(res2.data.data.tokenValue);
+        userWorkFlowStore.updateUserInfo({ loginId: res.data.data.loginId, tokenValue: res2.data.data.tokenValue, depidId: res1.data.data.deptIdList[0] });
+      })
+    });*/
+
+
+    
+    
+    workflowaxios.get('/user/getCurrentUserDetail', {
+    }).then((res1: any) => {
+      userWorkFlowStore.updateUserInfo({ loginId: res.data.data.loginId, tokenValue: res.data.data.tokenValue, depidId: res1.data.data.deptIdList[0] });
+    })
+  })
+};
+
 function handleSubmit() {
   loginFormMail.value?.validate(async (valid: boolean) => {
     if (!valid) {
@@ -109,7 +150,9 @@ function handleSubmit() {
         status: 'success',
       });
       const { redirect, ...othersQuery } = router.currentRoute.value.query;
-      console.log(redirect);
+      // 部署时需要解除注释
+      //await getFlyflowToken(userStore.userInfo.mobile);
+      //console.log(redirect);
       // 获取动态路由
       router.addRoute({
         name: 'root',
@@ -117,7 +160,7 @@ function handleSubmit() {
         component: DefaultLayout,
         children: appRoutes,
       });
-      
+
       router.push({
         name: (redirect as string) || 'home',
         query: {
@@ -125,7 +168,7 @@ function handleSubmit() {
         },
       });
     } catch (err) {
-      console.log("err",err);
+      console.log("err", err);
       Notify({
         type: 'error',
         title: t('login.tip.right'),

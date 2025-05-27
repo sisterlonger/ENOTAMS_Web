@@ -10,7 +10,9 @@
                                 @node-click="handleNodeClick"></tiny-tree-menu>
                         </tiny-col>
                         <tiny-col :span="9">
-                            <templateTable :tableData="tableData" />
+                            <tiny-sticky :z-index="1000" target=".content-main" :offset="160">
+                                <templateTable :tableData="tableData" />
+                            </tiny-sticky>
                         </tiny-col>
                     </tiny-row>
                 </tiny-layout>
@@ -21,7 +23,7 @@
 
 <script setup>
 import { reactive, ref } from 'vue';
-import { TreeMenu as TinyTreeMenu, Layout as TinyLayout, Row as TinyRow, Col as TinyCol } from '@opentiny/vue';
+import { TreeMenu as TinyTreeMenu, Layout as TinyLayout, Row as TinyRow, Col as TinyCol, TinySticky } from '@opentiny/vue';
 import { useUserStore } from '@/store';
 import { queryNodeTree, queryNodeTemplate } from '@/api/fetchInterface';
 import templateTable from './components/templateTable.vue';

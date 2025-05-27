@@ -48,6 +48,9 @@
                     <tiny-option value="与G项一致">与G项一致</tiny-option>
                 </tiny-select>
             </tiny-form-item>
+            <tiny-form-item label="半径" prop="qRadius" :validate-icon="validateIcon">
+                <tiny-input v-model="createData.qRadius"></tiny-input>
+            </tiny-form-item>
             <tiny-form-item label="佐证性材料要求" prop="materials" :validate-icon="validateIcon">
                 <tiny-input v-model="createData.materials" placeholder="用、作分隔符" clearable></tiny-input>
             </tiny-form-item>
@@ -98,6 +101,7 @@ const createData = reactive({
     qReach: '',
     qLowerLimit: '',
     qUpperLimit: '',
+    qRadius: '',
     materials: "",
 })
 const rules = ref({

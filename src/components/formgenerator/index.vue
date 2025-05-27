@@ -345,6 +345,9 @@ function replaceDollarSequentially(str, replacements) {
 const handleFormData = (formFieldList) => {
     let result = [];
     // 如果是children就不行,得根据template
+    if (!formFieldList || formFieldList === null || formFieldList.length === 0) {
+        return result;
+    }
     formFieldList.forEach((field) => {
         // 如果是子组件则递归，递归返回多个
         if (field.type === "children") {

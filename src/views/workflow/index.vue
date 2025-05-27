@@ -19,9 +19,10 @@ import checkPermission from "@/utils/permission";
 
 import workflowaxios from './components/workflow-axios';
 
-const bridgeUrl = ref(`${import.meta.env.VITE_API_WORKFLOW_URL}?token`); // Flyflow桥接页面地址
 const flyflowToken = ref(''); // 从后端获取的Flyflow临时Token
 const userWorkFlowStore = useWorkFlowStore();
+
+const bridgeUrl = ref(`${import.meta.env.VITE_API_WORKFLOW_URL}?token=${userWorkFlowStore.user.tokenValue}`); // Flyflow桥接页面地址
 
 const menuData = ref([
     {
@@ -88,21 +89,22 @@ const menuData = ref([
 function handleSkip({ url }) {
     const iframe = document.getElementById('workflow');
     iframe.contentWindow.postMessage({ type: 'ROUTE_CHANGE', path: url }, '*');
-    console.log(url);
-    console.log(iframe.contentWindow);
+    console.log('url',url);
+    //console.log(iframe.contentWindow);
     return false
 }
 
 const getFlyflow = async () => {
-    bridgeUrl.value = `${import.meta.env.VITE_API_WORKFLOW_URL}?token=${userWorkFlowStore.updateUserInfo.tokenValue}`;
+    console.log(`${import.meta.env.VITE_API_WORKFLOW_URL}?token=${userWorkFlowStore.user.tokenValue}`);
+    bridgeUrl.value = `${import.meta.env.VITE_API_WORKFLOW_URL}?token=${userWorkFlowStore.user.tokenValue}`;
 };
 
 
 onMounted(() => {
-    getFlyflow();
-    console.log(router.currentRoute.value.meta.locale);
+    //getFlyflow();
+    //console.log(router.currentRoute.value.meta.locale);
     // TODO 加入到权限控制中
-    console.log(checkPermission([router.currentRoute.value.meta.locale,'审批']));
+    //console.log(checkPermission([router.currentRoute.value.meta.locale,'审批']));
 });
 
 </script>

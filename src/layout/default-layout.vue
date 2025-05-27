@@ -192,6 +192,7 @@ watch(appStore.$state, (newValue, oldValue) => {
     changefooter.value = '#fff;';
   }
 });
+/*
 // 登录工作流
 const getFlyflowToken = async () => {
   await workflowaxios.post('/login/login', {
@@ -204,19 +205,21 @@ const getFlyflowToken = async () => {
       'AuthUserId': res.data.data.loginId,
       "Authorization": res.data.data.tokenValue,
     }
+    console.log("workflowaxios.defaults.headers.common",workflowaxios.defaults.headers.common);
     workflowaxios.get('/user/getCurrentUserDetail', {
     }).then((res1: any) => {
       console.log("rest1", res1);
+      console.log('token',res.data.data.tokenValue);
       userWorkFlowStore.updateUserInfo({ loginId: res.data.data.loginId, tokenValue: res.data.data.tokenValue, depidId: res1.data.data.deptIdList[0] });
     })
   })
-};
+};*/
 // 初始化默认主题
 onMounted(async () => {
   appStore.updateSettings({ theme: 'light' });
   theme.changeTheme(DefaultTheme);
   appStore.updateSettings({ themelist: 'default' });
-  await getFlyflowToken();
+  //await getFlyflowToken();
 });
 </script>
 
