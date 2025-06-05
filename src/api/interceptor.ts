@@ -35,7 +35,11 @@ axios.interceptors.request.use(
     }
 
     config.headers = { ...config.headers };
-
+    /*
+    if (config.responseType === 'blob') {
+      config.adapter = axios.defaults.adapter; // 强制使用默认适配器
+    }
+    console.log(config);*/
     return config;
   },
   (error) => {
@@ -45,7 +49,12 @@ axios.interceptors.request.use(
 );
 // add response interceptors
 axios.interceptors.response.use(
-  (response: AxiosResponse<HttpResponse>) => {
+  (response: AxiosResponse<HttpResponse> | Blob) => {
+     // 判断是否是文件下载请求（通过responseType判断）
+    if (response.config.responseType === 'blob') {
+      // 直接返回原始响应（包含Blob数据）
+      return response;
+    }
     const res = response.data;
     if (res.code !== '0' && res.code !== 200) {
       (res.errMsg || res.msg) &&
@@ -53,6 +62,7 @@ axios.interceptors.response.use(
           message: res.errMsg + res.msg,
           status: 'error',
         });
+      console.log(res.errMsg);
       return Promise.reject(new Error(res.errMsg + res.msg || 'Error'));
     }
     return res;

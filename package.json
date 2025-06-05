@@ -37,6 +37,7 @@
     "dayjs": "^1.11.13",
     "echarts": "~5.4.3",
     "echarts4": "npm:echarts@^4.9.0",
+    "file-saver": "^2.0.5",
     "fp-ts": "2.16.1",
     "mitt": "^3.0.1",
     "moment": "^2.30.1",

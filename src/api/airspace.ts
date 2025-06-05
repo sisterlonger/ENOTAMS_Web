@@ -13,8 +13,8 @@ export function queryAirSpaceList(params: AirSpaceSearch) {
 export function queryAirSpaceDetail(params: { id: string }) {
     return axios.get('/airspace/get', { params });
 }
-export function queryAirPortAndAirSpace() {
-    return axios.get('/airspace/getairportandairspace');
+export function queryAirPortAndAirSpace(params: { qReach: string }) {
+    return axios.get('/airspace/getairportandairspace',{params});
 }
 export function queryAirSpaceConfig(params: { id: string }) {
     return axios.get('/airspace/getairspaceconfig', { params });

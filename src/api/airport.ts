@@ -7,6 +7,9 @@ export interface AirPortSearch {
     pageIndex: number;
     pageSize: number;
 }
+export function queryAirPortList(params: AirPortSearch) {
+    return axios.get('/airport/list', { params });
+}
 export function queryAirPortTree(params: AirPortSearch) {
     return axios.get('/airport/treelist', { params });
 }

@@ -21,3 +21,4 @@ export * from './feedback';
 export * from './version';
 export * from './controlled';
 export * from './restricted';
+export * from './file';

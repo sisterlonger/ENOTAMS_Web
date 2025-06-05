@@ -2,7 +2,8 @@ export interface UserInfo {
   userID: string;
   userName: string;
   userCode: string;
-  airSpace?: string;
+  airSpaceCodeId?: string;
+  airPortCodeId?: string;
   roleName: string;
   roleID: number;
   depName?: string;

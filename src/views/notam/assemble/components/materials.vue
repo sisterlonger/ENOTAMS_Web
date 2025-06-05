@@ -2,9 +2,9 @@
     <div>
         <div v-for="(item, index) in materials" :key="index">
             <div class="title">{{ item }}</div>
-            <tiny-file-upload ref="upload" :action="action" :file-list="fileList" list-type="saas" :open-download-file="true"
-                :before-remove="beforeRemove" prompt-tip :file-size="[100, 200]" accept=".doc,.docx"
-                @download-file="handleDownloadFile"></tiny-file-upload>
+            <tiny-file-upload ref="upload" :action="action" :data="requestData" :file-list="fileList" list-type="saas"
+                :open-download-file="true" :headers='header' :before-remove="beforeRemove" prompt-tip @download-file="handleDownloadFile"
+                @success="onSuccess" @error="onError"></tiny-file-upload>
         </div>
     </div>
 </template>
@@ -12,7 +12,9 @@
 <script setup>
 import { ref, reactive, defineProps, toRefs, onMounted } from 'vue'
 import { TinyFileUpload, TinyModal } from '@opentiny/vue'
-import { queryTemplateDetail } from '@/api/fetchInterface';
+import { downloadFile } from '@/api/fetchInterface';
+import { saveAs } from 'file-saver';
+import { getToken } from '@/utils/auth';
 
 
 const props = defineProps({
@@ -24,67 +26,70 @@ const { templateData } = toRefs(props);
 // 素材类型
 const materials = ref([]);
 // 上传地址TODO
-const action = ref(`${import.meta.env.VITE_API_BASE_URL}/api/upload`)
+const action = ref(`${import.meta.env.VITE_API_BASE_URL}/file/upload`)
+// 上传接口的参数
+const requestData = ref({
+    //id: 123
+})
+const header =ref({Authorization:`Bearer ${getToken()}`})
 // 文件列表
 const fileList = reactive([
-    {
-        docId: 'M1T2A1N548572512085860351',
-        path: 'edm/one/',
-        docVersion: 'V1',
-        name: '佐证材料1.png',
-        docSize: 100 * 1024,
-        size: 100 * 1024,
-        serverName: 'ShenZhen'
-    },
-    {
-        docId: 'M1T2A1N548572512085860352',
-        path: 'edm/one/',
-        docVersion: 'V1',
-        name: '佐证材料2.png',
-        docSize: 100 * 1024,
-        size: 100 * 1024,
-        serverName: 'ShenZhen'
-    }
 ])
-// 下载事件
-const handleDownloadFile = (file) => {
-    // 模拟下载成功场景
-    if (file.docId === 'M1T2A1N548572512085860351') {
-        file.showDownloadBar = true
-        file.downloadPercentage = 0
 
-        const timer = setInterval(() => {
-            if (file.downloadPercentage >= 100) {
-                clearInterval(timer)
-                // 下载完成后可以隐藏进度条，因为进度条有过渡动画，所以可以延迟 1s 再隐藏
-                setTimeout(() => {
-                    file.showDownloadBar = false
-                }, 1000)
-
-                TinyModal.message({ message: '下载成功', status: 'success' })
-                return
-            }
-            file.downloadPercentage += 10
-        }, 300)
-    } else {
-        // 模拟下载失败场景
-        file.showDownloadBar = true
-
-        file.downloadPercentage = 0
-
-        const timer = setInterval(() => {
-            if (file.downloadPercentage >= 50) {
-                clearInterval(timer)
-                // file.showDownloadBar = false
-                file.downloadStatus = 'exception'
-
-                TinyModal.message({ message: '下载失败', status: 'error' })
-                return
-            }
-            file.downloadPercentage += 10
-        }, 300)
-    }
+// 成功上传事件
+const onSuccess = async (res, file) => {
+    console.log(res, file);
+    TinyModal.message({ message: '文件上传成功!', status: 'success' });
 }
+const onError = async (res, file) => {
+    //console.log(res, file);
+    TinyModal.message({ message: '文件上传失败!', status: 'error' });
+}
+// 下载事件
+const handleDownloadFile = async (file) => {
+    let requestFileName = "";
+    if (!file.name.includes('/')) {
+        let getCurrentDate = () => {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0'); // 月份从0开始
+            const day = String(now.getDate()).padStart(2, '0');
+            return `${year}${month}${day}`;
+        };
+
+        // 获取日期前缀
+        const datePrefix = getCurrentDate();
+        requestFileName = `${datePrefix}/${file.name}`
+    }
+    else {
+        requestFileName = file.names
+    }
+    try {
+        // 该文件名附带日期
+        const response = await downloadFile({ fileName:requestFileName });
+
+        // 手动处理文件下载
+        const contentDisposition = response.headers['content-disposition'];
+        let fileName = file.name;
+        if (contentDisposition) {
+            const match = contentDisposition.match(/filename="?(.+?)"?(;|$)/);
+            if (match) fileName = decodeURIComponent(match[1]);
+        }
+
+        saveAs(
+            new Blob([response.data], { type: response.headers['content-type'] }),
+            fileName
+        );
+
+        TinyModal.message({ message: '下载成功', status: 'success' });
+    } catch (error) {
+        console.error('下载失败:', error);
+        TinyModal.message({
+            message: error.response?.data?.msg || '下载失败',
+            status: 'error'
+        });
+    }
+};
 
 function beforeRemove(file) {
     return new Promise((resolve, reject) => {
@@ -95,7 +100,7 @@ function beforeRemove(file) {
 }
 // 请求数据接口方法
 const fetchData = async () => {
-    if(templateData.value.materials !== "" && templateData.value.materials !== null){
+    if (templateData.value.materials !== "" && templateData.value.materials !== null) {
         materials.value = templateData.value.materials.split("、");
     }
     materials.value.push('其他');

@@ -84,15 +84,32 @@ const updateOptions = async (newValue, fieldList) => {
     if (fieldList) {
         // 遍历formFields
         for (let i = 0; i < fieldList.length; i += 1) {
-            const dicTypeKey = fieldList[i].associationName?.replace("$", "");
-            // 如果找到对应的字段，则更新该字段的选项配置
-            if (fieldList[i].associationName?.includes("$")      // 确保 associationName 存在且包含 $
-                && typeof newValue[dicTypeKey] === "object") {
-                formData[fieldList[i].prop] = "";
-                fieldList[i].options = newValue[dicTypeKey];
+            // 多个并列组合在选项，结果为多个选项
+            if (fieldList[i].associationName && fieldList[i].associationName.includes(",")) {
+
+                // 拆分变量名数组
+                let associationNameList = [];
+                associationNameList = fieldList[i].associationName.split(",");
+                associationNameList.forEach((item) => {
+                    let dicTypeKey = item?.replace("$", "");
+                    // 如果存在无效的字段，则这个字段都不组装了
+                    if (typeof newValue[dicTypeKey] === "object") {
+                         fieldList[i].options = fieldList[i].options.concat(newValue[dicTypeKey])
+                    }
+                });
             }
-            if (fieldList[i].type.includes('hildren') && fieldList[i].children?.length > 0) {
-                updateOptions(newValue, fieldList[i].children);
+            // 单个
+            else {
+                const dicTypeKey = fieldList[i].associationName?.replace("$", "");
+                // 如果找到对应的字段，则更新该字段的选项配置
+                if (fieldList[i].associationName?.includes("$")      // 确保 associationName 存在且包含 $
+                    && typeof newValue[dicTypeKey] === "object") {
+                    formData[fieldList[i].prop] = "";
+                    fieldList[i].options = newValue[dicTypeKey];
+                }
+                if (fieldList[i].type.includes('hildren') && fieldList[i].children?.length > 0) {
+                    updateOptions(newValue, fieldList[i].children);
+                }
             }
         }
     }
@@ -103,7 +120,7 @@ const updateValue = async (newValue, fieldList) => {
         // 遍历formFields
         for (let i = 0; i < fieldList.length; i += 1) {
             let targetValue = "";
-            // 如果包含 +，则表示需要组合多个字段的值
+            // 如果包含 +，则表示需要组合多个字段的值，组合成一个值
             if (fieldList[i].associationName && fieldList[i].associationName.includes("+")) {
                 // 拆分变量名数组
                 let associationNameList = [];
@@ -184,7 +201,6 @@ const getOption = async (data, field) => {
     console.log("field", field);
     if (data) {
         // TODO,目前只有跑道，以后要多点其他。要灵活。是NAIP相关的,预留位置，关联其他选项来触发其他选项的可选项
-        // 下周一优先处理这里，还有要新增动态+的功能
         // 跑道、机场、情报区等等
         if (field.label === "跑道") {
             let response = await queryRwyConfig({ name: formData[field.prop] });

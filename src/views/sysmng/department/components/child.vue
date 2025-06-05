@@ -10,11 +10,17 @@
             <tiny-form-item label="专业" prop="field">
                 <tiny-input v-model="createData.field"></tiny-input>
             </tiny-form-item>
+            <tiny-form-item label="所属情报区" prop="airSpaceCodeId">
+                <tiny-input v-model="createData.airSpaceCodeId"></tiny-input>
+            </tiny-form-item>
+            <tiny-form-item label="所属机场" prop="airPortCodeId">
+                <tiny-input v-model="createData.airPortCodeId"></tiny-input>
+            </tiny-form-item>
             <tiny-form-item>
                 <tiny-button type="primary" @click="handleSubmit()">
                     提交
                 </tiny-button>
-                <tiny-button  @click="resetForm"> 重置 </tiny-button>
+                <tiny-button @click="resetForm"> 重置 </tiny-button>
             </tiny-form-item>
         </tiny-form>
     </div>
@@ -31,9 +37,11 @@ import {
     Modal,
     Numeric as TinyNumeric,
 } from '@opentiny/vue'
-import {  postDepartment } from '@/api/fetchInterface';
+import { postDepartment } from '@/api/fetchInterface';
 import { useWorkFlowStore } from '@/store';
 import workflowaxios from '@/views/workflow/components/workflow-axios';
+import airport from '@/router/routes/modules/airport';
+import airspace from '@/router/routes/modules/airspace';
 
 
 const props = defineProps({
@@ -50,6 +58,8 @@ const createData = reactive({
     parentDepID: parentDep.value.depID,
     depCode: "",
     parentDepCode: "",
+    airSpaceCodeId: "",
+    airPortCodeId: "",
     grade: parentDep.value.grade + 1,
     fullName: "",
 })
@@ -85,7 +95,7 @@ function handleSubmit() {
     ruleFormRef.value.validate(async (valid) => {
         if (valid) {
             createData.fullName = fullName;
-            await postDepartment(createData).then(res=>{
+            await postDepartment(createData).then(res => {
                 workflowaxios.defaults.headers.common = {
                     'Flyflow-Tenant-Id': '1',
                     'AuthUserId': userWorkFlowStore.user.loginId,
@@ -103,7 +113,7 @@ function handleSubmit() {
                     sort: 1,
                     weight: 1,
                 }
-                workflowaxios.post('/dept/create',  deptData ).then((res1) => {
+                workflowaxios.post('/dept/create', deptData).then((res1) => {
                     if (res1.data.ok === false) {
                         Modal.alert('提交失败!');
                     }
@@ -124,5 +134,4 @@ function resetForm() {
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

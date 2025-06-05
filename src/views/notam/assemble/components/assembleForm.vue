@@ -10,6 +10,8 @@
       </tiny-floatbar>
       <tiny-button type="primary" @click="stepStart" :modal-overlay-opening-padding="100"
         :modal-overlay-opening-radius="100">开始引导</tiny-button>
+      <tiny-button type="danger" @click="onChangeView" :modal-overlay-opening-padding="100"
+        :modal-overlay-opening-radius="100">切换视角</tiny-button>
       <tiny-guide :show-step="showStep" :dom-data="domData"></tiny-guide>
       <tiny-row class="guide-box1">
         <tiny-divider content-position="left" offset="5%" font-size="20px" content-background-color="#1476ff"
@@ -24,7 +26,7 @@
               </tiny-radio-group>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="4">
+          <tiny-col :span="4" v-show="createData.messageType === '代替报' || createData.messageType === '取消报'">
             <tiny-form-item label="报文号">
               <tiny-input v-model="createData.messageID"> </tiny-input>
             </tiny-form-item>
@@ -33,37 +35,37 @@
         <tiny-row>
           <tiny-col :span="12">
             <tiny-form-item label="Q项(限定行)">
-              <tiny-col :span="2" style="margin:2px">
+              <tiny-col :span="2" style="margin:2px" v-show="view">
                 <tiny-form-item label-width="80px" label="情报区">
                   <tiny-input v-model="createData.qAirSpace" disabled> </tiny-input>
                 </tiny-form-item>
               </tiny-col>
-              <tiny-col :span="2" style="margin:2px">
+              <tiny-col :span="2" style="margin:2px" v-show="view">
                 <tiny-form-item label-width="80px" label="通告代码">
                   <tiny-input v-model="createData.qCode" disabled> </tiny-input>
                 </tiny-form-item>
               </tiny-col>
-              <tiny-col :span="2" style="margin:2px">
+              <tiny-col :span="2" style="margin:2px" v-show="view">
                 <tiny-form-item label-width="80px" label="飞行类型">
                   <tiny-input v-model="createData.qFlightType" disabled> </tiny-input>
                 </tiny-form-item>
               </tiny-col>
-              <tiny-col :span="2" style="margin:2px">
+              <tiny-col :span="2" style="margin:2px" v-show="view">
                 <tiny-form-item label-width="80px" label="签发目的">
                   <tiny-input v-model="createData.qTarget" disabled> </tiny-input>
                 </tiny-form-item>
               </tiny-col>
-              <tiny-col :span="2" style="margin:2px">
+              <tiny-col :span="2" style="margin:2px" v-show="view">
                 <tiny-form-item label-width="80px" label="范围">
                   <tiny-input v-model="createData.qReach" disabled> </tiny-input>
                 </tiny-form-item>
               </tiny-col>
-              <tiny-col :span="2" style="margin:2px">
+              <tiny-col :span="2" style="margin:2px" v-show="view">
                 <tiny-form-item label-width="80px" label="下限">
                   <tiny-input v-model="createData.qLowerLimit" disabled></tiny-input>
                 </tiny-form-item>
               </tiny-col>
-              <tiny-col :span="2" style="margin:2px">
+              <tiny-col :span="2" style="margin:2px" v-show="view">
                 <tiny-form-item label-width="80px" label="上限">
                   <tiny-input v-model="createData.qUpperLimit" disabled></tiny-input>
                 </tiny-form-item>
@@ -93,11 +95,11 @@
         <tiny-divider content-position="left" offset="5%" font-size="20px" content-background-color="#1476ff"
           content-color="#ffffff">发生地与生效期</tiny-divider>
         <tiny-row>
-          <tiny-col :span="3">
+          <tiny-col :span="3" v-show="view">
             <!--情报区或者机场两大类选择器-->
             <tiny-form-item label="A项(发生地)">
               <tiny-select v-model="createData.a_airSpace" filterable placeholder="请选择情报区/机场" value-field="codeId"
-                text-field="txtName" clearable @change="onChangeA">
+                text-field="txtName" disabled clearable @change="onChangeA">
                 <tiny-option-group v-for="group in aOptions" :key="group.label" :label="group.label">
                   <tiny-option v-for="item in group.options" :key="item.value" :label="item.label"
                     :value="item.value"></tiny-option>
@@ -244,7 +246,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, defineProps, toRefs, onMounted, toRaw } from 'vue'
+import { ref, reactive, defineProps, toRefs, onMounted, toRaw, watch } from 'vue'
 import {
   Collapse as TinyCollapse,
   CollapseItem as TinyCollapseItem,
@@ -308,6 +310,8 @@ const props = defineProps({
 });
 const { templateID } = toRefs(props);
 const { templateData } = toRefs(props);
+// 视角变量
+const view = ref(false);
 // 引导变量
 const showStep = ref(false);
 const domData = ref([
@@ -391,7 +395,7 @@ const createData = reactive({
   state: '',
   remark: '',
   // 报文类型
-  messageType: '',
+  messageType: '新报',
   // 报文号
   messageID: '',
   // 报文生效类型
@@ -484,13 +488,26 @@ const baseTypeOption = ref({
     //{ field: 'fg', title: '', hidden: true },
   ]
 });
+
+watch(
+  () => createData.a_airSpace,
+  (newVal: string, oldVal: string) => {
+    if (newVal && newVal !== oldVal) {
+      onChangeA()
+    }
+  },
+  {
+    immediate: true,  // 保持初始化时触发
+    // deep: true 不需要，因为 a_airSpace 是 string 类型
+  }
+)
 // 初始化请求数据
 onMounted(async () => {
   if (templateID.value) {
     fetchData();
   }
   // 用户只会发自己情报区的电报
-  createData.qAirSpace = userStore.airSpace || "";
+  createData.qAirSpace = userStore.airSpaceCodeId || "";
 });
 
 const keyWord = ref();
@@ -526,8 +543,15 @@ const fetchAirPortAndAirSpace = async () => {
     background: 'rgba(0, 0, 0, 0.7)',
   });
   try {
-    const { data } = await queryAirPortAndAirSpace();
+    const { data } = await queryAirPortAndAirSpace({ qReach: createData.qReach });
     aOptions.value = data;
+    if (createData.qReach === 'E' || createData.qReach === 'W') {
+      createData.a_airSpace = userStore.airSpaceCodeId || '';
+    }
+    else {
+      createData.a_airSpace = userStore.airPortCodeId || '';
+    }
+    console.log(createData.a_airSpace);
   }
   catch (err) {
     console.log(err);
@@ -542,8 +566,8 @@ const fetchAirPortAndAirSpace = async () => {
 const fetchData = async () => {
   Object.assign(createData, templateData.value);
   handleKeyWord();
-  preCondition.value = true;
   await fetchAirPortAndAirSpace();
+  preCondition.value = true;
 };
 // 核心算法，提取关键字
 function extractContent(input: string): object {
@@ -600,15 +624,30 @@ function onAssemble() {
   eFormData.requiredList = Object.values(test);
   console.log(eFormData.requiredList);
   // 校验其他项---后续要做在formitem中
-    if ((createData.messageType === "新报" || createData.messageType === "代替报") && (isEmpty(createData.b_time) || isEmpty(createData.c_time))) {
+  // 新报代替报必须要有b、c项
+  // c项的末尾必须不是0000
+  // 开始时间必须小于结束时间
+
+  // NEITHER必须填B、C项
+  if (createData.messageValidType === 'NEITHER' && (isEmpty(createData.b_time) || isEmpty(createData.c_time))) {
     Modal.alert('请填写开始时间和结束时间');
+    return;
   }
-  if (createData.c_time.includes('0000')) {
+  if (createData.messageValidType === 'NEITHER' && createData.c_time.includes('0000')) {
     Modal.alert('结束时间的时分不能为00:00');
     return;
   }
-  if (createData.c_time < createData.b_time) {
+  if (createData.messageValidType === 'NEITHER' && createData.c_time < createData.b_time) {
     Modal.alert('结束时间不能大于开始时间');
+    return;
+  }
+  if (createData.messageValidType !== 'NEITHER' && isEmpty(createData.b_time)) {
+    Modal.alert('请填写开始时间');
+    return;
+  }
+  // 新报代替报必须要有b、c项
+  if ((createData.messageType === "新报" || createData.messageType === "代替报") && (isEmpty(createData.b_time) || isEmpty(createData.c_time)) && createData.messageValidType === '') {
+    Modal.alert('请填写开始时间和结束时间');
     return;
   }
   // 校验E项中的必填项是否都填完
@@ -616,6 +655,8 @@ function onAssemble() {
     Modal.alert('请填写必填项');
     return;
   }
+
+
 
   let assembleText = createData.template;
   matches.matchesRequiredLabel.forEach((item, index) => {
@@ -648,6 +689,7 @@ const airspaceConfigTypes = [
 ];
 const airportConfigTypes = [
   { key: 'rwys', prefix: 'rwys' },
+  { key: 'rwyDirections', prefix: 'rwyDirections' },
 ];
 // 处理config函数
 function processConfig(dataArray, prefix) {
@@ -660,7 +702,6 @@ function processConfig(dataArray, prefix) {
     // 根据数组长度决定赋值方式
     config[configKey] = items?.length === 1 ? items[0]?.value : items || [];
   });
-
   return config;
 }
 // 处理config函数
@@ -682,6 +723,7 @@ function uniqueByProperty(array: any, key: any) {
 };
 // A-E、Q。A项改变事件，触发了静态数据变化。只有A项和Q项可以触发静态数据变化
 async function onChangeA() {
+  console.log('xxxx');
   // 选择情报区-NDB、VOR/DME、限制区、管制区
   if (airSpaceCodes.value.includes(createData.a_airSpace)) {
     const { data } = await queryAirSpaceConfig({ id: createData.a_airSpace });
@@ -796,6 +838,10 @@ function onChangeBaseType() {
 // 引导按钮事件
 function stepStart() {
   showStep.value = !showStep.value
+}
+// 切换视角
+function onChangeView() {
+  view.value = !view.value
 }
 // 放大缩小PDF
 function onResizePdf() {

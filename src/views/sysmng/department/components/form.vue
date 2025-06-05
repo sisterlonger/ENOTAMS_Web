@@ -10,8 +10,20 @@
             <tiny-form-item v-if="createData.fullName" label="专业" prop="field">
                 <tiny-input v-model="createData.field"></tiny-input>
             </tiny-form-item>
-            <tiny-form-item v-if="createData.airSpace" label="情报区" prop="field">
-                <tiny-input v-model="createData.airSpace"></tiny-input>
+            <tiny-form-item v-if="createData.fullName" label="所属情报区" prop="field">
+                <tiny-select v-model="createData.airSpaceCodeId" placeholder="请选择所属情报区" filterable>
+                    <tiny-option v-for="item in airspaceOptions" :key="item.codeId" :label="item.codeId"
+                        :value="item.codeId"></tiny-option>
+                </tiny-select>
+            </tiny-form-item>
+            <tiny-form-item v-if="createData.fullName"  label="所属机场" prop="field">
+                <tiny-select v-model="createData.airPortCodeId" placeholder="请选择所属机场" filterable>
+                    <tiny-option v-for="item in airportOptions" :key="item.codeId" :label="item.codeId"
+                        :value="item.codeId"></tiny-option>
+                </tiny-select>
+            </tiny-form-item>
+            <tiny-form-item v-if='createData.fullName' label="Q码权限" prop="field">
+                <qcodeTree :qCodePermissions="createData.nodes" @onChange="getQCodePermission"></qcodeTree>
             </tiny-form-item>
             <tiny-form-item>
                 <tiny-button type="primary" @click="handleSubmit()">
@@ -41,12 +53,13 @@ import {
     Loading,
     Modal,
     Numeric as TinyNumeric,
-    DialogBox as TinyDialogBox, Notify,
+    DialogBox as TinyDialogBox, Notify, Select as TinySelect, Option as TinyOption,
 } from '@opentiny/vue';
 import { iconWarning } from '@opentiny/vue-icon';
-import { queryDepartmentDetail, postDepartment, deleteDepartment } from '@/api/fetchInterface';
+import { queryDepartmentDetail, postDepartment, deleteDepartment, queryAirPortList, queryAirSpaceList } from '@/api/fetchInterface';
 import { useWorkFlowStore } from '@/store';
 import workflowaxios from '@/views/workflow/components/workflow-axios';
+import qcodeTree from '@/components/qcodeTree/index.vue';
 import Child from './child.vue';
 
 const props = defineProps({
@@ -57,6 +70,8 @@ const ruleFormRef = ref();
 const boxVisibility = ref(false)
 const preCondition = ref(false);
 const userWorkFlowStore = useWorkFlowStore();
+const airportOptions = ref([]);
+const airspaceOptions = ref([]);
 const createData = reactive({
     depID: null,
     depName: '',
@@ -66,7 +81,12 @@ const createData = reactive({
     parentDepCode: "",
     grade: 0,
     fullName: "",
-    airSpace: '',
+    airSpaceCodeId: '',
+    airPortCodeId: '',
+    // get
+    nodes: [],
+    // set
+    nodeIds: [],
 })
 const rules = ref({
     depName: [
@@ -84,19 +104,41 @@ const state = reactive<{
     loading: null,
 });
 
-
-// 请求数据接口方法
-const fetchData = async () => {
-    /*
+const fetchConfig = async () => {
     state.loading = Loading.service({
         text: 'loading...',
         target: document.getElementById('container'),
         background: 'rgba(0, 0, 0, 0.7)',
-    });*/
+    });
+    try {
+        let airportList = await queryAirPortList();
+        airportOptions.value = airportList.data;
+        let airspaceList = await queryAirSpaceList();
+        airspaceOptions.value = airspaceList.data;
+
+    }
+    catch (err) {
+        Modal.alert('获取数据错误');
+        emit('close');
+    }
+    finally {
+        state.loading.close();
+    }
+}
+
+// 请求数据接口方法
+const fetchData = async () => {
+    state.loading = Loading.service({
+        text: 'loading...',
+        target: document.getElementById('container'),
+        background: 'rgba(0, 0, 0, 0.7)',
+    });
     try {
         const { data } = await queryDepartmentDetail({ id: depID.value });
         Object.assign(createData, data);
-        createData.fullName = data.fullName || data.depName;
+        createData.nodes = [];
+        createData.fullName = data.fullName;
+        createData.nodes = data.nodes.map((item: any) => { return item.nodeID });
     }
     catch (err) {
         Modal.alert('获取数据错误');
@@ -130,6 +172,7 @@ function dialogClose() {
 }
 // 初始化请求数据
 onMounted(async () => {
+    fetchConfig();
     if (depID.value) {
         fetchData();
     }
@@ -142,11 +185,15 @@ const emit = defineEmits(['close', 'query']);
 function handleSubmit() {
     ruleFormRef.value.validate(async (valid: any) => {
         if (valid) {
+            // 配置Q码
+            createData.nodeIds = createData.nodes;
+            /*
+            // 组装全称--不需要，这个应该是后端处理
             if (createData.fullName.split("-").pop() !== createData.depName) {
                 let strArr = createData.fullName.split("-");
                 let font = strArr.slice(0, strArr.length - 1).join("-");
                 createData.fullName = `${font}-${createData.depName}`;
-            }
+            }*/
             await postDepartment(createData).then(res => {
                 workflowaxios.defaults.headers.common = {
                     'Flyflow-Tenant-Id': '1',
@@ -211,6 +258,14 @@ async function onDelete() {
         });
         emit('query');
     });
+}
+// qcodeTree的值处理事件
+const getQCodePermission = (checkedData: any) => {
+    let qCodePermissions = checkedData.map((item: any) => {
+        // 只记录带权限的叶子结点，其他叶子结点会利用filter过滤
+        return item.nodeID;
+    })
+    createData.nodes = qCodePermissions.filter((item: any) => { return item !== null });
 }
 
 
