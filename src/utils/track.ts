@@ -25,7 +25,7 @@ function trackEvent(module: string, message: object) {
   const event: TrackEvent = { module, message, logTime: new Date() };
   eventQueue.push(event);
   saveQueue();
-  sendEvents();
+  //sendEvents();
 }
 
 // 批量发送事件

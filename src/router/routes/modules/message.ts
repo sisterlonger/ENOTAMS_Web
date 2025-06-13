@@ -1,10 +1,10 @@
 export default {
     path: 'message',
     name: 'message',
-    component: () => import('@/views/workflow/message/index.vue'),
+    component: () => import('@/views/notam/message/index.vue'),
     meta: {
-      locale: '消息列表',
-      order: 5,
+      locale: '报文记录',
+      order: 6,
     },
   };
   

@@ -1,14 +1,35 @@
 <template>
     <div class="demo-form">
-        <tiny-form ref="ruleFormRef" :model="createData" :rules="rules" label-width="100px">
-            <tiny-form-item label="模块" prop="module">
-                <tiny-input v-model="createData.module" disabled></tiny-input>
+        <tiny-form ref="ruleFormRef" :model="createData" label-width="150px">
+            <tiny-form-item label="时间" prop="ts">
+                <tiny-input v-model="createData.ts" disabled></tiny-input>
             </tiny-form-item>
-            <tiny-form-item label="操作人" prop="logger">
-                <tiny-input v-model="createData.logger" disabled></tiny-input>
+            <tiny-form-item label="请求方式" prop="method">
+                <tiny-input v-model="createData.method" disabled></tiny-input>
             </tiny-form-item>
-            <tiny-form-item label="日志内容" prop="message">
-                <tiny-input v-model="createData.message" disabled></tiny-input>
+            <tiny-form-item label="接口地址" prop="url">
+                <tiny-input v-model="createData.url" disabled></tiny-input>
+            </tiny-form-item>
+            <tiny-form-item label="请求参数" prop="body">
+                <tiny-input v-model="createData.body" disabled type="textarea" autosize></tiny-input>
+            </tiny-form-item>
+            <tiny-form-item label="响应结果" prop="result">
+                <tiny-input v-model="createData.result" disabled type="textarea" autosize></tiny-input>
+            </tiny-form-item>
+            <tiny-form-item label="报错日志" prop="error">
+                <tiny-input v-model="createData.error" disabled type="textarea" autosize></tiny-input>
+            </tiny-form-item>
+            <tiny-form-item label="部门" prop="depName">
+                <tiny-input v-model="createData.depName" disabled></tiny-input>
+            </tiny-form-item>
+            <tiny-form-item label="用户名" prop="userName">
+                <tiny-input v-model="createData.userName" disabled></tiny-input>
+            </tiny-form-item>
+            <tiny-form-item label="请求ip" prop="ip">
+                <tiny-input v-model="createData.ip" disabled></tiny-input>
+            </tiny-form-item>
+            <tiny-form-item label="响应时长(ms)" prop="duration">
+                <tiny-input v-model="createData.duration" disabled></tiny-input>
             </tiny-form-item>
             <tiny-form-item>
                 <tiny-button type="primary" @click="handleSubmit()">
@@ -32,29 +53,27 @@ import {
 } from '@opentiny/vue'
 import { iconWarning } from '@opentiny/vue-icon';
 import { queryUserLogsDetail } from '@/api/fetchInterface';
+import user from '@/mock/user';
 
 
 const props = defineProps({
-    id: Number,
+    ts: Date,
 });
-const { id } = toRefs(props);
+const { ts } = toRefs(props);
 
 const ruleFormRef = ref()
 const validateIcon = ref(iconWarning())
 const createData = reactive({
-    id: null,
-    logger: '',
-    message: '',
-    module: '',
-})
-const rules = ref({
-    logger: [
-        { required: true, message: '必填', trigger: 'blur' },
-    ],
-    message: [
-        { required: true, message: '必填', trigger: 'blur' },
-    ],
-    module: [{ required: false, message: '非必填', trigger: 'change' }],
+    ts: '',
+    method: '',
+    url: '',
+    body: '',
+    result: '',
+    error: '',
+    depName: '',
+    userName: '',
+    ip: '',
+    duration: '',
 })
 
 // 加载效果
@@ -73,7 +92,7 @@ const fetchData = async () => {
         background: 'rgba(0, 0, 0, 0.7)',
     });
     try {
-        const { data } = await queryUserLogsDetail({ id: id.value });
+        const { data } = await queryUserLogsDetail({ ts: ts.value });
         Object.assign(createData, data);
     }
     catch (err) {
@@ -87,7 +106,7 @@ const fetchData = async () => {
 
 // 初始化请求数据
 onMounted(async () => {
-    if (id.value) {
+    if (ts.value) {
         fetchData();
     }
 });
@@ -102,5 +121,4 @@ function handleSubmit() {
 
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

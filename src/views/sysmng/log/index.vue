@@ -8,15 +8,14 @@
           <tiny-collapse-item title="查询" name="0">
             <tiny-form label-width="100px" label-position="right" class="filter-form" size="small">
               <tiny-row>
-                <tiny-col :span="4">
+                <!-- <tiny-col :span="4">
                   <tiny-form-item label="模块">
                     <tiny-input v-model="formData.module" placeholder="请输入模块" clearable></tiny-input>
                   </tiny-form-item>
-                </tiny-col>
+                </tiny-col> -->
                 <tiny-col :span="4">
                   <tiny-form-item label="日志级别">
-                    <tiny-select
-                      v-model="formData.level" :options="statusOptions" placeholder="请输入日志级别" clearable>
+                    <tiny-select v-model="formData.level" :options="statusOptions" placeholder="请输入日志级别" clearable>
                     </tiny-select>
                   </tiny-form-item>
                 </tiny-col>
@@ -25,11 +24,11 @@
                     <tiny-input v-model="formData.logger" placeholder="请输入操作人" clearable></tiny-input>
                   </tiny-form-item>
                 </tiny-col>
-                <tiny-col :span="4">
+                <!-- <tiny-col :span="4">
                   <tiny-form-item label="对象">
                     <tiny-input v-model="formData.object" placeholder="请输入对象" clearable></tiny-input>
                   </tiny-form-item>
-                </tiny-col>
+                </tiny-col> -->
                 <tiny-col :span="4">
                   <tiny-form-item label="日志内容">
                     <tiny-input v-model="formData.message" placeholder="请输入日志内容" clearable></tiny-input>
@@ -55,17 +54,18 @@
         </tiny-collapse>
 
 
-        <tiny-grid ref="gridRef" :fetch-data="fetchData" seq-serial :pager="pagerConfig">
+        <tiny-grid ref="gridRef" :fetch-data="fetchData" seq-serial :pager="pagerConfig" :fit="true">
           <template #toolbar>
             <tiny-grid-toolbar :buttons="toolbarButtons"></tiny-grid-toolbar>
           </template>
           <tiny-grid-column type="index" width="60"></tiny-grid-column>
-          <tiny-grid-column field="module" title="模块" show-overflow></tiny-grid-column>
+          <!-- <tiny-grid-column field="module" title="模块" ></tiny-grid-column> -->
+          <tiny-grid-column field="logDate" title="时间"></tiny-grid-column>
           <tiny-grid-column field="level" title="日志级别"></tiny-grid-column>
           <tiny-grid-column field="logger" title="操作人"></tiny-grid-column>
-          <tiny-grid-column field="object" title="对象" show-overflow></tiny-grid-column>
-          <tiny-grid-column field="message" title="日志内容"></tiny-grid-column>
-          <tiny-grid-column field="exception" title="异常"></tiny-grid-column>
+          <!-- <tiny-grid-column field="object" title="对象" ></tiny-grid-column> -->
+          <tiny-grid-column field="message" title="日志内容" show-overflow></tiny-grid-column>
+          <tiny-grid-column field="exception" title="异常" show-overflow></tiny-grid-column>
           <tiny-grid-column title="操作" width="200" align="center">
             <template #default="data">
               <tiny-button v-track="'系统日志'" size="mini" type="primary" @click="editRowEvent(data.row)">查看</tiny-button>
@@ -73,7 +73,7 @@
           </tiny-grid-column>
         </tiny-grid>
         <tiny-dialog-box v-if="boxVisibility" v-model:visible="boxVisibility" title="查看" width="30%">
-          <dictionaryForm :id="operationID" @close="dialogClose" />
+          <dictionaryForm :id="logId" @close="dialogClose" />
         </tiny-dialog-box>
       </div>
     </div>
@@ -105,8 +105,9 @@ const fetchData = ref({
 const tableData = ref([
 ])
 const boxVisibility = ref(false)
-const operationID = ref(0)
+const logId = ref(0)
 const formData = ref({
+  logDate: '',
   module: "",
   thread: "",
   level: "",
@@ -151,12 +152,13 @@ async function getData({ page }) {
 }
 // 行操作
 const editRowEvent = (row) => {
-  operationID.value = row.operationID;
+  console.log(row);
+  logId.value = row.logID;
   boxVisibility.value = true;
 }
 // 关闭弹窗
 function dialogClose() {
-  operationID.value = 0;
+  logId.value = 0;
   boxVisibility.value = false;
   queryClick();
 }

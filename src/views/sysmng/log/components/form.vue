@@ -1,8 +1,11 @@
 <template>
     <div class="demo-form">
         <tiny-form ref="ruleFormRef" :model="createData" :rules="rules" label-width="100px">
-            <tiny-form-item label="模块" prop="module">
+            <!-- <tiny-form-item label="模块" prop="module">
                 <tiny-input v-model="createData.module" disabled></tiny-input>
+            </tiny-form-item> -->
+            <tiny-form-item label="时间" prop="logDate" :validate-icon="validateIcon">
+                <tiny-input v-model="createData.logDate" disabled></tiny-input>
             </tiny-form-item>
             <tiny-form-item label="日志级别" prop="level" :validate-icon="validateIcon">
                 <tiny-input v-model="createData.level" disabled></tiny-input>
@@ -10,14 +13,14 @@
             <tiny-form-item label="操作人" prop="logger">
                 <tiny-input v-model="createData.logger" disabled></tiny-input>
             </tiny-form-item>
-            <tiny-form-item label="对象" prop="object">
+            <!-- <tiny-form-item label="对象" prop="object">
                 <tiny-input v-model="createData.object" disabled></tiny-input>
-            </tiny-form-item>
+            </tiny-form-item> -->
             <tiny-form-item label="日志内容" prop="message">
-                <tiny-input v-model="createData.message" disabled></tiny-input>
+                <tiny-input v-model="createData.message" type="textarea" autosize disabled></tiny-input>
             </tiny-form-item>
             <tiny-form-item label="异常" prop="exception">
-                <tiny-input v-model="createData.exception" disabled></tiny-input>
+                <tiny-input v-model="createData.exception" type="textarea" autosize disabled></tiny-input>
             </tiny-form-item>
             <tiny-form-item>
                 <tiny-button type="primary" @click="handleSubmit()">
@@ -52,6 +55,7 @@ const ruleFormRef = ref()
 const validateIcon = ref(iconWarning())
 const createData = reactive({
     id: null,
+    logDate: "",
     level: '',
     logger: '',
     message: '',
@@ -101,6 +105,7 @@ const fetchData = async () => {
 
 // 初始化请求数据
 onMounted(async () => {
+    console.log('id', id.value);
     if (id.value) {
         fetchData();
     }
@@ -116,5 +121,4 @@ function handleSubmit() {
 
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

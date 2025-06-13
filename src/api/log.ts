@@ -38,14 +38,11 @@ export function queryLogsDetail(params: { id: number }) {
         params,
     });
 }
-export function deleteLogs(ids: []) {
-    return axios.post('/log/delete', ids);
-}
 export function queryUserLogsList(params: UserLogsSearch) {
-    return axios.get('/log/userlist', { params });
+    return axios.get('/log/operationlist', { params });
 }
-export function queryUserLogsDetail(params: { id: number }) {
-    return axios.get('/log/userget', {
+export function queryUserLogsDetail(params: { ts: Date }) {
+    return axios.get('/log/operationget', {
         params,
     });
 }

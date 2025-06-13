@@ -9,8 +9,35 @@
             <tiny-form label-width="100px" label-position="right" class="filter-form" size="small">
               <tiny-row>
                 <tiny-col :span="4">
-                  <tiny-form-item label="模块">
-                    <tiny-input v-model="formData.module" placeholder="请输入模块" clearable></tiny-input>
+                  <tiny-form-item label="时间范围">
+                    <tiny-date-picker v-model="formData.timeRange" type="datetimerange" placeholder="请选择时间"
+                      format="yyyy-MM-dd HH:mm" value-format="yyyy-MM-dd HH:mm"></tiny-date-picker>
+                  </tiny-form-item>
+                </tiny-col>
+                <tiny-col :span="4">
+                  <tiny-form-item label="请求方式">
+                    <tiny-select v-model="formData.method" placeholder="请选择请求方式" :options="methodOptions"
+                      clearable></tiny-select>
+                  </tiny-form-item>
+                </tiny-col>
+                <tiny-col :span="4">
+                  <tiny-form-item label="接口地址">
+                    <tiny-input v-model="formData.url" placeholder="请输入接口地址" clearable></tiny-input>
+                  </tiny-form-item>
+                </tiny-col>
+                <tiny-col :span="4">
+                  <tiny-form-item label="请求参数">
+                    <tiny-input v-model="formData.body" placeholder="请输入请求参数" clearable></tiny-input>
+                  </tiny-form-item>
+                </tiny-col>
+                <tiny-col :span="4">
+                  <tiny-form-item label="响应结果">
+                    <tiny-input v-model="formData.result" placeholder="请输入响应结果" clearable></tiny-input>
+                  </tiny-form-item>
+                </tiny-col>
+                <tiny-col :span="4">
+                  <tiny-form-item label="报错日志">
+                    <tiny-input v-model="formData.error" placeholder="请输入报错日志" clearable></tiny-input>
                   </tiny-form-item>
                 </tiny-col>
                 <tiny-col :span="4">
@@ -19,8 +46,14 @@
                   </tiny-form-item>
                 </tiny-col>
                 <tiny-col :span="4">
-                  <tiny-form-item label="日志内容">
-                    <tiny-input v-model="formData.message" placeholder="请输入日志内容" clearable></tiny-input>
+                  <tiny-form-item label="请求ip">
+                    <tiny-input v-model="formData.ip" placeholder="请输入请求ip" clearable></tiny-input>
+                  </tiny-form-item>
+                </tiny-col>
+                <tiny-col :span="4">
+                  <tiny-form-item label="状态">
+                    <tiny-select v-model="formData.status" placeholder="请选择状态" :options="statusOptions"
+                      clearable></tiny-select>
                   </tiny-form-item>
                 </tiny-col>
                 <tiny-col :span="4">
@@ -38,22 +71,30 @@
         </tiny-collapse>
 
 
-        <tiny-grid ref="gridRef" :fetch-data="fetchData" seq-serial :pager="pagerConfig">
+        <tiny-grid ref="gridRef" :fetch-data="fetchData" seq-serial :pager="pagerConfig" :fit="true">
           <template #toolbar>
             <tiny-grid-toolbar></tiny-grid-toolbar>
           </template>
-          <tiny-grid-column type="index" width="60"></tiny-grid-column>
-          <tiny-grid-column field="module" title="模块" show-overflow></tiny-grid-column>
-          <tiny-grid-column field="logger" title="操作人"></tiny-grid-column>
-          <tiny-grid-column field="message" title="日志内容"></tiny-grid-column>
+          <!-- <tiny-grid-column type="index" width="60"></tiny-grid-column> -->
+          <tiny-grid-column field="ts" title="时间"></tiny-grid-column>
+          <tiny-grid-column field="method" title="请求方式"></tiny-grid-column>
+          <tiny-grid-column field="url" title="接口地址"></tiny-grid-column>
+          <tiny-grid-column field="body" title="请求参数" show-overflow></tiny-grid-column>
+          <tiny-grid-column field="result" title="响应结果" show-overflow></tiny-grid-column>
+          <tiny-grid-column field="error" title="报错日志" show-overflow></tiny-grid-column>
+          <tiny-grid-column field="depName" title="部门"></tiny-grid-column>
+          <tiny-grid-column field="userName" title="用户名"></tiny-grid-column>
+          <tiny-grid-column field="ip" title="请求ip"></tiny-grid-column>
+          <tiny-grid-column field="duration" title="响应时长(ms)"></tiny-grid-column>
           <tiny-grid-column title="操作" width="200" align="center">
             <template #default="data">
-              <tiny-button v-track="route.name" size="mini" type="primary" @click="editRowEvent(data.row)">查看</tiny-button>
+              <tiny-button v-track="route.name" size="mini" type="primary"
+                @click="editRowEvent(data.row)">查看</tiny-button>
             </template>
           </tiny-grid-column>
         </tiny-grid>
-        <tiny-dialog-box v-if="boxVisibility" v-model:visible="boxVisibility" title="查看" width="30%">
-          <dictionaryForm :id="operationID" @close="dialogClose" />
+        <tiny-dialog-box v-if="boxVisibility" v-model:visible="boxVisibility" title="查看" width="50%">
+          <dictionaryForm :ts="ts" @close="dialogClose" />
         </tiny-dialog-box>
       </div>
     </div>
@@ -65,7 +106,7 @@ import { ref } from 'vue'
 import { useRoute } from 'vue-router';
 import {
   Grid as TinyGrid, GridColumn as TinyGridColumn, Button as TinyButton, DialogBox as TinyDialogBox, GridToolbar as TinyGridToolbar, Input as TinyInput, Form as TinyForm,
-  FormItem as TinyFormItem, Layout as TinyLayout, Row as TinyRow, Col as TinyCol, Modal, Collapse as TinyCollapse, CollapseItem as TinyCollapseItem, Select as TinySelect,
+  FormItem as TinyFormItem, Layout as TinyLayout, Row as TinyRow, Col as TinyCol, TinyDatePicker, Modal, Collapse as TinyCollapse, CollapseItem as TinyCollapseItem, Select as TinySelect,
 } from '@opentiny/vue';
 import { queryUserLogsList } from '@/api/fetchInterface';
 import dictionaryForm from './components/form.vue';
@@ -87,39 +128,84 @@ const fetchData = ref({
 const tableData = ref([
 ])
 const boxVisibility = ref(false)
-const operationID = ref(0)
+const ts = ref("")
 const formData = ref({
-  module: "",
+  timeRange: [],
+  startTime: '',
+  endTime: '',
+  method: "",
+  url: "",
+  body: "",
+  result: "",
+  error: "",
+  ip: "",
+  status: '',
   logger: "",
-  message: "",
 })
 const gridRef = ref()
 const activeNames = ref(['0'])
 const statusOptions = [
   {
-    value: 'normal',
-    label: 'normal',
+    value: '0',
+    label: '正常',
   },
   {
-    value: 'warning',
-    label: 'warning',
-  },
-  {
-    value: 'error',
-    label: 'error',
+    value: '1',
+    label: '异常',
   },
 ];
+const methodOptions = [{
+  value: 'GET',
+  label: 'GET',
+},
+{
+  value: 'POST',
+  label: 'POST',
+},];
 async function queryClick() {
   //getData({ page: pagerConfig.value.attrs });
   gridRef.value.handleFetch();
 }
 
+/**
+ * 将 ISO 8601 时间字符串转换为 "YYYY-MM-DD HH:mm:ss" 格式
+ * @param {string} isoString - ISO 8601 时间字符串（如 "2025-06-11T14:50:52.297+08:00"）
+ * @returns {string} 格式化后的时间字符串
+ */
+function formatIsoToSimple(isoString) {
+  const date = new Date(isoString);
+
+  // 提取各部分并补零（月份从 0 开始，需 +1）
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // 补零到两位
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+
+  // 拼接为目标格式
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
+
+// 使用示例
+const isoTime = "2025-06-11T14:50:52.297+08:00";
+const formattedTime = formatIsoToSimple(isoTime);
+console.log(formattedTime); // 输出：2025-06-11 14:50:52
 // 获取列表数据
 async function getData({ page }) {
   //this.$trackEvent('button_click', { buttonId: 'myButton' });
   const { currentPage, pageSize } = page
   formData.value.pageIndex = currentPage;
   formData.value.pageSize = pageSize;
+  if (formData.value.timeRange.length > 0) {
+    formData.value.startTime = String(formData.value.timeRange[0]);
+    formData.value.endTime = String(formData.value.timeRange[1]);
+  }
+  else{
+    formData.value.startTime = "";
+    formData.value.endTime = "";
+  }
+  console.log(formData.value);
   let response = await queryUserLogsList(formData.value);
   tableData.value = response.data;
   return Promise.resolve({
@@ -129,12 +215,12 @@ async function getData({ page }) {
 }
 // 行操作
 const editRowEvent = (row) => {
-  operationID.value = row.operationID;
+  ts.value = row.ts;
   boxVisibility.value = true;
 }
 // 关闭弹窗
 function dialogClose() {
-  operationID.value = 0;
+  ts.value = "";
   boxVisibility.value = false;
   queryClick();
 }

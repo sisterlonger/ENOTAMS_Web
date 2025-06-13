@@ -116,14 +116,14 @@
               </tiny-radio-group>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="2.5">
+          <tiny-col :span="3">
             <!--时间-->
             <tiny-form-item label="B项(开始时间)">
               <tiny-date-picker v-model="createData.b_time" type="datetime" placeholder="请选择时间" format="yyMMddHHmm"
                 value-format="yyMMddHHmm"></tiny-date-picker>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="2.5" v-if="createData.messageValidType === 'NEITHER'">
+          <tiny-col :span="3" v-if="createData.messageValidType === 'NEITHER'">
             <!--时间-->
             <tiny-form-item label="C项(结束时间)">
               <tiny-date-picker v-model="createData.c_time" type="datetime" placeholder="请选择时间" format="yyMMddHHmm"
@@ -166,13 +166,15 @@
                   <tiny-input v-model="createData.remark" type="textarea" autosize disabled> </tiny-input>
                 </tiny-form-item>
               </tiny-col>
-              <!-- <tiny-col :span="9" v-if="false">
+              <tiny-col :span="12">
                 <tiny-form-item class="demo-image__keep-style">
-                  <div>示例附件</div>
-                  <tiny-image v-if="false" :src="url" :preview-src-list="srcList" keep-style></tiny-image>
-                  <iframe src="/pdf/白云机场机场图.pdf" width="100%" height="600px" type="application/pdf" />
+                  <tiny-form-item label='参考附件' class="demo-image__keep-style">
+                    <tiny-select v-model="attachment" :options="attachmentOptions" placeholder="请选择需要参考的附件" clearable></tiny-select>
+                  </tiny-form-item>
+                  <tiny-image v-if='false' :src="url" :preview-src-list="srcList" keep-style></tiny-image>
+                  <iframe v-show="attachment" :src="attachment" width="100%" height="600px" type="application/pdf" />
                 </tiny-form-item>
-              </tiny-col> -->
+              </tiny-col>
             </tiny-collapse-item>
             <tiny-collapse-item title="必填项" name="必填项">
               <tiny-col>
@@ -440,7 +442,7 @@ const fgType = ref<any>('');
 // 折叠变量
 const activeNames = ref(['示例', '必填项', '选填项'])
 // 情报区四字码
-const airSpaceCodes = ref(["ZBPE", "ZGZU", "ZHWH", "ZJSA", "ZLHW", "ZPKM", "ZSHA", "ZWUQ", "ZYSH",]);
+const airSpaceCodes = ref(["ZGZU", "ZHWH", "ZJSA",]);
 // e项的组装数据
 const eFormData = reactive({
   requiredList: [],
@@ -488,6 +490,30 @@ const baseTypeOption = ref({
     //{ field: 'fg', title: '', hidden: true },
   ]
 });
+// 机场图、情报图附件
+const attachment = ref();
+const attachmentOptions = ref([
+  {
+    label: '白云机场chart图',
+    value: '/pdf/白云机场chart图.pdf',
+  },
+  {
+    label: '白云机场高度chart图',
+    value: '/pdf/白云机场高度chart图.pdf',
+  },
+  {
+    label: '广州区域图',
+    value: '/pdf/广州区域图.pdf',
+  },
+  {
+    label: '航路图',
+    value: '/pdf/航路图.pdf',
+  },
+  {
+    label: '10A-RWY01L',
+    value: '/pdf/10A-RWY01L.pdf',
+  },
+]);
 
 watch(
   () => createData.a_airSpace,
@@ -551,7 +577,6 @@ const fetchAirPortAndAirSpace = async () => {
     else {
       createData.a_airSpace = userStore.airPortCodeId || '';
     }
-    console.log(createData.a_airSpace);
   }
   catch (err) {
     console.log(err);
@@ -622,7 +647,6 @@ async function copyToClipboard() {
 function onAssemble() {
   let test = childRef.value.assembleStr();
   eFormData.requiredList = Object.values(test);
-  console.log(eFormData.requiredList);
   // 校验其他项---后续要做在formitem中
   // 新报代替报必须要有b、c项
   // c项的末尾必须不是0000
@@ -667,7 +691,6 @@ function onAssemble() {
   });
   // E项组装的文本
   eFormData.result = assembleText;
-  // TODO组装报文未完成
   let qText = `Q)${createData.qAirSpace}/${createData.qCode}/${createData.qFlightType}/${createData.qTarget}/${createData.qReach}/${createData.qLowerLimit}/${createData.qUpperLimit}/${createData.qLat}${createData.qLong}${createData.qRadius}`;
   // PERM时，C项为空,C项不能够选择0000时间，只能是2359
   let abcText = `A)${createData.a_airSpace} B)${createData.b_time || ''} C)${createData.messageValidType !== "NEITHER" ? createData.messageValidType : createData.c_time || ''}`;
@@ -723,7 +746,6 @@ function uniqueByProperty(array: any, key: any) {
 };
 // A-E、Q。A项改变事件，触发了静态数据变化。只有A项和Q项可以触发静态数据变化
 async function onChangeA() {
-  console.log('xxxx');
   // 选择情报区-NDB、VOR/DME、限制区、管制区
   if (airSpaceCodes.value.includes(createData.a_airSpace)) {
     const { data } = await queryAirSpaceConfig({ id: createData.a_airSpace });
@@ -773,7 +795,6 @@ async function onChangeA() {
       createData.qLong = "";
       staticData.value = {};
     }
-
   }
 }
 // D项点击事件
@@ -856,7 +877,9 @@ function onResizePdf() {
     pdfState.value = "缩小";
   }
 }
-// C项的时分禁止选择0000
+
+
+
 
 </script>
 

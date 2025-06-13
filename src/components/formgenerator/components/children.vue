@@ -35,7 +35,8 @@
 
                     <tiny-select v-model="formData[childrenItem.prop]"
                         :style="`width:${childrenItem.width !== null ? childrenItem.width : '200px'}`"
-                        :placeholder="childrenItem.placeholder" :options="childrenItem.options" clearable filterable
+                        :placeholder="childrenItem.placeholder" :options="childrenItem.options" clearable filterable 
+                        :optimization="childrenItem.options.length >1000  ? true : false"
                         @change="changeOption(formData[childrenItem.prop], childrenItem)"></tiny-select>
 
                     <span>{{
