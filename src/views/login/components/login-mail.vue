@@ -50,7 +50,9 @@ import useLoading from '@/hooks/loading';
 import { sm2, sm3, sm4 } from 'sm-crypto';
 import workflowaxios from '@/views/workflow/components/workflow-axios';
 import appRoutes from '@/router/routes/index';
+import noauthRoutes from '@/router/routes/noauth';
 import DefaultLayout from '@/layout/default-layout.vue';
+import GeneralLayout from '@/layout/general-layout.vue';
 
 
 import { RouteRecordRaw } from 'vue-router';
@@ -160,7 +162,12 @@ function handleSubmit() {
         component: DefaultLayout,
         children: appRoutes,
       });
-
+      
+      router.addRoute({
+        name: 'noauth',
+        path: import.meta.env.VITE_CONTEXT,
+        children: noauthRoutes,
+      });
       router.push({
         name: (redirect as string) || 'home',
         query: {

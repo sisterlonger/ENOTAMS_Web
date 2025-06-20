@@ -2,25 +2,29 @@ import axios from 'axios';
 
 export interface MessageSearch {
     messageId?: number;
+    qCode?: string;
+    airSpaceCodeId?: string;
     type?: string;
     validType?: string;
-    lat: string;
-    long: string;
-    radius: string;
-    telegramText: string;
+    lat?: string;
+    long?: string;
+    radius?: string;
+    telegramText?: string;
     startTime: string;
     endTime: string;
     pageIndex: number;
     pageSize: number;
 }
 export interface MessageVM {
-    dicID: number;
-    moduleName: string;
-    dicType: string;
-    dicKey: string;
-    dicValue: string;
-    orderID: number;
-    dicDescription: string;
+    qCode: string;
+    airSpaceCodeId: string;
+    type: string;
+    validType: string;
+    lat: string;
+    long: string;
+    radius: string;
+    telegramText: string;
+    templateId: number;
 }
 
 export function queryMessageList(params: MessageSearch) {

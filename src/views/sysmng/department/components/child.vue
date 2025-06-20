@@ -11,7 +11,10 @@
                 <tiny-input v-model="createData.field"></tiny-input>
             </tiny-form-item>
             <tiny-form-item label="所属情报区" prop="airSpaceCodeId">
-                <tiny-input v-model="createData.airSpaceCodeId"></tiny-input>
+                <tiny-select v-model="createData.airSpaceCodeId" placeholder="请选择所属情报区" filterable>
+                    <tiny-option v-for="item in airspaceOptions" :key="item.codeId" :label="item.codeId"
+                        :value="item.codeId"></tiny-option>
+                </tiny-select>
             </tiny-form-item>
             <tiny-form-item label="所属机场" prop="airPortCodeId">
                 <tiny-input v-model="createData.airPortCodeId"></tiny-input>
@@ -36,8 +39,9 @@ import {
     Loading,
     Modal,
     Numeric as TinyNumeric,
+    Select as TinySelect, Option as TinyOption,
 } from '@opentiny/vue'
-import { postDepartment } from '@/api/fetchInterface';
+import { postDepartment, queryAirSpaceList } from '@/api/fetchInterface';
 import { useWorkFlowStore } from '@/store';
 import workflowaxios from '@/views/workflow/components/workflow-axios';
 import airport from '@/router/routes/modules/airport';
@@ -51,6 +55,7 @@ const { parentDep } = toRefs(props);
 
 const ruleFormRef = ref()
 const userWorkFlowStore = useWorkFlowStore();
+const airspaceOptions = ref([]);
 const createData = reactive({
     depID: null,
     depName: '',
@@ -132,6 +137,15 @@ function handleSubmit() {
 function resetForm() {
     ruleFormRef.value.resetFields()
 }
+
+const fetchConfig = async () => {
+    let airspaceList = await queryAirSpaceList();
+    airspaceOptions.value = airspaceList.data;
+}
+// 初始化请求数据
+onMounted(async () => {
+    fetchConfig();
+});
 </script>
 
 <style scoped></style>

@@ -41,7 +41,7 @@ export default {
   'menu.airport':'机场',
   'menu.airwaypoint':'航路点',
   'menu.radionavigation':'无线电导航设施',
-  'menu.message':'报文记录',
+  'menu.message':'报文管理',
   ...localeSearchTable,
   ...localekanban,
   ...localeTheme,

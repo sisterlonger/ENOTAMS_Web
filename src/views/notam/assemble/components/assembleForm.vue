@@ -20,7 +20,7 @@
           <tiny-col :span="4">
             <tiny-form-item label="报文类型">
               <!--单选框-->
-              <tiny-radio-group v-model="createData.messageType">
+              <tiny-radio-group v-model="createData.messageType" :disabled="!isEmpty(messageId)">
                 <tiny-radio-button v-for="(item, index) in messageTypeOption" :label="item" :value="item"
                   :key="index"></tiny-radio-button>
               </tiny-radio-group>
@@ -28,63 +28,64 @@
           </tiny-col>
           <tiny-col :span="4" v-show="createData.messageType === '代替报' || createData.messageType === '取消报'">
             <tiny-form-item label="报文号">
-              <tiny-input v-model="createData.messageID"> </tiny-input>
+              <tiny-input v-model="createData.messageId" :disabled="!isEmpty(messageId)"> </tiny-input>
             </tiny-form-item>
           </tiny-col>
         </tiny-row>
         <tiny-row>
           <tiny-col :span="12">
             <tiny-form-item label="Q项(限定行)">
-              <tiny-col :span="2" style="margin:2px" v-show="view">
-                <tiny-form-item label-width="80px" label="情报区">
+              <tiny-col :span="isNoAuth ? 3.5 : 2" style="margin:2px" v-show="view">
+                <tiny-form-item label-width="60px" label="情报区">
                   <tiny-input v-model="createData.qAirSpace" disabled> </tiny-input>
                 </tiny-form-item>
               </tiny-col>
-              <tiny-col :span="2" style="margin:2px" v-show="view">
-                <tiny-form-item label-width="80px" label="通告代码">
+              <tiny-col :span="isNoAuth ? 3.5 : 2" style="margin:2px" v-show="view">
+                <tiny-form-item label-width="60px" label="代码">
                   <tiny-input v-model="createData.qCode" disabled> </tiny-input>
                 </tiny-form-item>
               </tiny-col>
-              <tiny-col :span="2" style="margin:2px" v-show="view">
-                <tiny-form-item label-width="80px" label="飞行类型">
+              <tiny-col :span="isNoAuth ? 3.5 : 2" style="margin:2px" v-show="view">
+                <tiny-form-item label-width="60px" label="类型">
                   <tiny-input v-model="createData.qFlightType" disabled> </tiny-input>
                 </tiny-form-item>
               </tiny-col>
-              <tiny-col :span="2" style="margin:2px" v-show="view">
-                <tiny-form-item label-width="80px" label="签发目的">
+              <tiny-col :span="isNoAuth ? 3.5 : 2" style="margin:2px" v-show="view">
+                <tiny-form-item label-width="60px" label="目的">
                   <tiny-input v-model="createData.qTarget" disabled> </tiny-input>
                 </tiny-form-item>
               </tiny-col>
-              <tiny-col :span="2" style="margin:2px" v-show="view">
-                <tiny-form-item label-width="80px" label="范围">
+              <tiny-col :span="isNoAuth ? 3.5 : 2" style="margin:2px" v-show="view">
+                <tiny-form-item label-width="60px" label="范围">
                   <tiny-input v-model="createData.qReach" disabled> </tiny-input>
                 </tiny-form-item>
               </tiny-col>
-              <tiny-col :span="2" style="margin:2px" v-show="view">
-                <tiny-form-item label-width="80px" label="下限">
+              <tiny-col :span="isNoAuth ? 3.5 : 2" style="margin:2px" v-show="view">
+                <tiny-form-item label-width="60px" label="下限">
                   <tiny-input v-model="createData.qLowerLimit" disabled></tiny-input>
                 </tiny-form-item>
               </tiny-col>
-              <tiny-col :span="2" style="margin:2px" v-show="view">
-                <tiny-form-item label-width="80px" label="上限">
+              <tiny-col :span="isNoAuth ? 3.5 : 2" style="margin:2px" v-show="view">
+                <tiny-form-item label-width="60px" label="上限">
                   <tiny-input v-model="createData.qUpperLimit" disabled></tiny-input>
                 </tiny-form-item>
               </tiny-col>
-              <tiny-col :span="2" style="margin:2px">
-                <tiny-form-item label-width="80px" label="纬度">
-                  <tiny-input placeholder="请输入纬度" v-model="createData.qLat">
+              <tiny-col :span="isNoAuth ? 3.5 : 2" style="margin:2px">
+                <tiny-form-item label-width="60px" label="纬度">
+                  <tiny-input placeholder="请输入纬度" v-model="createData.qLat" :disabled="!isEmpty(messageId)">
                   </tiny-input>
                 </tiny-form-item>
               </tiny-col>
-              <tiny-col :span="2" style="margin:2px">
-                <tiny-form-item label-width="80px" label="经度">
-                  <tiny-input placeholder="请输入经度" v-model="createData.qLong">
+              <tiny-col :span="isNoAuth ? 3.5 : 2" style="margin:2px">
+                <tiny-form-item label-width="60px" label="经度">
+                  <tiny-input placeholder="请输入经度" v-model="createData.qLong" :disabled="!isEmpty(messageId)">
                   </tiny-input>
                 </tiny-form-item>
               </tiny-col>
-              <tiny-col :span="2" style="margin:2px">
-                <tiny-form-item label-width="80px" label="半径">
-                  <tiny-input placeholder="请输入半径" v-model="createData.qRadius"> </tiny-input>
+              <tiny-col :span="isNoAuth ? 3.5 : 2" style="margin:2px">
+                <tiny-form-item label-width="60px" label="半径">
+                  <tiny-input placeholder="请输入半径" v-model="createData.qRadius" :disabled="!isEmpty(messageId)">
+                  </tiny-input>
                 </tiny-form-item>
               </tiny-col>
             </tiny-form-item>
@@ -107,34 +108,35 @@
               </tiny-select>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="4">
+          <tiny-col :span="isNoAuth ? 7 : 4">
             <!--生效时间-->
             <tiny-form-item label="有效期">
-              <tiny-radio-group v-model="createData.messageValidType" size="mini">
+              <tiny-radio-group v-model="createData.messageValidType" size="mini" :disabled="!isEmpty(messageId)">
                 <tiny-radio-button v-for="(item, index) in messageValidTypeOption" :label="item" :value="item"
                   :key="index"></tiny-radio-button>
               </tiny-radio-group>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="3">
+          <tiny-col :span="isNoAuth ? 6 : 3">
             <!--时间-->
             <tiny-form-item label="B项(开始时间)">
               <tiny-date-picker v-model="createData.b_time" type="datetime" placeholder="请选择时间" format="yyMMddHHmm"
-                value-format="yyMMddHHmm"></tiny-date-picker>
+                value-format="yyMMddHHmm" :disabled="!isEmpty(messageId)"></tiny-date-picker>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="3" v-if="createData.messageValidType === 'NEITHER'">
+          <tiny-col :span="isNoAuth ? 6 : 3" v-if="createData.messageValidType === 'NEITHER'">
             <!--时间-->
             <tiny-form-item label="C项(结束时间)">
               <tiny-date-picker v-model="createData.c_time" type="datetime" placeholder="请选择时间" format="yyMMddHHmm"
-                value-format="yyMMddHHmm"></tiny-date-picker>
+                value-format="yyMMddHHmm" :disabled="!isEmpty(messageId)"></tiny-date-picker>
             </tiny-form-item>
           </tiny-col>
           <tiny-row>
             <tiny-col :span="12">
               <!--分段时间-->
               <tiny-form-item label="D项(分段时间)">
-                <tiny-input v-model="createData.d_time" placeholder="请输入D项" @focus="onFocus"> </tiny-input>
+                <tiny-input v-model="createData.d_time" placeholder="请输入D项" :disabled="!isEmpty(messageId)"
+                  @focus="onFocus"> </tiny-input>
               </tiny-form-item>
             </tiny-col>
           </tiny-row>
@@ -145,7 +147,7 @@
         <tiny-divider content-position="left" offset="5%" font-size="20px" content-background-color="#1476ff"
           content-color="#ffffff">航行通告正文与上下限</tiny-divider>
         <!--E项-->
-        <tiny-form-item label="E项">
+        <tiny-form-item v-show="isEmpty(messageId)" label="E项">
           <tiny-collapse v-model="activeNames" class="demo-collapse-wrap">
             <tiny-collapse-item title="示例" name="示例">
               <tiny-col :span="4">
@@ -169,7 +171,8 @@
               <tiny-col :span="12">
                 <tiny-form-item class="demo-image__keep-style">
                   <tiny-form-item label='参考附件' class="demo-image__keep-style">
-                    <tiny-select v-model="attachment" :options="attachmentOptions" placeholder="请选择需要参考的附件" clearable></tiny-select>
+                    <tiny-select v-model="attachment" :options="attachmentOptions" placeholder="请选择需要参考的附件"
+                      clearable></tiny-select>
                   </tiny-form-item>
                   <tiny-image v-if='false' :src="url" :preview-src-list="srcList" keep-style></tiny-image>
                   <iframe v-show="attachment" :src="attachment" width="100%" height="600px" type="application/pdf" />
@@ -195,7 +198,7 @@
           <!--基准面格式-->
           <tiny-form-item label="基准面格式" v-if="createData.qLowerLimit !== null">
             <tiny-select v-model="createData.baseType" value-field="fg" text-field="fg" :grid-op="baseTypeOption"
-              render-type="grid" @change="onChangeBaseType()" placeholder="请选择基准面格式">
+              render-type="grid" :disabled="!isEmpty(messageId)" @change="onChangeBaseType()" placeholder="请选择基准面格式">
             </tiny-select>
           </tiny-form-item>
         </tiny-col>
@@ -203,7 +206,7 @@
           <!--下限-->
           <tiny-form-item label="F项(下限)" v-if="createData.qLowerLimit !== null">
             <tiny-input v-model="createData.f_lowerLimit" placeholder="请输入下限"
-              :disabled="createData.baseType.split('-')[0] == 'SFC' || createData.baseType.split('-')[0] == 'GND'"
+              :disabled="createData.baseType.split('-')[0] == 'SFC' || createData.baseType.split('-')[0] == 'GND' || !isEmpty(messageId)"
               @click="onFocusFG('F')"></tiny-input>
           </tiny-form-item>
         </tiny-col>
@@ -211,7 +214,8 @@
           <!--上限-->
           <tiny-form-item label="G项(上限)" v-if="createData.qLowerLimit !== null">
             <tiny-input v-model="createData.g_upperLimit" placeholder="请输入上限"
-              :disabled="createData.baseType.split('-')[1] === 'UNL'" @click="onFocusFG('G')"></tiny-input>
+              :disabled="createData.baseType.split('-')[1] === 'UNL' || !isEmpty(messageId)"
+              @click="onFocusFG('G')"></tiny-input>
           </tiny-form-item>
         </tiny-col>
       </tiny-row>
@@ -221,14 +225,16 @@
         <tiny-col :span="12">
           <!--报文-->
           <tiny-form-item label="组装文本">
-            <tiny-input v-model="createData.telegramText" type="textarea" autosize> </tiny-input>
+            <tiny-input v-model="createData.telegramText" type="textarea" autosize :disabled="!isEmpty(messageId)">
+            </tiny-input>
           </tiny-form-item>
         </tiny-col>
       </tiny-row>
-      <tiny-form-item>
-        <tiny-button type="primary" @click="onAssemble()"> 生成报文 </tiny-button>
-        <tiny-button type="primary" @click="onAssemble()"> 生成通知单 </tiny-button>
-        <tiny-button type="primary" @click="onAssemble()"> 发送报文 </tiny-button>
+      <tiny-form-item v-show="!isNoAuth">
+        <tiny-button type="primary" v-show="isEmpty(messageId) && act == 'add'" @click="onAssemble()">生成报文</tiny-button>
+        <tiny-button type="primary" v-show="!isEmpty(createData.telegramText) && isEmpty(messageId) && act == 'add'"
+          @click="onSend()">发送报文</tiny-button>
+        <tiny-button type="primary" :disabled="isEmpty(messageId)" @click="onNotice()">生成通知单</tiny-button>
         <tiny-button type="primary" @click="copyToClipboard()"> 复制规范到剪切板 </tiny-button>
       </tiny-form-item>
     </tiny-form>
@@ -277,14 +283,17 @@ import {
   TinyGuide,
   TinyFloatbar,
 } from '@opentiny/vue'
-import { queryAirPortAndAirSpace, queryAirPortConfig, queryAirSpaceConfig } from '@/api/fetchInterface';
+import { queryAirPortAndAirSpace, queryAirPortConfig, queryAirSpaceConfig, queryMessageDetail, postMessage, MessageVM } from '@/api/fetchInterface';
 import formgenerator from '@/components/formgenerator/index.vue';
 import schedulePicker from '@/components/schedulePicker/index.vue';
 import fgInput from '@/components/fginput/index.vue';
+import workflowaxios from '@/views/workflow/components/workflow-axios';
+
 import { useUserStore } from '@/store';
 import { isEmpty } from '@/utils/string-utils';
 import airport from '@/router/routes/modules/airport';
 import { limitOption } from '@/constants/limitOptions';
+import { create } from 'lodash';
 
 const handleScheduleChange = (rule: any) => {
   console.log('生成的规则：', rule);
@@ -309,9 +318,14 @@ const srcList = ref([
 const props = defineProps({
   templateID: Number,
   templateData: Object,
+  messageId: Number,
+  isNoAuth: Boolean,
+  act: String,
 });
 const { templateID } = toRefs(props);
 const { templateData } = toRefs(props);
+const { messageId } = toRefs(props);
+const { act } = toRefs(props);
 // 视角变量
 const view = ref(false);
 // 引导变量
@@ -399,7 +413,7 @@ const createData = reactive({
   // 报文类型
   messageType: '新报',
   // 报文号
-  messageID: '',
+  messageId: '',
   // 报文生效类型
   messageValidType: 'NEITHER',
   // F/G项的基准面
@@ -514,11 +528,32 @@ const attachmentOptions = ref([
     value: '/pdf/10A-RWY01L.pdf',
   },
 ]);
+const keyWord = ref();
+const keyWordLabel = ref();
+// 定义派发事件
+const emit = defineEmits(['close', 'createMessage']);
+// 加载效果
+const state = reactive<{
+  loading: any,
+}>({
+  loading: null,
+});
+
+const messageData: MessageVM = {
+  qCode: '',
+  airSpaceCodeId: '',
+  type: '',
+  validType: '',
+  lat: '',
+  long: '',
+  radius: '',
+  telegramText: ""
+};
 
 watch(
   () => createData.a_airSpace,
   (newVal: string, oldVal: string) => {
-    if (newVal && newVal !== oldVal) {
+    if (newVal && newVal !== oldVal && isEmpty(messageId.value)) {
       onChangeA()
     }
   },
@@ -536,31 +571,62 @@ onMounted(async () => {
   createData.qAirSpace = userStore.airSpaceCodeId || "";
 });
 
-const keyWord = ref();
-const keyWordLabel = ref();
-function successClick() {
-  Notify({
-    type: 'success',
-    message: '复制到剪贴板成功',
-    position: 'top-right'
-  })
+const handleMessage = async () => {
+  // 如果有messageId，则请求message接口,并且解析数据
+  if (messageId?.value !== null) {
+    let { data } = await queryMessageDetail({ id: messageId?.value });
+    console.log("messagedata", data);
+    // 当已经提交后，锁死E项
+    createData.a_airSpace = data.airSpaceCodeId;
+    createData.messageType = data.type;
+    createData.messageValidType = data.validType;
+    createData.qLat = data.lat;
+    createData.qLong = data.long;
+    createData.qRadius = data.radius;
+    createData.telegramText = data.telegramText;
+    // 当已经提交后，不显示E项
+    // 解析正文并赋值B、C、D、F、G项
+    // 定义结果类型（严格约束键为 A-G）
+    type ResultType = Record<'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G', string>;
+    // 修正后的正则表达式：精确匹配每个 A-G 项（非贪婪 + 断言）
+    // [A-G]\) 匹配 "字母)"
+    // (.*?) 非贪婪捕获括号内的内容（尽可能少匹配）
+    // (?=[A-G]\)|$) 正向断言：遇到下一个 "字母)" 或文本结束则停止
+    const regex = /[A-G]\)(.*?)(?=[A-G]\)|[\r\n]|$)/gm;
+    // 获取所有匹配结果（转换为数组）
+    const matches = Array.from(data.telegramText.matchAll(regex));
+    // 初始化结果对象
+    const result: ResultType = {} as ResultType;
+    // 遍历匹配结果（使用 forEach 规避 for...of 限制）
+    matches.forEach((match) => {
+      // 完整匹配项（如 "A)ZGGG"、"B)2506150000" 等）
+      const fullMatch = match[0];
+      // 提取字母（如 "A" 来自 "A)ZGGG"）
+      const letter = fullMatch.split(')')[0];
+      // 捕获组内容（括号内的值，可能为空）
+      const value = match[1] || '';
+      // 类型安全校验（确保字母在 A-G 范围内）
+      if (letter.length === 1 && letter >= 'A' && letter <= 'G') {
+        result[letter as keyof ResultType] = value.trim(); // 可选：去除首尾空格
+      }
+    });
+    // 输出验证（结果符合预期）
+    // console.log('A项:', result.A); // 输出："ZGGG"
+    // console.log('B项:', result.B); // 输出："2506150000"
+    // console.log('C项:', result.C); // 输出："2506170001"
+    // console.log('D项:', result.D); // 输出：""（空字符串）
+    // console.log('E项:', result.E); // 输出："RWY 01L/19R SALS不工作，因test."
+    // console.log('F项:', result.F); // 输出："SFC"
+    // console.log('G项:', result.G); // 输出："UNL"
+    // console.log(result);
+    createData.b_time = result.B;
+    createData.c_time = result.C;
+    createData.d_time = result.D;
+    createData.e_data = result.E;
+    createData.f_lowerLimit = result.F;
+    createData.g_upperLimit = result.G;
+  }
 }
-function errorClick(err) {
-  Notify({
-    type: 'error',
-    message: err,
-    position: 'top-right'
-  })
-}
-
-// 定义派发事件
-const emit = defineEmits(['close']);
-// 加载效果
-const state = reactive<{
-  loading: any,
-}>({
-  loading: null,
-});
 // A项（情报区/机场）的静态数据获取
 const fetchAirPortAndAirSpace = async () => {
   state.loading = Loading.service({
@@ -591,9 +657,29 @@ const fetchAirPortAndAirSpace = async () => {
 const fetchData = async () => {
   Object.assign(createData, templateData.value);
   handleKeyWord();
-  await fetchAirPortAndAirSpace();
+  // TODO 这个要特殊处理，因为有可能是detail，有可能是add
+  if (isEmpty(messageId.value)) {
+    await fetchAirPortAndAirSpace();
+  }
+  else {
+    handleMessage();
+  }
   preCondition.value = true;
 };
+function successClick() {
+  Notify({
+    type: 'success',
+    message: '复制到剪贴板成功',
+    position: 'top-right'
+  })
+}
+function errorClick(err) {
+  Notify({
+    type: 'error',
+    message: err,
+    position: 'top-right'
+  })
+}
 // 核心算法，提取关键字
 function extractContent(input: string): object {
   // 正则表达式匹配$之间的内容
@@ -703,6 +789,75 @@ function onAssemble() {
   }
   createData.telegramText = `${qText}\n${abcText}\n${dText}\n${eText}\n${fgText}`;
 }
+
+async function onSend() {
+  Modal.confirm(`确定发送报文？发送后将无法编辑！`).then(async (res: string) => {
+    if (res === 'confirm') {
+      messageData.qCode = createData.qCode;
+      messageData.airSpaceCodeId = createData.qAirSpace;
+      messageData.type = createData.messageType;
+      messageData.validType = createData.messageValidType;
+      messageData.lat = createData.qLat;
+      messageData.long = createData.qLong;
+      messageData.radius = createData.qRadius;
+      messageData.telegramText = createData.telegramText;
+      messageData.templateId = templateID.value;
+      await postMessage(messageData).then((res1: any) => {
+        if (res1.code === 200) {
+          Modal.message({ message: '发送成功', status: 'success' })
+          emit('createMessage', res1.data);
+        }
+      });
+    }
+  })
+}
+
+// 生成通知单事件
+async function onNotice() {
+  // 获取所有通知单列表
+  // 弹出选择框
+  // 生成通知单
+  createProcess(messageId.value, messageData.templateId);
+}
+// 创建流程
+const createProcess = async (createMessageId: number, templateId: number) => {
+  // 获取工作流流程列表
+  await workflowaxios.get('/combination/group/listCurrentUserStartGroup?hidden=false', {
+  }).then(async (res: any) => {
+    let workflowList = res.data.data[0].items;
+    let createProcessVM = {
+      flowId: "",
+      uniqueId: "",
+      paramMap: {},
+    }
+    createProcessVM.uniqueId = workflowList[1].uniqueId;
+    createProcessVM.flowId = workflowList[1].flowId;
+    await workflowaxios.post('/form/getFormDetail', {
+      flowId: createProcessVM.flowId,
+      from: "start",
+    }).then(async (res1: any) => {
+      let workflowFormList = res1.data.data.formList;
+      // 获取名为超链接的，并且附上templateId和messageid构建的链接
+      let consultationNumber = workflowFormList.find((item: any) => item.name === "会商数量");
+      let examineNumber = workflowFormList.find((item: any) => item.name === "审批部门数量");
+      let consultationDep = workflowFormList.find((item: any) => item.name === "需要会商的部门");
+      let examineDep = workflowFormList.find((item: any) => item.name === "需要审批的部门");
+      let link = workflowFormList.find((item: any) => item.name === "超链接");
+      createProcessVM.paramMap = {
+
+        [link.id]: `http://localhost:3031/vue-pro/enotam?templateID=${templateId}&messageId=${createMessageId}?`,
+        startUserMainDeptId: "1"
+      };
+      await workflowaxios.post('/process-instance/startProcessInstance',
+        createProcessVM
+      ).then(async (res2: any) => {
+        console.log("res2", res2);
+
+      })
+    })
+
+  })
+};
 // 获取配置项
 const airspaceConfigTypes = [
   { key: 'ndbs', prefix: 'ndbs' },

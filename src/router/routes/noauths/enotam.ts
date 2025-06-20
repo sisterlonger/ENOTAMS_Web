@@ -1,11 +1,11 @@
 export default {
-    path: 'message/:pathMatch(.*)*',
-    name: 'message',
-    component: () => import('@/views/notam/message/index.vue'),
+    path: 'enotam/:pathMatch(.*)*',
+    name: 'enotam',
+    component: () => import('@/views/notam/assemble/components/enotam.vue'),
     meta: {
-      locale: '报文管理',
-      order: 6,
-      //requiresAuth: false,
+      locale: '通告详情',
+      order: 0,
+      requiresAuth: false,
     },
   };
 //做一个单独的路由，能够接受route，参看message/index.vue

@@ -21,6 +21,15 @@ export default [
       requiresAuth: false,
     },
   },
+  // 线上地址
+  // {
+  //   path: `${import.meta.env.VITE_CONTEXT}enotam/:pathMatch(.*)*`,
+  //   name: 'enotam',
+  //   component: () => import('@/views/notam/assemble/components/enotam.vue'),
+  //   meta: {
+  //     requiresAuth: false,
+  //   },
+  // },
   /*
   {
     name: 'root',

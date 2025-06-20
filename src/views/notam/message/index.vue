@@ -9,16 +9,30 @@
             <tiny-form label-width="100px" label-position="right" class="filter-form" size="small">
               <tiny-row>
                 <tiny-col :span="4">
-                  <tiny-form-item label="报文类型">
-                    <tiny-select
-                      v-model="formData.validType" :options="typeOptions" placeholder="请输入报文类型" clearable>
+                  <tiny-form-item label="Q码">
+                    <tiny-input v-model="formData.qCode" placeholder="请输入Q码" clearable></tiny-input>
+                    <!-- <tiny-select v-model="formData.qCode" :options="qOptions" placeholder="请选择Q码" clearable>
+                    </tiny-select> -->
+                  </tiny-form-item>
+                </tiny-col>
+                <tiny-col :span="4">
+                  <tiny-form-item label="情报区">
+                    <tiny-select v-model="formData.airSpaceCodeId" placeholder="请选择情报区" filterable clearable>
+                      <tiny-option v-for="item in airSpaceOptions" :key="item.codeId" :label="item.codeId"
+                        :value="item.codeId"></tiny-option>
                     </tiny-select>
                   </tiny-form-item>
                 </tiny-col>
                 <tiny-col :span="4">
-                  <tiny-form-item label="报文生效类型">
-                    <tiny-select
-                      v-model="formData.validType" :options="validTypeOptions" placeholder="请输入报文生效类型" clearable>
+                  <tiny-form-item label="报文类型">
+                    <tiny-select v-model="formData.validType" :options="typeOptions" placeholder="请输入报文类型" clearable>
+                    </tiny-select>
+                  </tiny-form-item>
+                </tiny-col>
+                <tiny-col :span="4">
+                  <tiny-form-item label="生效类型">
+                    <tiny-select v-model="formData.validType" :options="validTypeOptions" placeholder="请输入报文生效类型"
+                      clearable>
                     </tiny-select>
                   </tiny-form-item>
                 </tiny-col>
@@ -68,21 +82,29 @@
             <tiny-grid-toolbar :buttons="toolbarButtons"></tiny-grid-toolbar>
           </template>
           <tiny-grid-column type="index" width="60"></tiny-grid-column>
-          <tiny-grid-column field="type" title="报文类型" ></tiny-grid-column>
+          <tiny-grid-column field="qCode" title="Q码"></tiny-grid-column>
+          <tiny-grid-column field="airSpaceCodeId" title="情报区"></tiny-grid-column>
+          <tiny-grid-column field="type" title="报文类型"></tiny-grid-column>
           <tiny-grid-column field="validType" title="报文生效类型"></tiny-grid-column>
           <tiny-grid-column field="lat" title="纬度"></tiny-grid-column>
-          <tiny-grid-column field="long" title="经度" ></tiny-grid-column>
-          <tiny-grid-column field="radius" title="半径" ></tiny-grid-column>
-          <tiny-grid-column field="telegramText" title="电报正文"></tiny-grid-column>
-          <tiny-grid-column field="createTime" title="创建时间" ></tiny-grid-column>
-          <tiny-grid-column title="操作" width="200" align="center">
+          <tiny-grid-column field="long" title="经度"></tiny-grid-column>
+          <tiny-grid-column field="radius" title="半径"></tiny-grid-column>
+          <tiny-grid-column field="telegramText" title="电报正文" show-overflow></tiny-grid-column>
+          <tiny-grid-column field="createTime" title="创建时间"></tiny-grid-column>
+          <tiny-grid-column title="操作" width="300" align="center">
             <template #default="data">
-              <tiny-button v-track="'电报记录'" size="mini" type="primary" @click="editRowEvent(data.row)">查看</tiny-button>
+              <tiny-button v-track="'电报'" size="mini" type="primary"
+                @click="editRowEvent(data.row,'电报')">电报</tiny-button>
+              <tiny-button v-track="'详情'" size="mini" type="info" @click="editRowEvent(data.row,'详情')">详情</tiny-button>
             </template>
           </tiny-grid-column>
         </tiny-grid>
-        <tiny-dialog-box v-if="boxVisibility" v-model:visible="boxVisibility" title="查看" width="30%">
+        <tiny-dialog-box v-if="messageVisibility" v-model:visible="messageVisibility" title="电报" width="30%">
           <messageForm :id="messageId" @close="dialogClose" />
+        </tiny-dialog-box>
+        <tiny-dialog-box v-if="workflowVisibility" v-model:visible="workflowVisibility" title="详情" width="80%"
+          max-height="1000px" top="5%" :close-on-click-modal="true">
+          <enotam :messageId="messageId" :templateID="templateId" act='edit' @close="dialogClose" />
         </tiny-dialog-box>
       </div>
     </div>
@@ -90,12 +112,13 @@
 </template>
 
 <script setup lang="jsx">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import {
   Grid as TinyGrid, GridColumn as TinyGridColumn, Button as TinyButton, DialogBox as TinyDialogBox, GridToolbar as TinyGridToolbar, Input as TinyInput, Form as TinyForm,
-  FormItem as TinyFormItem, Layout as TinyLayout, Row as TinyRow, Col as TinyCol, Modal,TinyDatePicker,  Collapse as TinyCollapse, CollapseItem as TinyCollapseItem, Select as TinySelect,
+  FormItem as TinyFormItem, Layout as TinyLayout, Row as TinyRow, Col as TinyCol, Modal, TinyDatePicker, Collapse as TinyCollapse, CollapseItem as TinyCollapseItem, Option as TinyOption, Select as TinySelect,
 } from '@opentiny/vue';
-import { queryMessageList } from '@/api/fetchInterface';
+import { queryMessageList, queryAirSpaceList } from '@/api/fetchInterface';
+import enotam from '@/views/notam/assemble/components/enotam.vue';
 import messageForm from './components/form.vue';
 
 const pagerConfig = ref({
@@ -113,19 +136,24 @@ const fetchData = ref({
 })
 const tableData = ref([
 ])
-const boxVisibility = ref(false)
+const messageVisibility = ref(false)
+const workflowVisibility = ref(false)
 const messageId = ref(0)
+const templateId = ref(0)
 const formData = ref({
+  qCode: "",
+  airSpaceCodeId: "",
   type: "",
   validType: "",
   lat: "",
   radius: "",
   telegramText: "",
-  createTime:"",
+  createTime: "",
   long: "",
   timeRange: [],
 })
 const gridRef = ref()
+const airSpaceOptions = ref([]);
 const activeNames = ref(['0'])
 const typeOptions = [
   {
@@ -170,7 +198,7 @@ async function getData({ page }) {
     formData.value.startTime = String(formData.value.timeRange[0]);
     formData.value.endTime = String(formData.value.timeRange[1]);
   }
-  else{
+  else {
     formData.value.startTime = "";
     formData.value.endTime = "";
   }
@@ -182,16 +210,32 @@ async function getData({ page }) {
   })
 }
 // 行操作
-const editRowEvent = (row) => {
+const editRowEvent = (row, type) => {
   messageId.value = row.messageId;
-  boxVisibility.value = true;
+  templateId.value = row.templateId;
+  if (type === "详情") {
+    workflowVisibility.value = true;
+  }
+  else if (type === "电报") {
+    messageVisibility.value = true;
+  }
 }
 // 关闭弹窗
 function dialogClose() {
   messageId.value = 0;
-  boxVisibility.value = false;
+  templateId.value = 0;
+  messageVisibility.value = false;
+  workflowVisibility.value = false;
   queryClick();
 }
+const fetchConfig = async () => {
+  let airspaceList = await queryAirSpaceList();
+  airSpaceOptions.value = airspaceList.data;
+}
+// 初始化请求数据
+onMounted(async () => {
+  await fetchConfig();
+});
 </script>
 
 <style lang="less" scoped>

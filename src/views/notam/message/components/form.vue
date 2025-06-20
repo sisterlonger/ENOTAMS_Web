@@ -1,10 +1,16 @@
 <template>
     <div class="demo-form">
         <tiny-form ref="ruleFormRef" :model="createData" :rules="rules" label-width="100px">
+            <tiny-form-item label="Q码" prop="qCode">
+                <tiny-input v-model="createData.qCode" disabled></tiny-input>
+            </tiny-form-item>
+            <tiny-form-item label="情报区" prop="airSpaceCodeId">
+                <tiny-input v-model="createData.airSpaceCodeId" disabled></tiny-input>
+            </tiny-form-item>
             <tiny-form-item label="报文类型" prop="type">
                 <tiny-input v-model="createData.type" disabled></tiny-input>
             </tiny-form-item>
-            <tiny-form-item label="报文生效类型" prop="validType" :validate-icon="validateIcon">
+            <tiny-form-item label="生效类型" prop="validType" :validate-icon="validateIcon">
                 <tiny-input v-model="createData.validType" disabled></tiny-input>
             </tiny-form-item>
             <tiny-form-item label="纬度" prop="lat" :validate-icon="validateIcon">
@@ -45,7 +51,6 @@ import {
 import { iconWarning } from '@opentiny/vue-icon';
 import { queryMessageDetail } from '@/api/fetchInterface';
 
-
 const props = defineProps({
     id: Number,
 });
@@ -55,15 +60,21 @@ const ruleFormRef = ref()
 const validateIcon = ref(iconWarning())
 const createData = reactive({
     id: null,
+    qCode: "",
+    airSpaceCodeId: "",
     validType: "",
+    type: '',
     lat: '',
     long: '',
     telegramText: '',
     createTime: "",
     radius: '',
-    type: '',
 })
 const rules = ref({
+    qCode: [{ required: true, message: '必填', trigger: 'change' }],
+    airSpaceCodeId: [{ required: true, message: '必填', trigger: 'change' }],
+    type: [{ required: true, message: '必填', trigger: 'change' }],
+    validType: [{ required: true, message: '必填', trigger: 'change' }],
     lat: [{ required: true, message: '必填', trigger: 'change' }],
     long: [
         { required: true, message: '必填', trigger: 'blur' },
@@ -71,8 +82,7 @@ const rules = ref({
     telegramText: [
         { required: true, message: '必填', trigger: 'blur' },
     ],
-    radius: [{ required: false, message: '非必填', trigger: 'change' }],
-    type: [{ required: false, message: '非必填', trigger: 'change' }],
+    radius: [{ required: true, message: '非必填', trigger: 'change' }],
 })
 
 // 加载效果
