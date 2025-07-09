@@ -7,12 +7,12 @@
     <tiny-tab-item :key="tabsList[1].name" :title="tabsList[1].title" :name="tabsList[1].name" :disabled="isEmpty(localMessageID)">
       <materials :messageId="localMessageID" :templateID="localTemplateID" :templateData="templateData" :isNoAuth="isNoAuth" :act="act"></materials>
     </tiny-tab-item>
-    <tiny-tab-item :key="tabsList[2].name" :title="tabsList[2].title" :name="tabsList[2].name" :disabled="isEmpty(localMessageID)">
+    <!-- <tiny-tab-item :key="tabsList[2].name" :title="tabsList[2].title" :name="tabsList[2].name" :disabled="isEmpty(localMessageID)">
       test2
-    </tiny-tab-item>
-    <tiny-tab-item :key="tabsList[3].name" :title="tabsList[3].title" :name="tabsList[3].name" :disabled="isEmpty(localMessageID)">
+    </tiny-tab-item> -->
+    <!-- <tiny-tab-item :key="tabsList[3].name" :title="tabsList[3].title" :name="tabsList[3].name" :disabled="isEmpty(localMessageID)">
       test3
-    </tiny-tab-item>
+    </tiny-tab-item> -->
   </tiny-tabs>
 </template>
 
@@ -45,14 +45,14 @@ const tabsList = ref([
     title: '佐证材料',
 
   },
-  {
-    name: '关键事件集',
-    title: '关键事件集',
-  },
-  {
-    name: '会商审批',
-    title: '会商审批',
-  },
+  // {
+  //   name: '关键事件集',
+  //   title: '关键事件集',
+  // },
+  // {
+  //   name: '会商审批',
+  //   title: '会商审批',
+  // },
 ])
 const props = defineProps({
   templateID: Number,

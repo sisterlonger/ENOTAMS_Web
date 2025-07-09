@@ -153,7 +153,7 @@ function handleSubmit() {
       });
       const { redirect, ...othersQuery } = router.currentRoute.value.query;
       // 部署时需要解除注释
-      //await getFlyflowToken(userStore.userInfo.mobile);
+      await getFlyflowToken(userStore.userInfo.mobile);
       //console.log(redirect);
       // 获取动态路由
       router.addRoute({

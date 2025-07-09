@@ -5,42 +5,42 @@
         :display-only="true">
         <tiny-row class="title">无线电导航设施</tiny-row>
         <tiny-row>
-          <tiny-col :span="3">
+          <tiny-col :span="4">
             <tiny-form-item label="名称" prop="txtName">
               <tiny-input v-model="formData.txtName"></tiny-input>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="3">
+          <tiny-col :span="4">
             <tiny-form-item label="报告点类型" prop="codeTypeMilOps">
               <tiny-input v-model="formData.codeTypeMilOps"></tiny-input>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="3">
+          <tiny-col :span="4">
             <tiny-form-item label="纬度" prop="geoLat">
               <tiny-input v-model="formData.geoLat"></tiny-input>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="3">
+          <tiny-col :span="4">
             <tiny-form-item label="经度" prop="geoLong">
               <tiny-input v-model="formData.geoLong"></tiny-input>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="3">
+          <tiny-col :span="4">
             <tiny-form-item label="呼号" prop="codeId">
               <tiny-input v-model="formData.codeId"></tiny-input>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="3">
+          <tiny-col :span="4">
             <tiny-form-item label="频率" prop="valFreq">
               <tiny-input v-model="formData.valFreq"></tiny-input>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="3">
+          <tiny-col :span="4">
             <tiny-form-item label="波道" prop="codeChannel">
               <tiny-input v-model="formData.codeChannel"></tiny-input>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="3">
+          <tiny-col :span="4">
             <tiny-form-item label="频率单位" prop="uomFreq">
               <tiny-input v-model="formData.uomFreq"></tiny-input>
             </tiny-form-item>

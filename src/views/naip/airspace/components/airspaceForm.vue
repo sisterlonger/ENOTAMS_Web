@@ -5,22 +5,22 @@
         :display-only="true">
         <tiny-row class="title">管制区/限制区信息</tiny-row>
         <tiny-row>
-          <tiny-col :span="3">
+          <tiny-col :span="6">
             <tiny-form-item label="名称" prop="txtName">
               <tiny-input v-model="formData.txtName"></tiny-input>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="3">
+          <tiny-col :span="6">
             <tiny-form-item label="编号" prop="codeId">
               <tiny-input v-model="formData.codeId"></tiny-input>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="3">
+          <tiny-col :span="6">
             <tiny-form-item label="区域类型" prop="txtLocalType">
               <tiny-input v-model="formData.horizontalRange"></tiny-input>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="3">
+          <tiny-col :span="6">
             <tiny-form-item label="说明" prop="txtRmk">
               <tiny-input v-model="formData.txtRmk"></tiny-input>
             </tiny-form-item>
@@ -35,12 +35,12 @@
               <tiny-input v-model="formData.verticalRange"></tiny-input>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="3">
+          <tiny-col :span="6">
             <tiny-form-item label="限制原因" prop="exRestrictReason">
               <tiny-input v-model="formData.exRestrictReason"></tiny-input>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="3">
+          <tiny-col :span="6">
             <tiny-form-item label="限制时间" prop="exRestrictTime">
               <tiny-input v-model="formData.exRestrictTime"></tiny-input>
             </tiny-form-item>
@@ -48,37 +48,37 @@
         </tiny-row>
          <tiny-row class="title">垂直范围信息</tiny-row>
         <tiny-row>
-          <tiny-col :span="3">
+          <tiny-col :span="6">
             <tiny-form-item label="气压基准面" prop="codeDistVerUpper">
               <tiny-input v-if='formData.class && formData.class.isContainVerLower'
                 v-model="formData.class.codeDistVerUpper"></tiny-input>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="3">
+          <tiny-col :span="6">
             <tiny-form-item label="高度上限(M)" prop="valDistVerUpper">
               <tiny-input v-if='formData.class && formData.class.isContainVerLower'
                 v-model="formData.class.valDistVerUpper"></tiny-input>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="3">
+          <tiny-col :span="6">
             <tiny-form-item label="是否包含高度上限" prop="isContainVerUpper">
               <tiny-input v-if='formData.class && formData.class.isContainVerLower'
                 v-model="formData.class.isContainVerUpper"></tiny-input>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="3">
+          <tiny-col :span="6">
             <tiny-form-item label="高度下限类型" prop="codeDistVerLower">
               <tiny-input v-if='formData.class && formData.class.isContainVerLower'
                 v-model="formData.class.codeDistVerLower"></tiny-input>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="3">
+          <tiny-col :span="6">
             <tiny-form-item label="高度下限(M)" prop="valDistVerLower">
               <tiny-input v-if='formData.class && formData.class.isContainVerLower'
                 v-model="formData.class.valDistVerLower"></tiny-input>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="3">
+          <tiny-col :span="6">
             <tiny-form-item label="是否包含高度下限" prop="isContainVerLower">
               <tiny-input v-if='formData.class && formData.class.isContainVerLower'
                 v-model="formData.class.isContainVerLower"></tiny-input>

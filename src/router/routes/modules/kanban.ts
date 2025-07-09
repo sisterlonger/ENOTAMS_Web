@@ -10,7 +10,7 @@ export default {
     {
       path: 'work',
       name: 'work',
-      component: () => import('@/views/kanban/board/work/index.vue'),
+      component: () => import('@/views/kanban/board/home/index.vue'),
       meta: {
         locale: '工作台',
       },
@@ -18,7 +18,7 @@ export default {
     {
       path: 'home',
       name: 'home',
-      component: () => import('@/views/kanban/board/home/index.vue'),
+      component: () => import('@/views/kanban/board/work/index.vue'),
       meta: {
         locale: '首页',
       },

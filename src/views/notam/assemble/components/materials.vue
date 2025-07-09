@@ -129,7 +129,7 @@ function beforeRemove(file) {
 // 请求数据接口方法
 const fetchData = async () => {
     let files = [];
-    // 是有报文号的，编辑
+    // 是有通告号的，编辑
     if (messageId.value) {
         const { data } = await queryMessageDetail({ id: messageId.value });
         // 有文件
@@ -160,7 +160,7 @@ const fetchData = async () => {
             materials.value.push({ title: '其他', fileList: [] });
         }
     }
-    // 无报文号,新增
+    // 无通告号,新增
     else {
         materials.value.push({ title: '其他', fileList: [] });
     }

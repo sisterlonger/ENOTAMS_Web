@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <Breadcrumb :items="['menu.notam', 'menu.message']" />
+    <Breadcrumb :items="['menu.publish', 'menu.message']" />
     <div class="content">
       <div class="content-main">
         <!--查询组件、选择-->
@@ -157,16 +157,16 @@ const airSpaceOptions = ref([]);
 const activeNames = ref(['0'])
 const typeOptions = [
   {
-    value: '新报',
-    label: '新报',
+    value: '新发报文',
+    label: '新发报文',
   },
   {
-    value: '代替报',
-    label: '代替报',
+    value: '代替现有报文',
+    label: '代替现有报文',
   },
   {
-    value: '取消报',
-    label: '取消报',
+    value: '取消现有报文',
+    label: '取消现有报文',
   },
 ];
 const validTypeOptions = [

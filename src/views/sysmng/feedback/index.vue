@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <Breadcrumb :items="['menu.systemManager', 'menu.feedback']" />
+        <Breadcrumb :items="['menu.board', 'menu.feedback']" />
         <div class="content">
             <div class="content-main">
                 <!--查询组件、选择-->

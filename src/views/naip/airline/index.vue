@@ -5,11 +5,11 @@
             <div class="content-main">
                 <tiny-layout style="width: 100%">
                     <tiny-row>
-                        <tiny-col :span="3">
+                        <tiny-col :span="3.5">
                             <tiny-tree-menu :get-menu-data-sync="getNodeDataSync" :props="mapField" wrap
                                 @node-click="handleNodeClick"></tiny-tree-menu>
                         </tiny-col>
-                        <tiny-col :span="9">
+                        <tiny-col :span="8.5">
                             <templateConfig :tableData="tableData" />
                         </tiny-col>
                     </tiny-row>

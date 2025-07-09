@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <Breadcrumb :items="['menu.systemManager', 'menu.userlist']" />
+        <Breadcrumb :items="['menu.workPermission', 'menu.userlist']" />
         <div class="content">
             <div class="content-main">
                 <!--查询组件、选择-->

@@ -11,12 +11,12 @@
       >
         <tiny-row class="title">航路信息（民航航路）</tiny-row>
         <tiny-row>
-          <tiny-col :span="3">
+          <tiny-col :span="6">
             <tiny-form-item label="航路信息" prop="txtDesig">
               <tiny-input v-model="formData.txtDesig"></tiny-input>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="3">
+          <tiny-col :span="6">
             <tiny-form-item label="航路类型" prop="txtLocType">
               <tiny-input v-model="formData.txtLocType"></tiny-input>
             </tiny-form-item>

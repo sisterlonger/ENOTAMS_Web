@@ -11,42 +11,42 @@
       >
         <tiny-row class="title">机场信息</tiny-row>
         <tiny-row>
-          <tiny-col :span="3">
+          <tiny-col :span="4">
             <tiny-form-item label="机场名称" prop="txtName">
               <tiny-input v-model="formData.txtName"></tiny-input>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="3">
+          <tiny-col :span="4">
             <tiny-form-item label="机场类型" prop="codeTypeMilOps">
               <tiny-input v-model="formData.codeTypeMilOps"></tiny-input>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="3">
+          <tiny-col :span="4">
             <tiny-form-item label="机场四字码" prop="codeId">
               <tiny-input v-model="formData.codeId"></tiny-input>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="3">
+          <tiny-col :span="4">
             <tiny-form-item label="机场三字码" prop="codeIada">
               <tiny-input v-model="formData.codeIada"></tiny-input>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="3">
+          <tiny-col :span="4">
             <tiny-form-item label="纬度" prop="geoLat">
               <tiny-input v-model="formData.geoLat"></tiny-input>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="3">
+          <tiny-col :span="4">
             <tiny-form-item label="经度" prop="geoLong">
               <tiny-input v-model="formData.geoLong"></tiny-input>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="3">
+          <tiny-col :span="4">
             <tiny-form-item label="机场磁差" prop="geoLong">
               <tiny-input v-model="formData.geoLong"></tiny-input>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="3">
+          <tiny-col :span="4">
             <tiny-form-item label="机场标高" prop="valElev">
               <tiny-input v-model="formData.geoLong"></tiny-input>
             </tiny-form-item>
