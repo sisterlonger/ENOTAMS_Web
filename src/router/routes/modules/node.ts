@@ -3,7 +3,7 @@ export default {
   name: 'node',
   component: () => import('@/views/notam/node/index.vue'),
   meta: {
-    locale: '节点管理',
+    locale: '规范配置',
     order: 1,
   },
 };

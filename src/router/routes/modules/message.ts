@@ -3,7 +3,7 @@ export default {
     name: 'message',
     component: () => import('@/views/notam/message/index.vue'),
     meta: {
-      locale: '报文管理',
+      locale: '通告记录',
       order: 6,
       //requiresAuth: false,
     },

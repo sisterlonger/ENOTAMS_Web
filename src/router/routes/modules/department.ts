@@ -3,7 +3,7 @@ export default {
   name: 'department',
   component: () => import('@/views/sysmng/department/index.vue'),
   meta: {
-    locale: '组织架构',
+    locale: '单位权限配置',
     order: 8,
   },
 };

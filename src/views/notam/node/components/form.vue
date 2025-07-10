@@ -54,6 +54,9 @@
             <tiny-form-item label="佐证性材料要求" prop="materials" :validate-icon="validateIcon">
                 <tiny-input v-model="createData.materials" placeholder="用、作分隔符" clearable></tiny-input>
             </tiny-form-item>
+            <tiny-form-item label="关联通告Q码" prop="relatedQCodes" :validate-icon="validateIcon">
+                <tiny-input v-model="createData.relatedQCodes" placeholder="用、作分隔符" clearable></tiny-input>
+            </tiny-form-item>
             <tiny-form-item>
                 <tiny-button type="primary" @click="handleSubmit()">
                     提交
@@ -103,6 +106,7 @@ const createData = reactive({
     qUpperLimit: '',
     qRadius: '',
     materials: "",
+    relatedQCodes: "",
 })
 const rules = ref({
     template: [{ required: true, message: '必填', trigger: 'change' }],

@@ -20,7 +20,7 @@ export default {
       name: 'home',
       component: () => import('@/views/kanban/board/work/index.vue'),
       meta: {
-        locale: '首页',
+        locale: '监控页',
       },
     },
   ],

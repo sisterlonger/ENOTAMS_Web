@@ -6,13 +6,19 @@ export interface TemplateSearch {
     pageSize: number;
 }
 export interface TemplateVM {
-    DicID: number;
-    ModuleName: string;
-    DicType: string;
-    DicKey: string;
-    DicValue: string;
-    OrderID: number;
-    DicDescription: string;
+    templateID: null,
+    template: string,
+    remark: string,
+    example: string,
+    qCode: string,
+    qFlightType: string,
+    qTarget: string,
+    qReach: string,
+    qLowerLimit: string,
+    qUpperLimit: string,
+    qRadius: string,
+    materials: string,
+    relatedQCodes: string,
 }
 
 export function queryTemplateList(params: TemplateSearch) {
