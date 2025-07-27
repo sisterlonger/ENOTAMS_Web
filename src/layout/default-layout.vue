@@ -92,6 +92,8 @@ watch(
 const tabsRefreshKey = ref('');
 const onClick = (tab: { name: string; link: string }) => {
   const routePaths = router.getRoutes().map((routeItem) => routeItem.path);
+  console.log(routePaths);
+  console.log(tab);
   if (!routePaths.includes(tab.name)) {
     Modal.message({
       message: '错误页面',

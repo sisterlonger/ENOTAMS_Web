@@ -1,9 +1,10 @@
 export default {
-    path: 'message/:pathMatch(.*)*',
+    // path: 'message/:pathMatch(.*)*',
+    path: 'message',
     name: 'message',
     component: () => import('@/views/notam/message/index.vue'),
     meta: {
-      locale: '通告记录',
+      locale: '通告发布审核',
       order: 6,
       //requiresAuth: false,
     },

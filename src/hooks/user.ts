@@ -24,12 +24,16 @@ export default function useUser() {
       status: 'success',
     });
     router.push({
-      name: logoutTo && typeof logoutTo === 'string' ? logoutTo : 'login',
-      query: {
-        ...router.currentRoute.value.query,
-        redirect: currentRoute.name as string,
-      },
+      name: 'login',
     });
+    // 原本的退出机制，会带着现在的路由重定向
+    // router.push({
+    //   name: logoutTo && typeof logoutTo === 'string' ? logoutTo : 'login',
+    //   query: {
+    //     ...router.currentRoute.value.query,
+    //     redirect: currentRoute.name as string,
+    //   },
+    // });
   };
   return {
     logout,

@@ -111,23 +111,23 @@
           </tiny-col>
           <tiny-col :span="7">
             <!--生效时间-->
-            <tiny-form-item label="有效期">
+            <tiny-form-item label="事件是否有明确的生效时间">
               <tiny-radio-group v-model="createData.messageValidType" size="mini" :disabled="!isEmpty(messageId)">
-                <tiny-radio-button v-for="(item, index) in messageValidTypeOption" :label="item" :value="item"
+                <tiny-radio-button v-for="(item, index) in messageValidTypeOption" :label="item.label" :text="item.text"
                   :key="index"></tiny-radio-button>
               </tiny-radio-group>
             </tiny-form-item>
           </tiny-col>
           <tiny-col :span="6">
             <!--时间-->
-            <tiny-form-item label="开始时间">
+            <tiny-form-item label="事件生效时间">
               <tiny-date-picker v-model="createData.b_time" type="datetime" placeholder="请选择时间" format="yyMMddHHmm"
                 value-format="yyMMddHHmm" :disabled="!isEmpty(messageId)"></tiny-date-picker>
             </tiny-form-item>
           </tiny-col>
           <tiny-col :span="6" v-if="createData.messageValidType !== 'PERM'">
             <!--时间-->
-            <tiny-form-item label="结束时间">
+            <tiny-form-item label="事件失效时间">
               <tiny-date-picker v-model="createData.c_time" type="datetime" placeholder="请选择时间" format="yyMMddHHmm"
                 value-format="yyMMddHHmm" :disabled="!isEmpty(messageId)"></tiny-date-picker>
             </tiny-form-item>
@@ -136,7 +136,7 @@
             <tiny-col :span="12">
               <!--分段时间-->
               <tiny-form-item label="分段时间">
-                <tiny-input v-model="createData.d_time" placeholder="请输入D项" :disabled="!isEmpty(messageId)"
+                <tiny-input v-model="createData.d_time" placeholder="如分时间段进行，请选择" :disabled="!isEmpty(messageId)"
                   @focus="onFocus"> </tiny-input>
               </tiny-form-item>
             </tiny-col>
@@ -199,14 +199,14 @@
           <!--影响高度范围-->
           <tiny-form-item label="影响高度范围" v-if="createData.qLowerLimit !== null">
             <tiny-select v-model="createData.baseType" value-field="fg" text-field="fg" :grid-op="baseTypeOption"
-              render-type="grid" :disabled="!isEmpty(messageId)" @change="onChangeBaseType()" placeholder="请选择影响高度范围">
+              render-type="grid" :disabled="!isEmpty(messageId)" @change="onChangeBaseType()" placeholder="请选择表示方式">
             </tiny-select>
           </tiny-form-item>
         </tiny-col>
         <tiny-col :span="4">
           <!--下限-->
           <tiny-form-item label="下限" v-if="createData.qLowerLimit !== null">
-            <tiny-input v-model="createData.f_lowerLimit" placeholder="请输入下限"
+            <tiny-input v-model="createData.f_lowerLimit" placeholder="输入高度下限数值"
               :disabled="createData.baseType.split('-')[0] == 'SFC' || createData.baseType.split('-')[0] == 'GND' || !isEmpty(messageId)"
               @click="onFocusFG('F')"></tiny-input>
           </tiny-form-item>
@@ -214,7 +214,7 @@
         <tiny-col :span="4">
           <!--上限-->
           <tiny-form-item label="上限" v-if="createData.qLowerLimit !== null">
-            <tiny-input v-model="createData.g_upperLimit" placeholder="请输入上限"
+            <tiny-input v-model="createData.g_upperLimit" placeholder="输入高度上限数值"
               :disabled="createData.baseType.split('-')[1] === 'UNL' || !isEmpty(messageId)"
               @click="onFocusFG('G')"></tiny-input>
           </tiny-form-item>
@@ -222,10 +222,10 @@
       </tiny-row>
       <tiny-row class="guide-box4">
         <tiny-divider content-position="left" offset="5%" font-size="20px" content-background-color="#1476ff"
-          content-color="#ffffff">组装报文</tiny-divider>
+          content-color="#ffffff">原始资料通知单以及预览</tiny-divider>
         <tiny-col :span="12">
           <!--报文-->
-          <tiny-form-item label="组装文本">
+          <tiny-form-item label="通告预览">
             <tiny-input v-model="createData.telegramText" type="textarea" autosize :disabled="!isEmpty(messageId)">
             </tiny-input>
           </tiny-form-item>
@@ -234,32 +234,33 @@
       <tiny-form-item v-show="!isNoAuth">
         <tiny-button type="primary" v-show="isEmpty(messageId) && act == 'add'" @click="onAssemble()">预览</tiny-button>
         <tiny-button type="primary" v-show="!isEmpty(createData.telegramText) && isEmpty(messageId) && act == 'add'"
-          @click="onSend()">原始资料存档</tiny-button>
-        <tiny-button v-show="!isEmpty(messageId) && act ==='add'" type="primary" @click="onNotice()">生成通知单</tiny-button>
+          @click="onSend()">确认并开始上报流程</tiny-button>
+        <tiny-button v-show="!isEmpty(messageId) && act === 'add'" type="primary"
+          @click="onNotice()">生成通知单</tiny-button>
         <!-- <tiny-button type="primary" 
         :disabled="isEmpty(messageId)"
          @click="onNotice()">生成通知单</tiny-button> -->
-        <tiny-button v-if="act==='edit'" type="primary" @click="copyToClipboard()"> 发送通告 </tiny-button>
+        <tiny-button v-if="act === 'edit'" type="primary" @click="copyToClipboard()"> 将通告发布至通告系统 </tiny-button>
       </tiny-form-item>
     </tiny-form>
-    <tiny-dialog-box  :modal="false" v-if="boxDVisibility" v-model:visible="boxDVisibility" append-to-body title="编辑分段时间" width="35%"
-      :close-on-click-modal="false">
+    <tiny-dialog-box :modal="false" v-if="boxDVisibility" v-model:visible="boxDVisibility" append-to-body title="编辑分段时间"
+      width="35%" :close-on-click-modal="false">
       <schedulePicker @scheduleChange="handleScheduleChange" @close="dialogClose" />
     </tiny-dialog-box>
-    <tiny-dialog-box  :modal="false" v-show="boxFVisibility" v-model:visible="boxFVisibility" append-to-body title="编辑F项" width="35%"
-      :close-on-click-modal="false">
+    <tiny-dialog-box :modal="false" v-show="boxFVisibility" v-model:visible="boxFVisibility" append-to-body title="编辑F项"
+      width="35%" :close-on-click-modal="false">
       <fgInput :baseType='baseType' :fgType='fgType' @fgChange="changeFG" @close="dialogClose" />
     </tiny-dialog-box>
-    <tiny-dialog-box  :modal="false" v-show="boxGVisibility" v-model:visible="boxGVisibility" append-to-body title="编辑G项" width="35%"
-      :close-on-click-modal="false">
+    <tiny-dialog-box :modal="false" v-show="boxGVisibility" v-model:visible="boxGVisibility" append-to-body title="编辑G项"
+      width="35%" :close-on-click-modal="false">
       <fgInput :baseType='baseType' :fgType='fgType' @fgChange="changeFG" @close="dialogClose" />
     </tiny-dialog-box>
-    <tiny-dialog-box  :modal="false" v-if="boxDepartmentVisibility" v-model:visible="boxDepartmentVisibility" append-to-body
-      title="选择部门" width="50%" :close-on-click-modal="false">
+    <tiny-dialog-box :modal="false" v-if="boxDepartmentVisibility" v-model:visible="boxDepartmentVisibility"
+      append-to-body title="原始资料上报流程" width="50%" :close-on-click-modal="false">
       <tiny-form label-width="120px">
-        <tiny-form-item label="会商部门：">
+        <tiny-form-item label="通告会商单位：">
           <tiny-cascader ref="cascaderConsultationRef" v-model="consultationDepIds" :options="departmentTreeData"
-            filterable :props="{
+            placeholder="请选择该通告会商单位" filterable :props="{
               children: 'children',
               value: 'depID',
               label: 'depName',
@@ -267,17 +268,19 @@
               multiple: true
             }" @change="onChangeConsultationDepList"></tiny-cascader>
         </tiny-form-item>
-        <tiny-form-item label="审批部门：">
-          <tiny-cascader ref="cascaderExamRef" v-model="examDepIds" :options="departmentTreeData" filterable :props="{
-            children: 'children',
-            value: 'depID',
-            label: 'depName',
-            emitPath: false,
-            multiple: true
-          }" @change="onChangeExamDepList"></tiny-cascader>
+        <tiny-form-item label="通告审批部门：">
+          <tiny-cascader ref="cascaderExamRef" v-model="examDepIds" :options="departmentTreeData"
+            placeholder="请选择该通告审批单位" filterable :props="{
+              children: 'children',
+              value: 'depID',
+              label: 'depName',
+              emitPath: false,
+              multiple: true
+            }" @change="onChangeExamDepList"></tiny-cascader>
         </tiny-form-item>
         <tiny-form-item>
-          <tiny-button type="info" @click="createProcess()">确认发送通知单</tiny-button>
+          <tiny-button type="primary" @click="createProcess()">上报情报单位</tiny-button>
+          <tiny-button type="info" @click="boxDepartmentVisibility = false">取消</tiny-button>
         </tiny-form-item>
       </tiny-form>
 
@@ -391,7 +394,7 @@ const domData = ref([
     ]
   },
   {
-    title: '发生地和生效期',
+    title: '通告生效和失效时间（北京时）',
     text: '发生地只能单选机场或者情报区,填写后自动填充Q项,生效期',
     domElement: '.guide-box2',
     button: [
@@ -533,24 +536,24 @@ const boxDepartmentVisibility = ref(false);
 // 报文类型
 const messageTypeOption = ref(['新发报文', '代替现有报文', '取消现有报文']);
 // 报文有效期类型
-const messageValidTypeOption = ref(['EST', 'PERM', 'NEITHER']);
-//const messageValidTypeOption = ref([{ label: '明确有开始结束时间', value: 'EST' }, { label: '永久存在', value: 'PERM' }, { label: '明确有结束时间', value: 'NEITHER' }]);
+//const messageValidTypeOption = ref(['EST', 'PERM', 'NEITHER']);
+const messageValidTypeOption = ref([{ text: '有确切的结束时间', label: 'NEITHER' }, { text: '永久有效', label: 'PERM' }, { text: '无法准确设定，只能预计', label: 'EST' }]);
 // 基准面类型
 const baseTypeOption = ref({
   height: 400,
   data: [
-    { fBase: 'SFC', gBase: "UNL", fg: "SFC-UNL" },
-    { fBase: 'GND', gBase: "UNL", fg: "GND-UNL" },
-    { fBase: 'SFC', gBase: 'XXX M AMSL', fg: "SFC-XXX M AMSL" },
-    { fBase: 'GND', gBase: 'XXX M AGL', fg: "GND-XXX M AGL" },
-    { fBase: 'XXX M AGL', gBase: 'XXX M AGL', fg: "XXX M AGL-XXX M AGL" },
-    { fBase: 'XXX M AMSL', gBase: 'XXX M AMSL', fg: "XXX M AMSL-XXX M AMSL" },
-    { fBase: 'FL XXX', gBase: "FL XXX", fg: "FL XXX-FL XXX" },
+    { fBase: 'SFC(从表面)', gBase: "UNL(无限高)", fg: "SFC-UNL" },
+    { fBase: 'GND(从地面)', gBase: "UNL(无限高)", fg: "GND-UNL" },
+    { fBase: 'SFC(从表面)', gBase: 'XXX M AMSL(从平均海平面)', fg: "SFC-XXX M AMSL" },
+    { fBase: 'GND(从地面)', gBase: 'XXX M AGL(从机场平面)', fg: "GND-XXX M AGL" },
+    { fBase: 'XXX M AGL(从机场平面)', gBase: 'XXX M AGL(从机场平面)', fg: "XXX M AGL-XXX M AGL" },
+    { fBase: 'XXX M AMSL(从平均海平面)', gBase: 'XXX M AMSL(从平均海平面)', fg: "XXX M AMSL-XXX M AMSL" },
+    { fBase: 'FL XXX(飞行高度)', gBase: "FL XXX(飞行高度)", fg: "FL XXX-FL XXX" },
   ],
   columns: [
     { type: 'radio', title: '', width: "10%" },
-    { field: 'fBase', title: 'F)项' },
-    { field: 'gBase', title: 'G)项' },
+    { field: 'fBase', title: '从', width: 220 },
+    { field: 'gBase', title: '到', width: 220 },
     //{ field: 'fg', title: '', hidden: true },
   ]
 });
@@ -698,7 +701,7 @@ const fetchAirPortAndAirSpace = async () => {
   catch (err) {
     console.log(err);
     Modal.alert('获取数据错误');
-    emit('close',false);
+    emit('close', false);
   }
   finally {
     state.loading.close();
@@ -787,28 +790,28 @@ function onAssemble() {
   // 校验其他项---后续要做在formitem中
   // 新发报文代替现有报文必须要有b、c项
   // c项的末尾必须不是0000
-  // 开始时间必须小于结束时间
+  // 事件生效时间必须小于事件失效时间
 
   // NEITHER必须填B、C项
   if (createData.messageValidType !== 'PERM' && (isEmpty(createData.b_time) || isEmpty(createData.c_time))) {
-    Modal.alert('请填写开始时间和结束时间');
+    Modal.alert('请填写事件生效时间和事件失效时间');
     return;
   }
   if (createData.messageValidType !== 'PERM' && createData.c_time.includes('0000')) {
-    Modal.alert('结束时间的时分不能为00:00');
+    Modal.alert('事件失效时间的时分不能为00:00');
     return;
   }
   if (createData.messageValidType !== 'PERM' && createData.c_time < createData.b_time) {
-    Modal.alert('结束时间不能大于开始时间');
+    Modal.alert('事件失效时间不能大于事件生效时间');
     return;
   }
   if (createData.messageValidType === 'PERM' && isEmpty(createData.b_time)) {
-    Modal.alert('请填写开始时间');
+    Modal.alert('请填写事件生效时间');
     return;
   }
   // 新发报文代替现有报文必须要有b、c项
   if ((createData.messageType === "新发报文" || createData.messageType === "代替现有报文") && (isEmpty(createData.b_time) || isEmpty(createData.c_time)) && createData.messageValidType === '') {
-    Modal.alert('请填写开始时间和结束时间');
+    Modal.alert('请填写事件生效时间和事件失效时间');
     return;
   }
   // 校验E项中的必填项是否都填完
@@ -854,7 +857,7 @@ function onAssemble() {
 }
 
 async function onSend() {
-  Modal.confirm(`确定原始资料存档？发送后将无法编辑！`).then(async (res: string) => {
+  Modal.confirm(`确认并开始上报流程？确定后将无法编辑！`).then(async (res: string) => {
     if (res === 'confirm') {
       messageData.qCode = createData.qCode;
       messageData.airSpaceCodeId = createData.qAirSpace;
@@ -957,7 +960,7 @@ const createProcess = async () => {
             //Modal.message({ message: '发送成功', status: 'success' })
             Modal.message({ message: '生成通知单成功', status: 'success' })
             // 自动通知对应q码的部门去填写
-            emit('close',true);
+            emit('close', true);
           }
         }).catch((err: any) => {
           console.log(err);
@@ -970,7 +973,7 @@ const createProcess = async () => {
       });
     })
     boxDepartmentVisibility.value = false;
-    emit('close',false);
+    emit('close', false);
 
   })
 };

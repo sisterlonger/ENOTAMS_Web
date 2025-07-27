@@ -30,6 +30,8 @@ export default {
   'menu.validation': 'Validation Management',
   'menu.dictionary': 'Dictionary Management',
   'menu.assemble': 'Assemble',
+  'menu.track': 'Track',
+  'menu.exam': 'Exam',
   'menu.department': 'Department Management',
   'menu.log': 'Log Management',
   'menu.menu': 'Menu Management',

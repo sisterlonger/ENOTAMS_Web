@@ -13,7 +13,8 @@ export const TAB_PERSISTENCE_KEYS = {
 
 const initTabs = () => {
     const tabs = JSON.parse(
-        localStorage.getItem(TAB_PERSISTENCE_KEYS.TABS) ?? '[]',
+        //localStorage.getItem(TAB_PERSISTENCE_KEYS.TABS) ?? '[]',
+        '[]'
     ) as Tab[];
     const routes = useRouter()
         .getRoutes()

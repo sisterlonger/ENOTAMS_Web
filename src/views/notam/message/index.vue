@@ -16,8 +16,8 @@
                   </tiny-form-item>
                 </tiny-col>
                 <tiny-col :span="4">
-                  <tiny-form-item label="情报区">
-                    <tiny-select v-model="formData.airSpaceCodeId" placeholder="请选择情报区" filterable clearable>
+                  <tiny-form-item label="发生地">
+                    <tiny-select v-model="formData.airSpaceCodeId" placeholder="请选择发生地" filterable clearable>
                       <tiny-option v-for="item in airSpaceOptions" :key="item.codeId" :label="item.codeId"
                         :value="item.codeId"></tiny-option>
                     </tiny-select>
@@ -52,8 +52,8 @@
                   </tiny-form-item>
                 </tiny-col>
                 <tiny-col :span="4">
-                  <tiny-form-item label="电报正文">
-                    <tiny-input v-model="formData.telegramText" placeholder="请输入电报正文" clearable></tiny-input>
+                  <tiny-form-item label="主要内容(E项)">
+                    <tiny-input v-model="formData.telegramText" placeholder="请输入主要内容(E项)" clearable></tiny-input>
                   </tiny-form-item>
                 </tiny-col>
                 <tiny-col :span="4">
@@ -82,28 +82,31 @@
             <tiny-grid-toolbar :buttons="toolbarButtons"></tiny-grid-toolbar>
           </template>
           <tiny-grid-column type="index" width="60"></tiny-grid-column>
-          <tiny-grid-column field="qCode" title="Q码"></tiny-grid-column>
-          <tiny-grid-column field="airSpaceCodeId" title="情报区"></tiny-grid-column>
-          <tiny-grid-column field="type" title="报文类型"></tiny-grid-column>
-          <tiny-grid-column field="validType" title="报文生效类型"></tiny-grid-column>
+          <!-- <tiny-grid-column field="qCode" title="Q码"></tiny-grid-column> -->
+          <tiny-grid-column field="airSpaceCodeId" title="发生地" width="10%"></tiny-grid-column>
+          <tiny-grid-column field="type" title="报文类型" width="10%"></tiny-grid-column>
+          <!-- <tiny-grid-column field="validType" title="报文生效类型"></tiny-grid-column> -->
           <!-- <tiny-grid-column field="lat" title="纬度"></tiny-grid-column>
           <tiny-grid-column field="long" title="经度"></tiny-grid-column>
           <tiny-grid-column field="radius" title="半径"></tiny-grid-column> -->
-          <tiny-grid-column field="telegramText" title="电报正文" show-overflow></tiny-grid-column>
-          <tiny-grid-column field="createTime" title="创建时间"></tiny-grid-column>
+          <tiny-grid-column field="telegramText" title="主要内容(E项)" show-overflow></tiny-grid-column>
+          <tiny-grid-column field="createTime" title="创建时间" width="11%" :renderer="renderName"></tiny-grid-column>
+          <!-- <tiny-grid-column field="" title="当前处理人" width="10%"></tiny-grid-column> -->
+          <tiny-grid-column field="" title="状态" width="10%"></tiny-grid-column>
           <tiny-grid-column title="操作" width="200" align="center">
             <template #default="data">
               <tiny-button v-track="'电报'" size="mini" type="primary"
-                @click="editRowEvent(data.row,'电报')">电报</tiny-button>
-              <tiny-button v-track="'详情'" size="mini" type="info" @click="editRowEvent(data.row,'详情')">详情</tiny-button>
+                @click="editRowEvent(data.row, '电报')">电报</tiny-button>
+              <tiny-button v-track="'详情'" size="mini" type="info" @click="editRowEvent(data.row, '详情')">详情</tiny-button>
             </template>
           </tiny-grid-column>
         </tiny-grid>
-        <tiny-dialog-box  :modal="false" v-if="messageVisibility" v-model:visible="messageVisibility" title="电报" width="30%">
+        <tiny-dialog-box :modal="false" v-if="messageVisibility" v-model:visible="messageVisibility" title="电报"
+          width="30%">
           <messageForm :id="messageId" @close="dialogClose" />
         </tiny-dialog-box>
-        <tiny-dialog-box  :modal="false" v-if="workflowVisibility" v-model:visible="workflowVisibility" title="详情" width="80%"
-          max-height="1000px" top="5%" :close-on-click-modal="true">
+        <tiny-dialog-box :modal="false" v-if="workflowVisibility" v-model:visible="workflowVisibility" title="详情"
+          width="80%" max-height="1000px" top="5%" :close-on-click-modal="true">
           <enotam :messageId="messageId" :templateID="templateId" act='edit' @close="dialogClose" />
         </tiny-dialog-box>
       </div>
@@ -186,6 +189,10 @@ const validTypeOptions = [
 async function queryClick() {
   //getData({ page: pagerConfig.value.attrs });
   gridRef.value.handleFetch();
+}
+
+function renderName(h, { row }) {
+  return row.createTime.slice(0, 10)
 }
 
 // 获取列表数据

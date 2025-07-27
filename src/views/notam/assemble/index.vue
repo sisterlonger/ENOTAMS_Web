@@ -2,6 +2,7 @@
     <div class="container">
         <Breadcrumb v-show="false" :items="['menu.publish', 'menu.assemble']" />
         <div class="content">
+            <div style="margin: 10px;color:brown">请选择发布通告的主题和内容</div>
             <div class="content-main">
                 <tiny-layout>
                     <tiny-row>
