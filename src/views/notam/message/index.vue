@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <Breadcrumb :items="['menu.publish', 'menu.message']" />
+    <Breadcrumb v-show="false" :items="['menu.publish', 'menu.message']" />
     <div class="content">
       <div class="content-main">
         <!--查询组件、选择-->
@@ -86,12 +86,12 @@
           <tiny-grid-column field="airSpaceCodeId" title="情报区"></tiny-grid-column>
           <tiny-grid-column field="type" title="报文类型"></tiny-grid-column>
           <tiny-grid-column field="validType" title="报文生效类型"></tiny-grid-column>
-          <tiny-grid-column field="lat" title="纬度"></tiny-grid-column>
+          <!-- <tiny-grid-column field="lat" title="纬度"></tiny-grid-column>
           <tiny-grid-column field="long" title="经度"></tiny-grid-column>
-          <tiny-grid-column field="radius" title="半径"></tiny-grid-column>
+          <tiny-grid-column field="radius" title="半径"></tiny-grid-column> -->
           <tiny-grid-column field="telegramText" title="电报正文" show-overflow></tiny-grid-column>
           <tiny-grid-column field="createTime" title="创建时间"></tiny-grid-column>
-          <tiny-grid-column title="操作" width="300" align="center">
+          <tiny-grid-column title="操作" width="200" align="center">
             <template #default="data">
               <tiny-button v-track="'电报'" size="mini" type="primary"
                 @click="editRowEvent(data.row,'电报')">电报</tiny-button>
@@ -99,10 +99,10 @@
             </template>
           </tiny-grid-column>
         </tiny-grid>
-        <tiny-dialog-box v-if="messageVisibility" v-model:visible="messageVisibility" title="电报" width="30%">
+        <tiny-dialog-box  :modal="false" v-if="messageVisibility" v-model:visible="messageVisibility" title="电报" width="30%">
           <messageForm :id="messageId" @close="dialogClose" />
         </tiny-dialog-box>
-        <tiny-dialog-box v-if="workflowVisibility" v-model:visible="workflowVisibility" title="详情" width="80%"
+        <tiny-dialog-box  :modal="false" v-if="workflowVisibility" v-model:visible="workflowVisibility" title="详情" width="80%"
           max-height="1000px" top="5%" :close-on-click-modal="true">
           <enotam :messageId="messageId" :templateID="templateId" act='edit' @close="dialogClose" />
         </tiny-dialog-box>

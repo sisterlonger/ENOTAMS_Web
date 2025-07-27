@@ -107,7 +107,7 @@ const setVisible = () => {
 
 // 用户设置
 const userlist = [
-  { label: 'menu.work', value: 1 },
+  { label: 'menu.home', value: 1 },
   { label: 'messageBox.assemble', value: 2 },
   { label: 'menu.usercenter', value: 3 },
   { label: 'messageBox.logout', value: 4 },
@@ -116,7 +116,7 @@ const userlist = [
 const switchUser = (e: number) => {
   switch (e) {
     case 1:
-      router.push({ name: 'work' });
+      router.push({ name: 'home' });
       break;
     case 2:
       router.push({ name: 'assemble' });

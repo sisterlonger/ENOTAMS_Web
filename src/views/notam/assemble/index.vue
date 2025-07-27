@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <Breadcrumb :items="['menu.publish', 'menu.assemble']" />
+        <Breadcrumb v-show="false" :items="['menu.publish', 'menu.assemble']" />
         <div class="content">
             <div class="content-main">
                 <tiny-layout>

@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <Breadcrumb :items="['menu.exception', 'menu.exception.500']" />
+    <Breadcrumb v-show="false" :items="['menu.exception', 'menu.exception.500']" />
     <div class="content">
       <div class="content-main">
         <img src="@/assets/images/500.png" alt="404" class="image" />

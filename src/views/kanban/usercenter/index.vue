@@ -1,6 +1,6 @@
 <template>
     <div>
-        <Breadcrumb :items="['menu.usercenter']" />
+        <Breadcrumb v-show="false" :items="['menu.usercenter']" />
         <div class="general-top">
             <headtop></headtop>
         </div>

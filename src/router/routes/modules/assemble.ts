@@ -3,7 +3,7 @@ export default {
   name: 'assemble',
   component: () => import('@/views/notam/assemble/index.vue'),
   meta: {
-    locale: '通告组装',
+    locale: '原始资料收集',
     order: 5,
   },
 };

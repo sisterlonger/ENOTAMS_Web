@@ -6,7 +6,7 @@
 
 <template>
   <div class="container">
-    <Breadcrumb :items="[...props.breadcrumb]" />
+    <Breadcrumb v-show="false" :items="[...props.breadcrumb]" />
     <div class="container-info">
       <div class="general-card">
         <div class="general-content">

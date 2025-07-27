@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <Breadcrumb :items="['menu.systemManager', 'menu.permission']" />
+        <Breadcrumb v-show="false" :items="['menu.systemManager', 'menu.permission']" />
         <div class="content">
             <div class="content-main">
                 <!--查询组件、选择-->
@@ -48,7 +48,7 @@
                         </template>
                     </tiny-grid-column>
                 </tiny-grid>
-                <tiny-dialog-box v-if="boxVisibility" v-model:visible="boxVisibility" title="编辑" width="30%">
+                <tiny-dialog-box  :modal="false" v-if="boxVisibility" v-model:visible="boxVisibility" title="编辑" width="30%">
                     <dictionaryForm :permissionID="permissionID" @close="dialogClose" />
                 </tiny-dialog-box>
             </div>

@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <Breadcrumb :items="['menu.systemManager', 'menu.log']" />
+    <Breadcrumb v-show="false" :items="['menu.systemManager', 'menu.log']" />
     <div class="content">
       <div class="content-main">
         <!--查询组件、选择-->
@@ -72,7 +72,7 @@
             </template>
           </tiny-grid-column>
         </tiny-grid>
-        <tiny-dialog-box v-if="boxVisibility" v-model:visible="boxVisibility" title="查看" width="30%">
+        <tiny-dialog-box  :modal="false" v-if="boxVisibility" v-model:visible="boxVisibility" title="查看" width="30%">
           <dictionaryForm :id="logId" @close="dialogClose" />
         </tiny-dialog-box>
       </div>

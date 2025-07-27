@@ -235,26 +235,26 @@
         <tiny-button type="primary" v-show="isEmpty(messageId) && act == 'add'" @click="onAssemble()">预览</tiny-button>
         <tiny-button type="primary" v-show="!isEmpty(createData.telegramText) && isEmpty(messageId) && act == 'add'"
           @click="onSend()">原始资料存档</tiny-button>
-        <tiny-button type="primary" @click="onNotice()">生成通知单</tiny-button>
+        <tiny-button v-show="!isEmpty(messageId) && act ==='add'" type="primary" @click="onNotice()">生成通知单</tiny-button>
         <!-- <tiny-button type="primary" 
         :disabled="isEmpty(messageId)"
          @click="onNotice()">生成通知单</tiny-button> -->
-        <tiny-button v-if="false" type="primary" @click="copyToClipboard()"> 复制规范到剪切板 </tiny-button>
+        <tiny-button v-if="act==='edit'" type="primary" @click="copyToClipboard()"> 发送通告 </tiny-button>
       </tiny-form-item>
     </tiny-form>
-    <tiny-dialog-box v-if="boxDVisibility" v-model:visible="boxDVisibility" append-to-body title="编辑分段时间" width="35%"
+    <tiny-dialog-box  :modal="false" v-if="boxDVisibility" v-model:visible="boxDVisibility" append-to-body title="编辑分段时间" width="35%"
       :close-on-click-modal="false">
       <schedulePicker @scheduleChange="handleScheduleChange" @close="dialogClose" />
     </tiny-dialog-box>
-    <tiny-dialog-box v-show="boxFVisibility" v-model:visible="boxFVisibility" append-to-body title="编辑F项" width="35%"
+    <tiny-dialog-box  :modal="false" v-show="boxFVisibility" v-model:visible="boxFVisibility" append-to-body title="编辑F项" width="35%"
       :close-on-click-modal="false">
       <fgInput :baseType='baseType' :fgType='fgType' @fgChange="changeFG" @close="dialogClose" />
     </tiny-dialog-box>
-    <tiny-dialog-box v-show="boxGVisibility" v-model:visible="boxGVisibility" append-to-body title="编辑G项" width="35%"
+    <tiny-dialog-box  :modal="false" v-show="boxGVisibility" v-model:visible="boxGVisibility" append-to-body title="编辑G项" width="35%"
       :close-on-click-modal="false">
       <fgInput :baseType='baseType' :fgType='fgType' @fgChange="changeFG" @close="dialogClose" />
     </tiny-dialog-box>
-    <tiny-dialog-box v-if="boxDepartmentVisibility" v-model:visible="boxDepartmentVisibility" append-to-body
+    <tiny-dialog-box  :modal="false" v-if="boxDepartmentVisibility" v-model:visible="boxDepartmentVisibility" append-to-body
       title="选择部门" width="50%" :close-on-click-modal="false">
       <tiny-form label-width="120px">
         <tiny-form-item label="会商部门：">
@@ -322,7 +322,7 @@ import {
   TinyFloatbar,
   TinyCascader,
 } from '@opentiny/vue'
-import { queryAirPortAndAirSpace, queryAirPortConfig, queryAirSpaceConfig, queryMessageDetail, postMessage, MessageVM, queryDepartmentTreeList } from '@/api/fetchInterface';
+import { queryAirPortAndAirSpace, queryAirPortConfig, queryAirSpaceConfig, queryMessageDetail, postWorkflowId, postMessage, MessageVM, queryDepartmentTreeList } from '@/api/fetchInterface';
 import formgenerator from '@/components/formgenerator/index.vue';
 import schedulePicker from '@/components/schedulePicker/index.vue';
 import fgInput from '@/components/fginput/index.vue';
@@ -634,6 +634,7 @@ const handleMessage = async () => {
     createData.qLong = data.long;
     createData.qRadius = data.radius;
     createData.telegramText = data.telegramText;
+    createData.templateID = data.templateId;
     // 当已经提交后，不显示E项
     // 解析正文并赋值B、C、D、F、G项
     // 定义结果类型（严格约束键为 A-G）
@@ -697,7 +698,7 @@ const fetchAirPortAndAirSpace = async () => {
   catch (err) {
     console.log(err);
     Modal.alert('获取数据错误');
-    emit('close');
+    emit('close',false);
   }
   finally {
     state.loading.close();
@@ -829,7 +830,7 @@ function onAssemble() {
   eFormData.result = assembleText;
   let qText = `Q)${createData.qAirSpace}/${createData.qCode}/${createData.qFlightType}/${createData.qTarget}/${createData.qReach}/${createData.qLowerLimit}/${createData.qUpperLimit}/${createData.qLat}${createData.qLong}${createData.qRadius}`;
   // PERM时，C项为空,C项不能够选择0000时间，只能是2359
-    // C的文本
+  // C的文本
   let cText = "";
   if (createData.messageValidType === "PERM") {
     cText = "PERM";
@@ -840,7 +841,7 @@ function onAssemble() {
   else {
     cText = `${createData.c_time || ''}`;
   }
-  let abcText = `A)${ createData.a_airSpace } B)${ createData.b_time || '' } C)${cText}`;
+  let abcText = `A)${createData.a_airSpace} B)${createData.b_time || ''} C)${cText}`;
   //let abcText = `A)${createData.a_airSpace} B)${createData.b_time || ''} C)${createData.messageValidType === "NEITHER" ? createData.messageValidType : createData.c_time || ''}`;
   let dText = isEmpty(createData.d_time) ? "" : `\nD)${createData.d_time}`;
   let eText = `E)${eFormData.result}`;
@@ -867,8 +868,12 @@ async function onSend() {
       await postMessage(messageData).then((res1: any) => {
         if (res1.code === 200) {
           Modal.message({ message: '发送成功', status: 'success' })
+          messageId.value = res1.data;
           emit('createMessage', res1.data);
         }
+      }).catch((err: any) => {
+        console.log(err);
+        Modal.message({ message: `发送失败，原因${err}`, status: 'error' })
       });
     }
   })
@@ -930,7 +935,7 @@ const createProcess = async () => {
         [consultationDep.id]: consultationDepList.value,
         [examineNumber.id]: examineDepList.value.length,
         [examineDep.id]: examineDepList.value,
-        [link.id]: `${import.meta.env.VITE_BASE_URL}/vue-pro/enotam?templateID=${messageData.templateId}&messageId=${messageId.value}`,
+        [link.id]: `${import.meta.env.VITE_BASE_URL}/vue-pro/enotam?templateID=${messageData.templateId || createData.templateID}&messageId=${messageId.value}`,
         // 这里需要配置对应用户的id
         startUserMainDeptId: userWorkFlowStore.user.depidId
       };
@@ -940,15 +945,32 @@ const createProcess = async () => {
         createProcessVM
       ).then(async (res2: any) => {
         console.log("res2", res2);
-        Modal.message({ message: '发送成功', status: 'success' })
-
+        // 对应表flyflow_process_instance_record-process_instance_id
+        let messageWorkflow = {
+          messageId: messageId.value,
+          workflowId: res2.data.data,
+        }
+        //console.log(messageWorkflow);
+        // 将messageId和workflowId关联起来
+        await postWorkflowId(messageWorkflow).then((res3: any) => {
+          if (res3.code === 200) {
+            //Modal.message({ message: '发送成功', status: 'success' })
+            Modal.message({ message: '生成通知单成功', status: 'success' })
+            // 自动通知对应q码的部门去填写
+            emit('close',true);
+          }
+        }).catch((err: any) => {
+          console.log(err);
+          Modal.message({ message: `通知单生成失败，原因${err}`, status: 'error' })
+        });
+        //Modal.message({ message: '生成通知单成功', status: 'success' })
       }).catch((err: any) => {
         console.log(err);
-        Modal.message({ message: `发送失败，原因${err}`, status: 'error' })
+        Modal.message({ message: `通知单生成失败，原因${err}`, status: 'error' })
       });
     })
     boxDepartmentVisibility.value = false;
-    emit('close');
+    emit('close',false);
 
   })
 };

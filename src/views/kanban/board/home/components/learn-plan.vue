@@ -8,7 +8,7 @@
             <span>{{ $t('work.index.plans') }}</span>
           </div>
           <div>
-            <span class="plan-pass">1890</span>
+            <span class="plan-pass">18</span>
             <span class="num">&nbsp;/ {{ $t('work.index.Numbers') }}</span>
           </div>
         </div>

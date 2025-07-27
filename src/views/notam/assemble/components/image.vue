@@ -1,5 +1,5 @@
 <template>
-    <tiny-dialog-box v-model:visible="show" title="消息" width="30%">
+    <tiny-dialog-box  :modal="false" v-model:visible="show" title="消息" width="30%">
         <div class="demo-image__keep-style">
             <tiny-image :src="url" :preview-src-list="srcList" keep-style></tiny-image>
         </div>

@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <Breadcrumb :items="['menu.systemManager', 'menu.version']" />
+        <Breadcrumb v-show="false" :items="['menu.systemManager', 'menu.version']" />
         <div class="content">
             <div class="content-main">
                 <tiny-button v-if="userStore.userInfo.userName == 'admin'" type='primary'
@@ -19,7 +19,7 @@
                         </template>
                     </tiny-timeline-item>
                 </tiny-time-line>
-                <tiny-dialog-box v-if="boxVisibility" v-model:visible="boxVisibility" title="编辑" width="30%">
+                <tiny-dialog-box  :modal="false" v-if="boxVisibility" v-model:visible="boxVisibility" title="编辑" width="30%">
                     <versionForm @close="dialogClose" />
                 </tiny-dialog-box>
             </div>

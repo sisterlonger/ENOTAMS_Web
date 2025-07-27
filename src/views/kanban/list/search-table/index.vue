@@ -1,6 +1,6 @@
 <template>
   <div class="container-list">
-    <Breadcrumb :items="['menu.list', 'menu.list.searchTable']"/>
+    <Breadcrumb v-show="false" :items="['menu.list', 'menu.list.searchTable']"/>
     <div class="contain">
       <div class="contain-head">
         <span>{{ $t( 'searchTable.form.create' ) }}</span>

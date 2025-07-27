@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-      <Breadcrumb :items="['menu.systemManager', 'menu.menu']" />
+      <Breadcrumb v-show="false" :items="['menu.systemManager', 'menu.menu']" />
       <div class="content">
         <div class="content-main">
           <tiny-button type="primary" @click="add()">新增根目录</tiny-button>
@@ -24,7 +24,7 @@
             </tiny-tree>
           </div>
         </div>
-        <tiny-dialog-box v-if="boxVisibility" v-model:visible="boxVisibility" title="编辑" width="30%">
+        <tiny-dialog-box  :modal="false" v-if="boxVisibility" v-model:visible="boxVisibility" title="编辑" width="30%">
           <dictionaryForm :menuID="menuID" :parentID="parentID" @close="dialogClose" />
         </tiny-dialog-box>
       </div>

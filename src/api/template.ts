@@ -29,6 +29,11 @@ export function queryTemplateDetail(params: { id: number }) {
         params,
     });
 }
+export function queryByQCodeTemplateDetail(params: { qcode: string }) {
+    return axios.get('/template/getbyqcode', {
+        params,
+    });
+}
 export function deleteTemplate(ids: []) {
     return axios.post('/template/delete', ids);
 }

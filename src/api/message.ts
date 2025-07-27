@@ -25,6 +25,12 @@ export interface MessageVM {
     radius: string;
     telegramText: string;
     templateId: number;
+    workflowId: number;
+    parentId: number;
+}
+export interface MessageWorkflowVM {
+    messageId: number;
+    workflowId: string;
 }
 
 export function queryMessageList(params: MessageSearch) {
@@ -40,4 +46,7 @@ export function deleteMessage(ids: []) {
 }
 export function postMessage(data: MessageVM) {
     return axios.post<MessageVM>('/message/post', data);
+}
+export function postWorkflowId(data: MessageWorkflowVM) {
+    return axios.post<MessageWorkflowVM>('/message/postworkflowid', data);
 }

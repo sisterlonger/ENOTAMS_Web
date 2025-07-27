@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <Breadcrumb :items="['menu.workPermission', 'menu.role']" />
+        <Breadcrumb v-show="false" :items="['menu.workPermission', 'menu.role']" />
         <div class="content">
             <div class="content-main">
                 <!--查询组件、选择-->
@@ -63,7 +63,7 @@
                         </template>
                     </tiny-grid-column>
                 </tiny-grid>
-                <tiny-dialog-box v-if="boxVisibility" v-model:visible="boxVisibility" title="编辑" width="60%">
+                <tiny-dialog-box  :modal="false" v-if="boxVisibility" v-model:visible="boxVisibility" title="编辑" width="60%">
                     <roleForm :roleID="roleID" @close="dialogClose" />
                 </tiny-dialog-box>
             </div>

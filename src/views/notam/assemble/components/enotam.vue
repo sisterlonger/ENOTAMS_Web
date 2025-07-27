@@ -1,11 +1,13 @@
 <template>
   <tiny-tabs v-if="preCondition" v-model="activeName" tab-style="border-card" size="small">
     <tiny-tab-item :key="tabsList[0].name" :title="tabsList[0].title" :name="tabsList[0].name">
-      <assembleForm :messageId="localMessageID" :templateID="localTemplateID" :templateData="templateData" 
-      :isNoAuth="isNoAuth" :act="act" @close="dialogClose" @createMessage="createMessage" />
+      <assembleForm :messageId="localMessageID" :templateID="localTemplateID" :templateData="templateData"
+        :isNoAuth="isNoAuth" :act="act" @close="dialogClose" @createMessage="createMessage" />
     </tiny-tab-item>
-    <tiny-tab-item :key="tabsList[1].name" :title="tabsList[1].title" :name="tabsList[1].name" :disabled="isEmpty(localMessageID)">
-      <materials :messageId="localMessageID" :templateID="localTemplateID" :templateData="templateData" :isNoAuth="isNoAuth" :act="act"></materials>
+    <tiny-tab-item :key="tabsList[1].name" :title="tabsList[1].title" :name="tabsList[1].name"
+      :disabled="isEmpty(localMessageID)">
+      <materials :messageId="localMessageID" :templateID="localTemplateID" :templateData="templateData"
+        :isNoAuth="isNoAuth" :act="act"></materials>
     </tiny-tab-item>
     <!-- <tiny-tab-item :key="tabsList[2].name" :title="tabsList[2].title" :name="tabsList[2].name" :disabled="isEmpty(localMessageID)">
       test2
@@ -19,7 +21,7 @@
 <script setup lang="ts">
 import { ref, toRefs, defineProps, defineEmits, reactive, onMounted } from 'vue'
 import { TinyTabs, TinyTabItem, Modal, Loading } from '@opentiny/vue'
-import { queryTemplateDetail } from '@/api/fetchInterface';
+import { queryTemplateDetail, queryByQCodeTemplateDetail } from '@/api/fetchInterface';
 import { useRouter } from 'vue-router';
 import { isEmpty } from '@/utils/string-utils';
 import assembleForm from './assembleForm.vue';
@@ -54,6 +56,8 @@ const tabsList = ref([
   //   title: '会商审批',
   // },
 ])
+
+// 新增时act为add，有templateID，查看通告审核发布时，act为edit，且messageId和templateID都有。其他情况没有任何内容，只能从路由读取
 const props = defineProps({
   templateID: Number,
   messageId: Number,
@@ -90,8 +94,25 @@ const fetchData = async () => {
   }
 };
 // 关闭弹窗
-function dialogClose() {
-  emit('close');
+async function dialogClose(status: boolean) {
+  // status代表成功发送通告
+  // 如果status为true且配置了关联通告，需要关联通告
+  if (status && !isEmpty(templateData.value.relatedQCodes)) {
+    let qcode = templateData.value.qCode;
+    let relatedQcodes = templateData.value.relatedQCodes;
+    preCondition.value = false;
+    await queryByQCodeTemplateDetail({ qcode: templateData.value.relatedQCodes }).then((res: any) => {
+      if (res.code === 200) {
+        templateData.value = res.data;
+        localMessageID.value = templateData.value.messageId;
+        localTemplateID.value = templateData.value.templateID;
+        Modal.alert(`请填写【${qcode}】关联通告【${relatedQcodes}】信息`);
+      }
+    })
+    preCondition.value = true;
+  } else {
+    emit('close');
+  }
 }
 
 function createMessage(id: number) {
@@ -101,7 +122,7 @@ function createMessage(id: number) {
 // 初始化请求数据
 onMounted(async () => {
   let queryParams = route.query;
-  if(Number(queryParams.templateID as string)>0){
+  if (Number(queryParams.templateID as string) > 0) {
     isNoAuth.value = true;
   }
   localTemplateID.value = Number(queryParams.templateID as string) || templateID.value;

@@ -2,7 +2,7 @@
     <div class="tiny-demo">
         <BWrapper v-if="true"></BWrapper>
         <tiny-nav-menu :before-skip="handleSkip" prevent :data="menuData"></tiny-nav-menu>
-        <iframe :src="bridgeUrl" width="100%" height="900px" id="workflow"
+        <iframe :src="bridgeUrl" width="100%" height="550px" id="workflow"
             sandbox="allow-scripts allow-same-origin allow-forms" frameborder="0">
             <p>您的浏览器不支持iframe标签。</p>
         </iframe>

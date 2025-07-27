@@ -37,7 +37,7 @@
                 </tiny-button>
             </tiny-form-item>
         </tiny-form>
-        <tiny-dialog-box v-if="boxVisibility" v-model:visible="boxVisibility" title="编辑" width="30%">
+        <tiny-dialog-box  :modal="false" v-if="boxVisibility" v-model:visible="boxVisibility" title="编辑" width="30%">
             <Child :parentDep="createData" @close="dialogClose" />
         </tiny-dialog-box>
     </div>

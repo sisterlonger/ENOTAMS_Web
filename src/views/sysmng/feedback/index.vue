@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <Breadcrumb :items="['menu.board', 'menu.feedback']" />
+        <Breadcrumb v-show="false" :items="['menu.board', 'menu.feedback']" />
         <div class="content">
             <div class="content-main">
                 <!--查询组件、选择-->
@@ -60,7 +60,7 @@
                         </template>
                     </tiny-grid-column>
                 </tiny-grid>
-                <tiny-dialog-box v-if="boxVisibility" v-model:visible="boxVisibility" title="编辑" width="30%">
+                <tiny-dialog-box  :modal="false" v-if="boxVisibility" v-model:visible="boxVisibility" title="编辑" width="30%">
                     <feedbackForm :feedbackID="feedbackID" :action="action" @close="dialogClose" />
                 </tiny-dialog-box>
             </div>

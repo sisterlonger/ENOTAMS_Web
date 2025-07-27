@@ -13,7 +13,7 @@
           </template>
         </tiny-grid-column>
       </tiny-grid>
-      <tiny-dialog-box v-if="boxVisibility" v-model:visible="boxVisibility" title="编辑" width="50%">
+      <tiny-dialog-box  :modal="false" v-if="boxVisibility" v-model:visible="boxVisibility" title="编辑" width="50%">
         <templateForm :templateID="templateID" :destroy-on-close="true" @close="dialogClose" />
       </tiny-dialog-box>
     </div>
