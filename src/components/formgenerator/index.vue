@@ -1,7 +1,7 @@
 <template>
     <div>
         <tiny-row v-if="preCondition">
-            <tiny-form ref="ruleFormRef" :model="formData" :rules="formRules" :label-width="formStyle.width || '100px'">
+            <tiny-form ref="ruleFormRef" :model="formData" :rules="formRules" :label-width="formStyle.width || '100px'" overflow-title>
                 <div v-for="(item, index) in formFields" :key="'field' + index">
                     <tiny-form-item v-if="!item.hidden" :label="keyWordLabel[index]" :prop="item.prop">
                         <!--输入组件-->

@@ -50,3 +50,8 @@ export function postMessage(data: MessageVM) {
 export function postWorkflowId(data: MessageWorkflowVM) {
     return axios.post<MessageWorkflowVM>('/message/postworkflowid', data);
 }
+export function queryGetRelateMessage(params: { id: number }) {
+    return axios.get('/message/getrelatemessage', {
+        params,
+    });
+}

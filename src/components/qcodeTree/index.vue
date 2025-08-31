@@ -2,10 +2,13 @@
   <div>
     <!-- <tiny-tree-menu class="demo-tree-menu" node-key="id" show-checkbox :data="treeData"></tiny-tree-menu>  -->
     <tiny-row>
-      <tiny-col :span="9">
+      <tiny-col :span="11">
+        <div class="option-row">
+          <tiny-input v-model="filterText"  placeholder="搜索" @input="inputChange"></tiny-input>
+        </div>
         <tiny-tree ref="treeRef" class="qcodetree" :data="treeData" node-key="nodeID" :props="mapField"
           highlight-current current-node-key="1" show-checkbox :show-contextmenu="true" :indent="16" show-line
-          size="medium" :expand-on-click-node="false" @check-change="onChange">
+          size="medium" :expand-on-click-node="false" :filter-node-method="filterNodeMethod" @check-change="onChange">
         </tiny-tree>
       </tiny-col>
     </tiny-row>
@@ -13,8 +16,8 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted,defineProps ,defineEmits,toRefs,watch} from 'vue'
-import { Row as TinyRow, Col as TinyCol, TinyTree } from '@opentiny/vue'
+import { ref, reactive, onMounted, defineProps, defineEmits, toRefs, watch } from 'vue'
+import { Row as TinyRow, Col as TinyCol, TinyTree ,TinyInput} from '@opentiny/vue'
 import { queryNodeTree } from '@/api/fetchInterface';
 
 const emit = defineEmits(['onChange']);
@@ -29,13 +32,14 @@ const props = defineProps({
 
 // 组件ref
 const treeRef = ref(null);
+const filterText = ref('')
 
 const { qCodePermissions } = toRefs(props);
 // 组件数据
 const treeData = ref({})
 
 watch(qCodePermissions, (newPermissions) => {
-    handleCheckKey(newPermissions)
+  handleCheckKey(newPermissions)
 })
 
 
@@ -43,6 +47,7 @@ watch(qCodePermissions, (newPermissions) => {
 const getNodeDataSync = async () => {
   const { data } = await queryNodeTree();
   treeData.value = data.children;
+  console.log(qCodePermissions);
   handleCheckKey(qCodePermissions)
 }
 //映射
@@ -59,6 +64,13 @@ const onChange = (data) => {
 // 处理初始化的勾选
 const handleCheckKey = (checkedData) => {
   treeRef.value.setCheckedKeys(checkedData);
+}
+
+function inputChange() {
+  treeRef.value.filter(filterText.value)
+}
+function filterNodeMethod(text, data, node) {
+  return data.label.includes(text)
 }
 // 初始化请求数据
 onMounted(async () => {

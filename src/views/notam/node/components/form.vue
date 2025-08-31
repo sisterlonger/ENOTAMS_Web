@@ -1,14 +1,14 @@
 <template>
     <div>
-        <tiny-form ref="ruleFormRef" :model="createData" :rules="rules" label-width="125px">
+        <tiny-form v-if="preCondition" ref="ruleFormRef" :model="createData" :rules="rules" label-width="125px">
             <tiny-form-item label="模版" prop="template" :validate-icon="validateIcon">
-                <tiny-input v-model="createData.template"></tiny-input>
+                <tiny-input v-model="createData.template" type="textarea" autosize></tiny-input>
             </tiny-form-item>
             <tiny-form-item label="例子" prop="example" :validate-icon="validateIcon">
-                <tiny-input v-model="createData.example"></tiny-input>
+                <tiny-input v-model="createData.example" type="textarea" autosize></tiny-input>
             </tiny-form-item>
             <tiny-form-item label="备注" prop="remark" :validate-icon="validateIcon">
-                <tiny-input v-model="createData.remark"></tiny-input>
+                <tiny-input v-model="createData.remark" type="textarea" autosize></tiny-input>
             </tiny-form-item>
             <tiny-form-item label="航行通告代码" prop="qCode" :validate-icon="validateIcon">
                 <tiny-input v-model="createData.qCode"></tiny-input>
@@ -57,6 +57,9 @@
             <tiny-form-item label="关联通告Q码" prop="relatedQCodes" :validate-icon="validateIcon">
                 <tiny-input v-model="createData.relatedQCodes" placeholder="用、作分隔符" clearable></tiny-input>
             </tiny-form-item>
+            <tiny-form-item label="关联通告Q码" prop="field">
+                <qcodeTree :qCodePermissions="createData.relateNodes" @onChange="getQCodePermission"></qcodeTree>
+            </tiny-form-item>
             <tiny-form-item>
                 <tiny-button type="primary" @click="handleSubmit()">
                     提交
@@ -82,6 +85,7 @@ import {
     Col as TinyCol,
 } from '@opentiny/vue'
 import { iconWarning } from '@opentiny/vue-icon';
+import qcodeTree from '@/components/qcodeTree/index.vue';
 import { queryTemplateDetail, postTemplate } from '@/api/fetchInterface';
 
 
@@ -107,6 +111,10 @@ const createData = reactive({
     qRadius: '',
     materials: "",
     relatedQCodes: "",
+    // get
+    relateNodes: [],
+    // set
+    relateNodeIds: [],
 })
 const rules = ref({
     template: [{ required: true, message: '必填', trigger: 'change' }],
@@ -124,7 +132,7 @@ const state = reactive<{
 }>({
     loading: null,
 });
-
+const preCondition = ref(false)
 let dicType = ref([]);
 // 请求数据接口方法
 const fetchData = async () => {
@@ -136,6 +144,8 @@ const fetchData = async () => {
     try {
         const { data } = await queryTemplateDetail({ id: templateID.value });
         Object.assign(createData, data);
+        createData.relateNodes = [];
+        createData.relateNodes = data.relateNodes.map((item: any) => { return item.nodeID });
     }
     catch (err) {
         Modal.alert('获取数据错误');
@@ -151,6 +161,7 @@ onMounted(() => {
     console.log(templateID.value);
     if (templateID.value) {
         fetchData();
+        preCondition.value = true;
     }
 });
 
@@ -161,6 +172,7 @@ const emit = defineEmits(['close']);
 function handleSubmit() {
     ruleFormRef.value.validate(async (valid) => {
         if (valid) {
+            createData.relateNodeIds = createData.nodes;
             await postTemplate(createData);
             emit('close');
         } else {
@@ -168,7 +180,14 @@ function handleSubmit() {
         }
     })
 }
-
+// qcodeTree的值处理事件
+const getQCodePermission = (checkedData: any) => {
+    let qCodePermissions = checkedData.map((item: any) => {
+        // 只记录带权限的叶子结点，其他叶子结点会利用filter过滤
+        return item.nodeID;
+    })
+    createData.nodes = qCodePermissions.filter((item: any) => { return item !== null });
+}
 
 
 function resetForm() {

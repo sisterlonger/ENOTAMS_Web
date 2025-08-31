@@ -3,7 +3,7 @@
     <tiny-grid ref="theGridRef" :data="tableData.value" seq-serial :stripe="true"
       :edit-config="{ trigger: 'manual', mode: 'cell', autoClear: false }">
       <!-- <tiny-grid-column type="index" width="5%"></tiny-grid-column> -->
-      <tiny-grid-column field="qCode" title="事件场景" width="20%" :filter="nameFilter"></tiny-grid-column>
+      <tiny-grid-column field="circumstances" title="事件场景" width="20%" :filter="nameFilter"></tiny-grid-column>
       <tiny-grid-column field="example" title="例子" width="20%" :filter="nameFilter"></tiny-grid-column>
       <tiny-grid-column field="template" title="标准规范" width="30%" :filter="nameFilter"></tiny-grid-column>
             <tiny-grid-column field="remark" title="备注" width="20%" :filter="nameFilter"></tiny-grid-column>

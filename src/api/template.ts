@@ -29,8 +29,8 @@ export function queryTemplateDetail(params: { id: number }) {
         params,
     });
 }
-export function queryByQCodeTemplateDetail(params: { qcode: string }) {
-    return axios.get('/template/getbyqcode', {
+export function queryByTemplateIdTemplateDetail(params: { templateId: number }) {
+    return axios.get('/template/getbytemplateid', {
         params,
     });
 }

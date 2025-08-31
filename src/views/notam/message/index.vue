@@ -77,7 +77,8 @@
         </tiny-collapse>
 
 
-        <tiny-grid ref="gridRef" :fetch-data="fetchData" seq-serial :pager="pagerConfig" :fit="true">
+        <tiny-grid v-if="preCondition" ref="gridRef" :fetch-data="fetchData" seq-serial :pager="pagerConfig"
+          :fit="true">
           <template #toolbar>
             <tiny-grid-toolbar :buttons="toolbarButtons"></tiny-grid-toolbar>
           </template>
@@ -91,23 +92,33 @@
           <tiny-grid-column field="radius" title="半径"></tiny-grid-column> -->
           <tiny-grid-column field="telegramText" title="主要内容(E项)" show-overflow></tiny-grid-column>
           <tiny-grid-column field="createTime" title="创建时间" width="11%" :renderer="renderName"></tiny-grid-column>
-          <!-- <tiny-grid-column field="" title="当前处理人" width="10%"></tiny-grid-column> -->
-          <tiny-grid-column field="" title="状态" width="10%"></tiny-grid-column>
+          <tiny-grid-column field="taskAssignShow" title="当前处理人" width="10%"></tiny-grid-column>
+          <tiny-grid-column field="status" title="状态" width="10%">
+            <template #default="data">
+              <tiny-tag size="mini" :type="data.row.buttonType" effect="dark">{{
+                data.row.status }}</tiny-tag>
+            </template>
+          </tiny-grid-column>
           <tiny-grid-column title="操作" width="200" align="center">
             <template #default="data">
-              <tiny-button v-track="'电报'" size="mini" type="primary"
+              <tiny-button v-show="data.row.status !== '未开始'" v-track="'电报'" size="mini" type="success"
                 @click="editRowEvent(data.row, '电报')">电报</tiny-button>
-              <tiny-button v-track="'详情'" size="mini" type="info" @click="editRowEvent(data.row, '详情')">详情</tiny-button>
+              <tiny-button v-show="data.row.status !== '未开始'" v-track="'详情'" size="mini" type="info"
+                @click="editRowEvent(data.row, '详情')">详情</tiny-button>
+              <tiny-button v-show="data.row.status === '未开始'" v-track="'处理'" size="mini" type="primary"
+                @click="editRowEvent(data.row, '处理')">处理</tiny-button>
             </template>
           </tiny-grid-column>
         </tiny-grid>
         <tiny-dialog-box :modal="false" v-if="messageVisibility" v-model:visible="messageVisibility" title="电报"
-          width="30%">
+          width="40%">
           <messageForm :id="messageId" @close="dialogClose" />
         </tiny-dialog-box>
+        <!--包含工作进展、提醒设置、关联通告-->
         <tiny-dialog-box :modal="false" v-if="workflowVisibility" v-model:visible="workflowVisibility" title="详情"
           width="80%" max-height="1000px" top="5%" :close-on-click-modal="true">
-          <enotam :messageId="messageId" :templateID="templateId" act='edit' @close="dialogClose" />
+          <enotam :messageId="messageId" :templateID="templateId" :processInstanceId="processInstanceId"
+            :flowId="flowId" :act='act' @close="dialogClose" />
         </tiny-dialog-box>
       </div>
     </div>
@@ -117,10 +128,13 @@
 <script setup lang="jsx">
 import { ref, onMounted } from 'vue'
 import {
-  Grid as TinyGrid, GridColumn as TinyGridColumn, Button as TinyButton, DialogBox as TinyDialogBox, GridToolbar as TinyGridToolbar, Input as TinyInput, Form as TinyForm,
+  Grid as TinyGrid, GridColumn as TinyGridColumn, Button as TinyButton, DialogBox as TinyDialogBox, GridToolbar as TinyGridToolbar, Input as TinyInput, Form as TinyForm, TinyTag,
   FormItem as TinyFormItem, Layout as TinyLayout, Row as TinyRow, Col as TinyCol, Modal, TinyDatePicker, Collapse as TinyCollapse, CollapseItem as TinyCollapseItem, Option as TinyOption, Select as TinySelect,
 } from '@opentiny/vue';
 import { queryMessageList, queryAirSpaceList } from '@/api/fetchInterface';
+import { isEmpty } from '@/utils/string-utils';
+
+import workflowaxios from '@/views/workflow/components/workflow-axios';
 import enotam from '@/views/notam/assemble/components/enotam.vue';
 import messageForm from './components/form.vue';
 
@@ -143,6 +157,8 @@ const messageVisibility = ref(false)
 const workflowVisibility = ref(false)
 const messageId = ref(0)
 const templateId = ref(0)
+const processInstanceId = ref("")
+const flowId = ref("")
 const formData = ref({
   qCode: "",
   airSpaceCodeId: "",
@@ -155,6 +171,8 @@ const formData = ref({
   long: "",
   timeRange: [],
 })
+let workFlowList = ref([]);
+const preCondition = ref(false)
 const gridRef = ref()
 const airSpaceOptions = ref([]);
 const activeNames = ref(['0'])
@@ -186,6 +204,7 @@ const validTypeOptions = [
     label: 'NEITHER',
   },
 ];
+const act = ref("")
 async function queryClick() {
   //getData({ page: pagerConfig.value.attrs });
   gridRef.value.handleFetch();
@@ -211,6 +230,46 @@ async function getData({ page }) {
   }
   let response = await queryMessageList(formData.value);
   tableData.value = response.data;
+
+  // 核心实现：将workFlowList的值赋值给匹配的tableData
+  const workflowMap = new Map();
+
+  // 1. 创建workFlowList的快速查找映射
+  workFlowList.value.forEach(item => {
+    if (item.processInstanceId) {
+      workflowMap.set(item.processInstanceId, {
+        taskAssignShow: item.taskAssignShow,
+        flowId: item.flowId,
+        taskId: item.taskId,
+        processInstanceId: item.processInstanceId
+      });
+    }
+  });
+  // 2. 遍历tableData进行匹配赋值,table的workflowid对应的是processInstanceId
+  tableData.value.forEach(item => {
+    if (item.workflowId && workflowMap.has(item.workflowId)) {
+      const workflowData = workflowMap.get(item.workflowId);
+      Object.assign(item, {
+        taskAssignShow: workflowData.taskAssignShow,
+        flowId: workflowData.flowId,
+        taskId: workflowData.taskId,
+        processInstanceId: workflowData.processInstanceId,
+      });
+    }
+    if (isEmpty(item.taskAssignShow) && !isEmpty(item.type)) {
+      item.status = "已完成";
+      item.buttonType = "success"
+    }
+    else if (!isEmpty(item.taskAssignShow) && !isEmpty(item.type)) {
+      item.status = "进行中";
+      item.buttonType = "danger"
+    }
+    else {
+      item.status = "未开始";
+      item.buttonType = "primary"
+    }
+  });
+  //console.log("table----------", tableData.value)
   return Promise.resolve({
     result: tableData.value,
     page: { total: response.count },
@@ -220,17 +279,27 @@ async function getData({ page }) {
 const editRowEvent = (row, type) => {
   messageId.value = row.messageId;
   templateId.value = row.templateId;
+  processInstanceId.value = row.processInstanceId;
+  flowId.value = row.flowId;
   if (type === "详情") {
     workflowVisibility.value = true;
+    act.value = "edit";
   }
   else if (type === "电报") {
     messageVisibility.value = true;
+  }
+  else if (type === "处理") {
+    act.value = "add";
+    workflowVisibility.value = true;
   }
 }
 // 关闭弹窗
 function dialogClose() {
   messageId.value = 0;
   templateId.value = 0;
+  processInstanceId.value = "";
+  flowId.value = "0";
+  act.value = "";
   messageVisibility.value = false;
   workflowVisibility.value = false;
   queryClick();
@@ -239,9 +308,56 @@ const fetchConfig = async () => {
   let airspaceList = await queryAirSpaceList();
   airSpaceOptions.value = airspaceList.data;
 }
+// 通过属性去重
+const uniqueByProp = (arr, prop) => {
+  return [...new Map(arr.map(item => [item[prop], item])).values()];
+}
 // 初始化请求数据
 onMounted(async () => {
   await fetchConfig();
+  // 获取已办、待办、发起
+  // 获取具体某个流程实例的详情
+  // await workflowaxios.get('/process-instance/queryDetailByProcessInstanceId',
+  //       {params:{processInstanceId:"e055348b-5d5c-11f0-a1ba-0242ac150004"}}
+  //     ).then(async (res2: any) => {
+  //       console.log("res2", res2);
+
+  //     }).catch((err: any) => {
+  //       console.log(err);
+  //       Modal.message({ message: `通知单生成失败，原因${err}`, status: 'error' })
+  //     });
+  // 待办
+  await workflowaxios.post('combination/group/queryTodoTaskList', {
+    "pageNum": 1,
+    "pageSize": 1000
+  },).then((res1) => {
+    workFlowList.value = workFlowList.value.concat(res1.data.data.records)
+  }).catch((err) => {
+    console.log(err);
+    Modal.message({ message: `获取流程详情失败，原因：${err}`, status: 'error' })
+  });
+  // 发起
+  await workflowaxios.post('/combination/group/queryInitiatedTaskList', {
+    "pageNum": 1,
+    "pageSize": 1000
+  },).then((res1) => {
+    workFlowList.value = workFlowList.value.concat(res1.data.data.records)
+  }).catch((err) => {
+    console.log(err);
+    Modal.message({ message: `获取流程详情失败，原因：${err}`, status: 'error' })
+  });
+  // 已办
+  await workflowaxios.post('/combination/group/queryFinishedTaskList', {
+    "pageNum": 1,
+    "pageSize": 1000
+  },).then((res1) => {
+    workFlowList.value = workFlowList.value.concat(res1.data.data.records)
+  }).catch((err) => {
+    console.log(err);
+    Modal.message({ message: `获取流程详情失败，原因：${err}`, status: 'error' })
+  });
+  workFlowList.value = uniqueByProp(workFlowList.value, "processInstanceId")
+  preCondition.value = true;
 });
 </script>
 
