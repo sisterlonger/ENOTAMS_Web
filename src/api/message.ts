@@ -32,7 +32,10 @@ export interface MessageWorkflowVM {
     messageId: number;
     workflowId: string;
 }
-
+export interface PublishVM {
+    messageId: number;
+    state: string;
+}
 export function queryMessageList(params: MessageSearch) {
     return axios.get('/message/list', { params });
 }
@@ -49,6 +52,9 @@ export function postMessage(data: MessageVM) {
 }
 export function postWorkflowId(data: MessageWorkflowVM) {
     return axios.post<MessageWorkflowVM>('/message/postworkflowid', data);
+}
+export function publishMessage(data: PublishVM) {
+    return axios.post<PublishVM>('/message/publish', data);
 }
 export function queryGetRelateMessage(params: { id: number }) {
     return axios.get('/message/getrelatemessage', {

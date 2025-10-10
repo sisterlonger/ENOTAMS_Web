@@ -4,17 +4,23 @@
             <div class="title">{{ item.title }}</div>
             <tiny-file-upload :ref="`upload${item.title}`" :action="item.action" :data="requestData"
                 :file-list="item.fileList" list-type="saas" :open-download-file="true" :headers='header'
-                :before-remove="beforeRemove" prompt-tip @download-file="handleDownloadFile" @success="onSuccess"
-                @error="onError">
+                :before-remove="beforeRemove" prompt-tip  :disabled="act === 'detail'"
+                @download-file="handleDownloadFile" @success="onSuccess" @error="onError">
             </tiny-file-upload>
+        </div>
+        <div>
+            <div class="title">参考附件</div>
+            <tiny-select v-model="attachment" :options="attachmentOptions" placeholder="请选择需要参考的附件"
+                clearable></tiny-select>
+            <iframe v-show="attachment" :src="attachment" width="100%" height="600px" type="application/pdf" />
         </div>
     </div>
 </template>
 
 <script setup>
-import { ref, reactive, defineProps, toRefs, onMounted } from 'vue'
-import { TinyFileUpload, Modal } from '@opentiny/vue'
-import { downloadFile, queryMessageDetail, deleteFile } from '@/api/fetchInterface';
+import { ref, reactive, defineProps, toRefs, onMounted, watch } from 'vue'
+import { TinyFileUpload, Modal, TinySelect } from '@opentiny/vue'
+import { downloadFile, queryMessageDetail, queryTemplateDetail, deleteFile, updateFile } from '@/api/fetchInterface';
 import { saveAs } from 'file-saver';
 import { getToken } from '@/utils/auth';
 import { isEmpty } from '@/utils/string-utils';
@@ -22,19 +28,19 @@ import { isEmpty } from '@/utils/string-utils';
 
 const props = defineProps({
     templateID: Number,
-    templateData: Object,
     messageId: Number,
     act: String,
 });
 const { templateID } = toRefs(props);
-const { templateData } = toRefs(props);
+const templateData = reactive({});
 const { messageId } = toRefs(props);
+const { act } = toRefs(props);
 // 素材类型
 const materials = ref([]);
 const preCondition = ref(false);
 // 上传接口的参数
 const requestData = ref({
-    messageId: messageId.value,
+    messageId: messageId.value || 0,
     materialType: "",
 })
 const header = ref({ Authorization: `Bearer ${getToken()}` })
@@ -43,7 +49,56 @@ const deleteFileVM = {
     messageId: 0,
     url: '',
 };
+// 机场图、情报图附件
+const attachment = ref();
+const attachmentOptions = ref([
+    {
+        label: '白云机场chart图',
+        value: '/pdf/白云机场chart图.pdf',
+    },
+    {
+        label: '白云机场高度chart图',
+        value: '/pdf/白云机场高度chart图.pdf',
+    },
+    {
+        label: '广州区域图',
+        value: '/pdf/广州区域图.pdf',
+    },
+    {
+        label: '航路图',
+        value: '/pdf/航路图.pdf',
+    },
+    {
+        label: '10A-RWY01L',
+        value: '/pdf/10A-RWY01L.pdf',
+    },
+]);
+watch(
+    messageId,
+    async (newValue) => {
+        // 调用关联接口
 
+        if (!isEmpty(newValue) && act.value === "add") {
+            //console.log(newValue);
+            //console.log(materials);
+            let updateFileVM = [];
+            materials.value.forEach(item => {
+                if (item.fileList.length > 0) {
+                    updateFileVM.push({ fileId: item.fileList[0].id, messageId: newValue })
+                }
+            })
+            //console.log(updateFileVM);
+            if (updateFileVM.length > 0) {
+                await updateFile(updateFileVM).then((res1) => {
+                    if (res1.code !== 200) {
+                        Modal.message({ message: '更新文件失败', status: 'error' })
+                    }
+                });
+            }
+        }
+    },
+    { immediate: true, deep: true, }
+);
 // 成功上传事件
 const onSuccess = async (res, file) => {
     //console.log(res, file);
@@ -126,18 +181,34 @@ function beforeRemove(file) {
         })
     })
 }
+const handleNoFile = (files) => {
+    // 该模板下的附件类型
+            if (!isEmpty(templateData.materials)) {
+                let titleList = templateData.materials.split("、");
+                titleList.forEach((title) => {
+                    let subFiles = files.filter((item) => item.materialType === title);
+                    let subFileList = [];
+                    if (subFiles && subFiles.length > 0) {
+                        subFiles.forEach((item) => { subFileList.push({ name: item.fileName, url: item.url, id: item.fileId }) })
+                    }
+                    materials.value.push({ title, fileList: subFileList || [], action: `${import.meta.env.VITE_API_BASE_URL}/file/upload?messageId=${messageId.value}&materialType=${title}` });
+                });
+            }
+            materials.value.push({ title: '其他', fileList: [] });
+}
 // 请求数据接口方法
 const fetchData = async () => {
     let files = [];
     // 是有通告号的，编辑
     if (messageId.value) {
         const { data } = await queryMessageDetail({ id: messageId.value });
+        console.log(data.files);
         // 有文件
         if (data.files.length > 0) {
             files = data.files;
             // 该模板下的附件类型
-            if (templateData.value.materials !== "" && templateData.value.materials !== null) {
-                let titleList = templateData.value.materials.split("、");
+            if (!isEmpty(templateData.materials)) {
+                let titleList = templateData.materials.split("、");
                 titleList.forEach((title) => {
                     let subFiles = files.filter((item) => item.materialType === title);
                     let subFileList = [];
@@ -155,21 +226,22 @@ const fetchData = async () => {
             }
             materials.value.push({ title: '其他', fileList: otherFileList || [], action: `${import.meta.env.VITE_API_BASE_URL}/file/upload?messageId=${messageId.value}&materialType=其他` });
         }
-        // 无文件
-        else{
-            materials.value.push({ title: '其他', fileList: [] });
+        // 无文件,和无通告号一样处理
+        else {
+            handleNoFile(files)
         }
     }
     // 无通告号,新增
     else {
-        materials.value.push({ title: '其他', fileList: [] });
+       handleNoFile(files)
     }
-    console.log(materials.value)
     preCondition.value = true;
 };
 // 初始化请求数据
 onMounted(async () => {
     if (templateID.value) {
+        const { data } = await queryTemplateDetail({ id: templateID.value });
+        Object.assign(templateData, data);
         await fetchData();
     }
 });

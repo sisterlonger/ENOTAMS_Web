@@ -27,7 +27,9 @@ export function uploadFile(params: {
   })
 }
 
-
+export function updateFile(data: FileVM) {
+    return axios.post<FileVM>('/file/update', data);
+}
 
 export function deleteFile(data: FileVM) {
     return axios.post<FileVM>('/file/delete', data);

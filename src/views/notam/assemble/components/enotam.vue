@@ -8,35 +8,45 @@
           @close="dialogClose" @createMessage="createMessage" />
       </tiny-tab-item>
       <!--附件记录-->
-      <tiny-tab-item :key="tabsList[1].name" :title="tabsList[1].title" :name="tabsList[1].name"
-        :disabled="isEmpty(localMessageID)">
-        <materials :messageId="localMessageID" :templateID="localTemplateID" :templateData="templateData"
-          :isNoAuth="isNoAuth" :act="act"></materials>
+      <tiny-tab-item :key="tabsList[1].name" :title="tabsList[1].title" :name="tabsList[1].name">
+        <materials :messageId="localMessageID" :templateID="localTemplateID" :isNoAuth="isNoAuth" :act="act">
+        </materials>
       </tiny-tab-item>
       <!--流程记录-->
       <tiny-tab-item v-if="act === 'edit'" :key="tabsList[2].name" :title="tabsList[2].title" :name="tabsList[2].name">
-        <workflow :processInstanceId="processInstanceId || '0'" :flowId="flowId || '0'" :messageId="localMessageID"></workflow>
+        <workflow :processInstanceId="processInstanceId || '0'" :flowId="flowId || '0'" :messageId="localMessageID">
+        </workflow>
       </tiny-tab-item>
-      <!-- <tiny-tab-item :key="tabsList[2].name" :title="tabsList[2].title" :name="tabsList[2].name" :disabled="isEmpty(localMessageID)">
-      test2
-    </tiny-tab-item> -->
-      <!-- <tiny-tab-item :key="tabsList[3].name" :title="tabsList[3].title" :name="tabsList[3].name" :disabled="isEmpty(localMessageID)">
-      test3
-    </tiny-tab-item> -->
     </tiny-tabs>
     <tiny-dialog-box :modal="false" v-if="boxVisibility" v-model:visible="boxVisibility" title="请选择需要发送的关联通告"
-      width="70%">
+      width="90%">
       <tiny-grid ref="basicGridRef" :data="tableData"
-        :edit-config="{ trigger: 'click', mode: 'cell', showStatus: true }"
+        :edit-config="{ trigger: 'click', mode: 'cell', showStatus: true }" resizable :fit="true"
         @toolbar-button-click="toolbarButtonClickEvent">
         <template #toolbar>
           <tiny-grid-toolbar :buttons="toolbarButtons"></tiny-grid-toolbar>
         </template>
         <tiny-grid-column type="index" width="60"></tiny-grid-column>
         <tiny-grid-column type="selection" width="60"></tiny-grid-column>
-        <tiny-grid-column field="circumstances" title="事件场景"></tiny-grid-column>
-        <tiny-grid-column field="template" title="模板"></tiny-grid-column>
-        <tiny-grid-column field="example" title="例子"></tiny-grid-column>
+        <tiny-grid-column field="qCode" title="需发布关联通告的主题" width="100"></tiny-grid-column>
+        <tiny-grid-column field="circumstances" title="需发布关联通告的事件场景"></tiny-grid-column>
+        <!--选择框-->
+        <tiny-grid-column field="example" width="50%" title="需通知关联通告的所属单位" :editor="{
+          component: TinyCascader,
+          attrs: {
+            filterable: true, clearable: true,
+            options: departmentTreeData,
+            props: {
+              children: 'children',
+              value: 'depID',
+              label: 'depName',
+              emitPath: false,
+              multiple: true,
+            },
+            placeholder: '请选择所属单位',
+            style: { width: '100%' }
+          },
+        }"></tiny-grid-column>
       </tiny-grid>
     </tiny-dialog-box>
   </div>
@@ -44,8 +54,8 @@
 
 <script setup lang="ts">
 import { ref, toRefs, defineProps, defineEmits, reactive, onMounted } from 'vue'
-import { TinyTabs, TinyTabItem, Modal, Loading, DialogBox as TinyDialogBox, TinyGrid, TinyGridColumn, Button as TinyButton, TinyGridToolbar } from '@opentiny/vue'
-import { queryTemplateDetail, queryByTemplateIdTemplateDetail, postMessage } from '@/api/fetchInterface';
+import { TinyTabs, TinyTabItem, Modal, Loading, DialogBox as TinyDialogBox, TinyGrid, TinyGridColumn, Button as TinyButton, TinyGridToolbar, TinyCascader } from '@opentiny/vue'
+import { queryTemplateDetail, queryByTemplateIdTemplateDetail, postMessage, queryDepartmentTreeList } from '@/api/fetchInterface';
 import { useRouter } from 'vue-router';
 import { isEmpty } from '@/utils/string-utils';
 import { useUserStore } from '@/store';
@@ -76,20 +86,16 @@ const tabsList = ref([
     name: '工作进展',
     title: '工作进展',
   },
-  // {
-  //   name: '会商审批',
-  //   title: '会商审批',
-  // },
 ])
 const toolbarButtons = ref([
   {
     code: 'relate',
-    name: '确定关联已选通告',
+    name: '通知关联单位',
     type: "primary"
   },
   {
     code: 'cancel',
-    name: '无需关联',
+    name: '无需通知',
     type: "danger"
   },
 ])
@@ -117,6 +123,7 @@ const templateData = ref({});
 const isNoAuth = ref(false);
 const basicGridRef = ref(null)
 const preCondition = ref(false);
+const departmentTreeData = ref([]);
 const userStore = useUserStore();
 // 请求数据接口方法
 const fetchData = async () => {
@@ -144,11 +151,16 @@ async function dialogClose(status: boolean) {
   // 如果status为true且配置了关联通告，需要关联通告
   if (status && !isEmpty(templateData.value.templateID)) {
     preCondition.value = false;
+    // 有关联通告才需要填写
     await queryByTemplateIdTemplateDetail({ templateId: templateData.value.templateID }).then((res: any) => {
       if (res.code === 200) {
         tableData = res.data;
-        boxVisibility.value = true;
-        //emit('close');
+        if (tableData.length > 0) {
+          boxVisibility.value = true;
+        }
+        else {
+          emit('close');
+        }
       }
     })
     //preCondition.value = true;
@@ -182,7 +194,7 @@ async function onSend(createData: any) {
       let messageData: any = {}
       messageData.qCode = createData.qCode;
       messageData.airSpaceCodeId = userStore.airSpaceCodeId || "";;
-      //messageData.type = createData.messageType;
+      messageData.type = "新发报文";
       //messageData.validType = createData.messageValidType;
       //messageData.lat = createData.qLat;
       //messageData.long = createData.qLong;
@@ -198,6 +210,7 @@ async function onSend(createData: any) {
         console.log(err);
         Modal.message({ message: `发送失败，原因${err}`, status: 'error' })
       });
+      emit('close')
     }
   })
 }
@@ -213,7 +226,20 @@ onMounted(async () => {
     await fetchData();
     preCondition.value = true;
   }
-  console.log("----------------------",localMessageID);
+  const { data } = await queryDepartmentTreeList();
+  departmentTreeData.value = data.children;
+  // // 测试用，后面删除
+  // await queryByTemplateIdTemplateDetail({ templateId: templateData.value.templateID }).then((res: any) => {
+  //   if (res.code === 200) {
+  //     tableData = res.data;
+  //     if (tableData.length > 0) {
+  //       boxVisibility.value = true;
+  //     }
+  //     else {
+  //       emit('close');
+  //     }
+  //   }
+  // })
 
 });
 </script>

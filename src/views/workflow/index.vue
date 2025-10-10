@@ -95,7 +95,6 @@ function handleSkip({ url }) {
 }
 
 const getFlyflow = async () => {
-    console.log(`${import.meta.env.VITE_API_WORKFLOW_URL}?token=${userWorkFlowStore.user.tokenValue}`);
     bridgeUrl.value = `${import.meta.env.VITE_API_WORKFLOW_URL}?token=${userWorkFlowStore.user.tokenValue}`;
 };
 

@@ -2,40 +2,37 @@
   <tiny-layout>
     <tiny-row v-if="preCondition" :flex="true" justify="center">
       <tiny-col>
-        <div class="col">
+        <div class="col" @click="goTask('待办')">
           <div class="title">
             <img src="@/assets/images/plan-1.png" />
-            <!-- <span>{{ $t('work.index.plans') }}</span> -->
             <span>待办</span>
           </div>
           <div>
-            <span class="plan-pass">{{numData.value.pendingNum}}</span>
+            <span class="plan-pass">{{ numData.value.pendingNum }}</span>
             <span class="num">&nbsp;/ {{ $t('work.index.Numbers') }}</span>
           </div>
         </div>
       </tiny-col>
       <tiny-col>
+        <div class="col" @click="goTask('已办')">
+          <div class="title">
+            <img src="@/assets/images/plan-3.png" />
+            <span>已办</span>
+          </div>
+          <div>
+            <span class="plan-fail">{{ numData.value.completedNum }}</span>
+            <span class="num">&nbsp;/ {{ $t('work.index.Numbers') }}</span>
+          </div>
+        </div>
+      </tiny-col>
+      <!-- <tiny-col>
         <div class="col">
           <div class="title">
             <img src="@/assets/images/plan-2.png" />
-            <!-- <span>{{ $t('work.index.Unfinished') }}</span> -->
-             <span>发起</span>
+            <span>发起</span>
           </div>
           <div>
-            <span class="plan-pass">{{numData.value.startedNum}}</span>
-            <span class="num">&nbsp;/ {{ $t('work.index.Numbers') }}</span>
-          </div>
-        </div>
-      </tiny-col>
-      <tiny-col>
-        <div class="col">
-          <div class="title">
-            <img src="@/assets/images/plan-3.png" />
-            <!-- <span>{{ $t('work.index.beOverdue') }}</span> -->
-            <span>已完成</span>
-          </div>
-          <div>
-            <span class="plan-fail">{{numData.value.completedNum}}</span>
+            <span class="plan-pass">{{ numData.value.startedNum }}</span>
             <span class="num">&nbsp;/ {{ $t('work.index.Numbers') }}</span>
           </div>
         </div>
@@ -44,21 +41,20 @@
         <div class="col">
           <div class="title">
             <img src="@/assets/images/plan-4.png" />
-            <!-- <span>{{ $t('work.index.Overdue') }}</span> -->
             <span>抄送</span>
           </div>
           <div>
-            <span class="plan-pass">{{numData.value.copyNum}}</span>
+            <span class="plan-pass">{{ numData.value.copyNum }}</span>
             <span class="num">&nbsp;/ {{ $t('work.index.Numbers') }}</span>
           </div>
         </div>
-      </tiny-col>
+      </tiny-col> -->
     </tiny-row>
   </tiny-layout>
 </template>
 
 <script lang="ts" setup>
-import { ref,reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import {
   Layout as TinyLayout,
   Row as TinyRow,
@@ -66,11 +62,24 @@ import {
   Modal
 } from '@opentiny/vue';
 import workflowaxios from '@/views/workflow/components/workflow-axios';
+import router from '@/router';
 
 const numData = reactive({
   completedNum: "0", copyNum: "0", pendingNum: "0", startedNum: "0",
 })
 const preCondition = ref(false)
+
+const goTask = (workflowStatus: string) => {
+  console.log(workflowStatus)
+  //message,exam
+  /*
+  router.push({
+    name: 'track',
+    query: {
+      workflowStatus
+    }
+  });*/
+}
 
 // 初始化请求数据
 onMounted(async () => {

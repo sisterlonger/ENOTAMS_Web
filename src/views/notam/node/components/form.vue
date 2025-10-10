@@ -1,6 +1,9 @@
 <template>
     <div>
         <tiny-form v-if="preCondition" ref="ruleFormRef" :model="createData" :rules="rules" label-width="125px">
+            <tiny-form-item label="事件场景" prop="circumstances" :validate-icon="validateIcon">
+                <tiny-input v-model="createData.circumstances" type="textarea" autosize></tiny-input>
+            </tiny-form-item>
             <tiny-form-item label="模版" prop="template" :validate-icon="validateIcon">
                 <tiny-input v-model="createData.template" type="textarea" autosize></tiny-input>
             </tiny-form-item>
@@ -54,7 +57,7 @@
             <tiny-form-item label="佐证性材料要求" prop="materials" :validate-icon="validateIcon">
                 <tiny-input v-model="createData.materials" placeholder="用、作分隔符" clearable></tiny-input>
             </tiny-form-item>
-            <tiny-form-item label="关联通告Q码" prop="relatedQCodes" :validate-icon="validateIcon">
+            <tiny-form-item v-show="false" label="关联通告Q码" prop="relatedQCodes" :validate-icon="validateIcon">
                 <tiny-input v-model="createData.relatedQCodes" placeholder="用、作分隔符" clearable></tiny-input>
             </tiny-form-item>
             <tiny-form-item label="关联通告Q码" prop="field">
@@ -99,6 +102,7 @@ const ruleFormRef = ref()
 const validateIcon = ref(iconWarning())
 const createData = reactive({
     templateID: null,
+    circumstances:"",
     template: '',
     remark: '',
     example: '',
@@ -117,6 +121,7 @@ const createData = reactive({
     relateNodeIds: [],
 })
 const rules = ref({
+    circumstances: [{ required: true, message: '必填', trigger: 'change' }],
     template: [{ required: true, message: '必填', trigger: 'change' }],
     example: [
         { required: false, message: '请输入例子', trigger: 'blur' },

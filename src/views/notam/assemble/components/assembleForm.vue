@@ -15,10 +15,10 @@
       <tiny-guide :show-step="showStep" :dom-data="domData"></tiny-guide>
       <tiny-row class="guide-box1">
         <tiny-divider content-position="left" offset="5%" font-size="20px" content-background-color="#1476ff"
-          content-color="#ffffff">限定行</tiny-divider>
+          content-color="#ffffff">请选择需要发布的通告类型</tiny-divider>
         <tiny-row>
           <tiny-col :span="8">
-            <tiny-form-item label="报文类型">
+            <tiny-form-item label="通告类型">
               <!--单选框-->
               <tiny-radio-group v-model="createData.messageType" :disabled="act === 'edit'"
                 @change="onChangeMessageType">
@@ -35,7 +35,12 @@
         </tiny-row>
         <tiny-row>
           <tiny-col :span="12">
-            <tiny-form-item label="Q项(限定行)">
+            <tiny-form-item label="Q项">
+              <template #label>
+                <tiny-tooltip type="info" content="根据需要修改发生地的经纬度信息和影响范围；默认所在机场" placement="top">
+                  <div>Q项<tiny-icon-help-solid class="IconHelpSolid"></tiny-icon-help-solid></div>
+                </tiny-tooltip>
+              </template>
               <tiny-col :span="isNoAuth ? 4 : 2.5" style="margin:2px" v-show="view">
                 <tiny-form-item label-width="60px" label="情报区">
                   <tiny-input v-model="createData.qAirSpace" :disabled="act === 'edit'"> </tiny-input>
@@ -146,9 +151,10 @@
       </tiny-row>
       <tiny-row class="guide-box3">
         <tiny-divider content-position="left" offset="5%" font-size="20px" content-background-color="#1476ff"
-          content-color="#ffffff">原始资料内容及影响范围</tiny-divider>
+          content-color="#ffffff">请选择或输入原始资料内容的必填项目和选填项目</tiny-divider>
         <!--E项-->
-        <tiny-form-item v-show="act === 'add'" label="原始资料内容">
+        <div style="margin: 1%;">事件场景:此模板用于发布新增的地空通信管制席位情况，需输入新增席位名称、中英文呼号和频率等信息生成原始资料通知单,可选择输入该设施所属机场。</div>
+        <tiny-form-item v-show="act === 'add'" label-width="0px">
           <tiny-collapse v-model="activeNames" class="demo-collapse-wrap">
             <tiny-collapse-item title="必填项" name="必填项">
               <tiny-col>
@@ -180,16 +186,6 @@
                 <tiny-form-item>
                   <div>备注</div>
                   <tiny-input v-model="createData.remark" type="textarea" autosize disabled> </tiny-input>
-                </tiny-form-item>
-              </tiny-col>
-              <tiny-col :span="12">
-                <tiny-form-item class="demo-image__keep-style">
-                  <tiny-form-item label='参考附件' class="demo-image__keep-style">
-                    <tiny-select v-model="attachment" :options="attachmentOptions" placeholder="请选择需要参考的附件"
-                      clearable></tiny-select>
-                  </tiny-form-item>
-                  <tiny-image v-if='false' :src="url" :preview-src-list="srcList" keep-style></tiny-image>
-                  <iframe v-show="attachment" :src="attachment" width="100%" height="600px" type="application/pdf" />
                 </tiny-form-item>
               </tiny-col>
             </tiny-collapse-item>
@@ -225,6 +221,10 @@
           content-color="#ffffff">原始资料通知单以及预览</tiny-divider>
         <!--预览--->
         <tiny-col :span="12">
+          <!--预览通知单-->
+          <tiny-row><tiny-col :span="12">
+              <exportMessage v-if="showNotice" :formData="createData" :act="'edit'" />
+            </tiny-col></tiny-row>
           <!--报文-->
           <tiny-form-item label="通告预览">
             <tiny-input v-model="createData.telegramText" type="textarea" autosize :disabled="act === 'edit'">
@@ -236,16 +236,8 @@
         <tiny-button type="primary" v-show="act == 'add'" @click="onAssemble()">预览</tiny-button>
         <tiny-button type="primary" v-show="!isEmpty(createData.telegramText) && act == 'add'"
           @click="onSend()">确认并开始上报流程</tiny-button>
-        <tiny-button v-show="!isEmpty(messageId)" type="primary" @click="onNotice()">生成通知单</tiny-button>
-        <!-- <tiny-button type="primary" 
-        :disabled="isEmpty(messageId)"
-         @click="onNotice()">生成通知单</tiny-button> -->
         <tiny-button v-if="act === 'edit'" type="primary" @click="copyToClipboard()"> 将通告发布至通告系统 </tiny-button>
       </tiny-form-item>
-      <!--预览通知单-->
-      <tiny-row><tiny-col :span="12">
-          <exportMessage v-if="showNotice" :formData="createData" />
-        </tiny-col></tiny-row>
     </tiny-form>
     <tiny-dialog-box :modal="false" v-if="boxDVisibility" v-model:visible="boxDVisibility" append-to-body title="编辑分段时间"
       width="35%" :close-on-click-modal="false">
@@ -263,8 +255,13 @@
       append-to-body title="原始资料上报流程" width="60%" :close-on-click-modal="false">
       <tiny-form label-width="150px">
         <tiny-form-item label="通告会商单位：">
+          <template #label>
+            <tiny-tooltip type="info" content="通告会商单位仅通知，无需其同意可继续进行流程" placement="top">
+              <div>通告会商单位：<tiny-icon-help-solid class="IconHelpSolid"></tiny-icon-help-solid></div>
+            </tiny-tooltip>
+          </template>
           <tiny-cascader ref="cascaderConsultationRef" v-model="consultationDepIds" :options="departmentTreeData"
-            placeholder="请选择该通告会商单位" filterable :props="{
+            placeholder="请选择该通告会商单位" filterable clearable :props="{
               children: 'children',
               value: 'depID',
               label: 'depName',
@@ -273,6 +270,11 @@
             }" @change="onChangeConsultationDepList"></tiny-cascader>
         </tiny-form-item>
         <tiny-form-item label="通告审批部门：">
+          <template #label>
+            <tiny-tooltip type="info" content="审批单位提供意见后方可继续" placement="top">
+              <div>通告审批部门：<tiny-icon-help-solid class="IconHelpSolid"></tiny-icon-help-solid></div>
+            </tiny-tooltip>
+          </template>
           <tiny-cascader ref="cascaderExamRef" v-model="examDepIds" :options="departmentTreeData"
             placeholder="请选择该通告审批单位" filterable :props="{
               children: 'children',
@@ -283,17 +285,10 @@
             }" @change="onChangeExamDepList"></tiny-cascader>
         </tiny-form-item>
         <tiny-form-item>
-          <tiny-button type="primary" @click="createProcess()">上报情报单位</tiny-button>
+          <tiny-button type="primary" @click="createProcess()">确定</tiny-button>
           <tiny-button type="info" @click="boxDepartmentVisibility = false">取消</tiny-button>
         </tiny-form-item>
       </tiny-form>
-
-      <!-- <tiny-col :span="2">审批部门：</tiny-col>
-      <tiny-col :span="10">
-        <tiny-tree :data="departmentTreeData" node-key="depID" :props="mapField" highlight-current current-node-key="1"
-          show-checkbox :show-contextmenu="true" :indent="16" show-line size="medium" :expand-on-click-node="false">
-        </tiny-tree>
-      </tiny-col> -->
     </tiny-dialog-box>
   </div>
 </template>
@@ -328,20 +323,24 @@ import {
   TinyGuide,
   TinyFloatbar,
   TinyCascader,
+  TinyTooltip,
 } from '@opentiny/vue'
 import { queryAirPortAndAirSpace, queryAirPortConfig, queryAirSpaceConfig, queryMessageDetail, postWorkflowId, postMessage, MessageVM, queryDepartmentTreeList } from '@/api/fetchInterface';
 import formgenerator from '@/components/formgenerator/index.vue';
 import schedulePicker from '@/components/schedulePicker/index.vue';
 import fgInput from '@/components/fginput/index.vue';
 import workflowaxios from '@/views/workflow/components/workflow-axios';
+import { iconHelpSolid } from '@opentiny/vue-icon'
 
 import { useUserStore, useWorkFlowStore } from '@/store';
 import { isEmpty } from '@/utils/string-utils';
 import exportMessage from './export.vue';
 
 
+const TinyIconHelpSolid = iconHelpSolid()
+
 const handleScheduleChange = (rule: any) => {
-  console.log('生成的规则：', rule);
+  //console.log('生成的规则：', rule);
   createData.d_time = rule;
   // 示例输出：
   // {
@@ -354,12 +353,6 @@ const userWorkFlowStore = useWorkFlowStore();
 const userStore = useUserStore();
 const childRef = ref<any>();
 const preCondition = ref(false);
-const url = ref(`https://res.hc-cdn.com/tiny-vue-saas/2.2.19.20240417162130/static/images/mountain.png`)
-const srcList = ref([
-  `https://res.hc-cdn.com/tiny-vue-saas/2.2.19.20240417162130/static/images/mountain.png`,
-  `https://res.hc-cdn.com/tiny-vue-saas/2.2.19.20240417162130/static/images/house.jpg`,
-  `https://res.hc-cdn.com/tiny-vue-saas/2.2.19.20240417162130/static/images/bridge.jpg`
-])
 const props = defineProps({
   templateID: Number,
   templateData: Object,
@@ -378,7 +371,6 @@ const departmentTreeData = ref([]);
 const consultationDepIds = ref([]);
 const examDepIds = ref([]);
 const consultationDepList = ref([]);
-const examDepList = ref([]);
 
 const examineDepList = ref([]);
 // 视角变量
@@ -387,8 +379,8 @@ const view = ref(false);
 const showStep = ref(false);
 const domData = ref([
   {
-    title: '限定行',
-    text: '请先选择报文类型,Q项内容无需填写(在A项填写后将自动填充)',
+    title: '需要发布的通告类型',
+    text: '请先选择通告类型,Q项内容无需填写(在A项填写后将自动填充)',
     domElement: '.guide-box1',
     button: [
       {
@@ -465,10 +457,11 @@ const createData = reactive({
   picturePath: '',
   state: '',
   remark: '',
-  // 报文类型
+  // 通告类型
   messageType: '新发报文',
   // 通告号
   messageId: '',
+  parentId: 0,
   // 报文生效类型
   messageValidType: 'NEITHER',
   // F/G项的基准面
@@ -537,10 +530,9 @@ const boxDVisibility = ref(false)
 const boxFVisibility = ref(false)
 const boxGVisibility = ref(false)
 const boxDepartmentVisibility = ref(false);
-// 报文类型
+// 通告类型
 const messageTypeOption = ref(['新发报文', '代替现有报文', '取消现有报文']);
 // 报文有效期类型
-//const messageValidTypeOption = ref(['EST', 'PERM', 'NEITHER']);
 const messageValidTypeOption = ref([{ text: '有确切的结束时间', label: 'NEITHER' }, { text: '永久有效', label: 'PERM' }, { text: '无法准确设定，只能预计', label: 'EST' }]);
 // 基准面类型
 const baseTypeOption = ref({
@@ -561,30 +553,6 @@ const baseTypeOption = ref({
     //{ field: 'fg', title: '', hidden: true },
   ]
 });
-// 机场图、情报图附件
-const attachment = ref();
-const attachmentOptions = ref([
-  {
-    label: '白云机场chart图',
-    value: '/pdf/白云机场chart图.pdf',
-  },
-  {
-    label: '白云机场高度chart图',
-    value: '/pdf/白云机场高度chart图.pdf',
-  },
-  {
-    label: '广州区域图',
-    value: '/pdf/广州区域图.pdf',
-  },
-  {
-    label: '航路图',
-    value: '/pdf/航路图.pdf',
-  },
-  {
-    label: '10A-RWY01L',
-    value: '/pdf/10A-RWY01L.pdf',
-  },
-]);
 const keyWord = ref();
 const keyWordLabel = ref();
 // 定义派发事件
@@ -627,7 +595,6 @@ onMounted(async () => {
   }
   // 用户只会发自己情报区的电报
   createData.qAirSpace = userStore.airSpaceCodeId || "";
-  console.log(createData.qAirSpace);
 });
 
 const handleMessage = async () => {
@@ -644,6 +611,8 @@ const handleMessage = async () => {
     createData.qRadius = data.radius;
     createData.telegramText = data.telegramText;
     createData.templateID = data.templateId;
+    createData.parentId = data.parentId;
+    console.log(data, createData.parentId);
     // 当已经提交后，不显示E项
     // 解析正文并赋值B、C、D、F、G项
     // 定义结果类型（严格约束键为 A-G）
@@ -670,15 +639,6 @@ const handleMessage = async () => {
         result[letter as keyof ResultType] = value.trim(); // 可选：去除首尾空格
       }
     });
-    // 输出验证（结果符合预期）
-    // console.log('A项:', result.A); // 输出："ZGGG"
-    // console.log('B项:', result.B); // 输出："2506150000"
-    // console.log('C项:', result.C); // 输出："2506170001"
-    // console.log('D项:', result.D); // 输出：""（空字符串）
-    // console.log('E项:', result.E); // 输出："RWY 01L/19R SALS不工作，因test."
-    // console.log('F项:', result.F); // 输出："SFC"
-    // console.log('G项:', result.G); // 输出："UNL"
-    // console.log(result);
     createData.b_time = result.B;
     createData.c_time = result.C;
     createData.d_time = result.D;
@@ -716,9 +676,10 @@ const fetchAirPortAndAirSpace = async () => {
 // 请求数据接口方法
 const fetchData = async () => {
   Object.assign(createData, templateData.value);
-  console.log(createData, templateData.value);
   handleKeyWord();
   if (act.value === 'add') {
+    // 加了handleMessage，不知道有没有影响，如果不加，那么parentId等数据不能导入
+    handleMessage();
     await fetchAirPortAndAirSpace();
   }
   else {
@@ -862,6 +823,7 @@ function onAssemble() {
     fgText = `\nF)${createData.f_lowerLimit} G)${createData.g_upperLimit}`
   }
   createData.telegramText = `${qText}\n${abcText}${dText}\n${eText}${fgText}`;
+  createData.e_data = eText
   showNotice.value = true;
   console.log("showNotice.value", showNotice.value);
 }
@@ -878,6 +840,7 @@ async function onSend() {
       messageData.radius = createData.qRadius;
       messageData.telegramText = createData.telegramText;
       messageData.templateId = templateID.value;
+      messageData.parentId = createData.parentId;
       if (!isEmpty(messageId)) {
         messageData.messageId = messageId.value;
       }
@@ -886,6 +849,7 @@ async function onSend() {
           Modal.message({ message: '发送成功', status: 'success' })
           messageId.value = res1.data;
           emit('createMessage', res1.data);
+          onNotice();
         }
       }).catch((err: any) => {
         console.log(err);
@@ -896,11 +860,11 @@ async function onSend() {
 }
 const onChangeConsultationDepList = () => {
   let checkVal = cascaderConsultationRef.value.getCheckedNodes(true);
-  consultationDepList.value = checkVal.map((item) => { return { id: item.value, type: "dept", name: item.label } })
+  consultationDepList.value = checkVal.map((item: any) => { return { id: item.value, type: "dept", name: item.label } })
 }
 const onChangeExamDepList = () => {
   let checkVal = cascaderExamRef.value.getCheckedNodes(true);
-  examineDepList.value = checkVal.map((item) => { return { id: item.value, type: "dept", name: item.label } })
+  examineDepList.value = checkVal.map((item: any) => { return { id: item.value, type: "dept", name: item.label } })
 }
 
 // 生成通知单事件
@@ -915,8 +879,6 @@ async function onNotice() {
 }
 // 创建流程
 const createProcess = async () => {
-  // console.log(consultationDepIds, examineDepList);
-  // console.log(consultationDepList, examineDepListResult);
   // 获取工作流流程列表
   await workflowaxios.get('/combination/group/listCurrentUserStartGroup?hidden=false', {
   }).then(async (res: any) => {
@@ -960,7 +922,7 @@ const createProcess = async () => {
       await workflowaxios.post('/process-instance/startProcessInstance',
         createProcessVM
       ).then(async (res2: any) => {
-        console.log("res2", res2);
+        //console.log("res2", res2);
         // 对应表flyflow_process_instance_record-process_instance_id
         let messageWorkflow = {
           messageId: messageId.value,
@@ -970,7 +932,6 @@ const createProcess = async () => {
         // 将messageId和workflowId关联起来
         await postWorkflowId(messageWorkflow).then((res3: any) => {
           if (res3.code === 200) {
-            //Modal.message({ message: '发送成功', status: 'success' })
             Modal.message({ message: '生成通知单成功', status: 'success' })
             // 自动通知对应q码的部门去填写
             emit('close', true);
@@ -979,7 +940,6 @@ const createProcess = async () => {
           console.log(err);
           Modal.message({ message: `通知单生成失败，原因${err}`, status: 'error' })
         });
-        //Modal.message({ message: '生成通知单成功', status: 'success' })
       }).catch((err: any) => {
         console.log(err);
         Modal.message({ message: `通知单生成失败，原因${err}`, status: 'error' })
@@ -1144,7 +1104,7 @@ function onChangeBaseType() {
     createData.qUpperLimit = "";
   }
 }
-// 改变报文类型事件
+// 改变通告类型事件
 function onChangeMessageType() {
   if (createData.messageType === "代替现有报文" || createData.messageType === "代替现有报文") {
     createData.b_time = getCurrentFormattedTime();
@@ -1200,9 +1160,5 @@ function onResizePdf() {
   .tiny-form-item {
     margin-bottom: 10px;
   }
-}
-
-.demo-image__keep-style {
-  /*idth: 200px;*/
 }
 </style>

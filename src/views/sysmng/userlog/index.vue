@@ -190,7 +190,6 @@ function formatIsoToSimple(isoString) {
 // 使用示例
 const isoTime = "2025-06-11T14:50:52.297+08:00";
 const formattedTime = formatIsoToSimple(isoTime);
-console.log(formattedTime); // 输出：2025-06-11 14:50:52
 // 获取列表数据
 async function getData({ page }) {
   //this.$trackEvent('button_click', { buttonId: 'myButton' });
@@ -205,7 +204,6 @@ async function getData({ page }) {
     formData.value.startTime = "";
     formData.value.endTime = "";
   }
-  console.log(formData.value);
   let response = await queryUserLogsList(formData.value);
   tableData.value = response.data;
   return Promise.resolve({
