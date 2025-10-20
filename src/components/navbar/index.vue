@@ -10,6 +10,9 @@
       </div>
     </div>
     <ul class="right-side">
+      <li>
+        <span>当前登录人：{{ data.userName }}</span>
+      </li>
       <li v-if="false">
         <input id="navbar-search" class="input-icon" :placeholder="$t('setting.input.search')" />
       </li>
@@ -25,7 +28,6 @@
         {{ item.label }}</li>
   </div>
   </li>
-
   <li>
     <span @click="help">{{ $t('settings.navbar.help') }}</span>
   </li>

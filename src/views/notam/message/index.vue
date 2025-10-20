@@ -89,6 +89,7 @@
             <tiny-grid-toolbar :buttons="toolbarButtons"></tiny-grid-toolbar>
           </template>
           <tiny-grid-column type="index" width="60"></tiny-grid-column>
+          <tiny-grid-column field="messageId" title="通告号" width="60"></tiny-grid-column>
           <!-- <tiny-grid-column field="qCode" title="Q码"></tiny-grid-column> -->
           <tiny-grid-column field="airSpaceCodeId" title="发生地" width="10%"></tiny-grid-column>
           <tiny-grid-column field="type" title="报文类型" width="10%"></tiny-grid-column>
@@ -106,7 +107,7 @@
             <template #default="data">
               <!-- <tiny-button v-show="data.row.status !== '未开始'" v-track="'电报'" size="mini" type="success"
                 @click="editRowEvent(data.row, '电报')">电报</tiny-button> -->
-                <tiny-button v-show="data.row.workflowStatus === '未开始'" v-track="'详情'" size="mini" type="info"
+              <tiny-button v-show="data.row.workflowStatus === '未开始'" v-track="'详情'" size="mini" type="info"
                 @click="editRowEvent(data.row, '处理关联通告')">处理关联通告</tiny-button>
               <tiny-button v-show="data.row.status !== '未开始'" v-track="'详情'" size="mini" type="info"
                 @click="editRowEvent(data.row, '详情')">详情</tiny-button>
@@ -115,9 +116,9 @@
               <tiny-button v-show="data.row.status === '已完成'" v-track="'发布'" size="mini" type="success"
                 @click="editRowEvent(data.row, '发布')">发布</tiny-button>
               <tiny-button v-show="data.row.status === '已发布'" v-track="'代替'" size="mini" type="primary"
-                @click="editRowEvent(data.row, '代替')">代替</tiny-button>
+                @click="editRowEvent(data.row, '代替')">代替报</tiny-button>
               <tiny-button v-show="data.row.status === '已发布'" v-track="'取消'" size="mini" type="primary"
-                @click="editRowEvent(data.row, '取消')">取消</tiny-button>
+                @click="editRowEvent(data.row, '取消')">取消报</tiny-button>
             </template>
           </tiny-grid-column>
         </tiny-grid>
@@ -132,9 +133,9 @@
             :flowId="flowId" :taskId="taskId" :act="act" @close="dialogClose" />
         </tiny-dialog-box>
         <!--新增的关联通告-->
-        <tiny-dialog-box :modal="false" v-if="addVisibility" v-model:visible="addVisibility" title="详情"
-          width="80%" max-height="1000px" top="5%" :close-on-click-modal="true">
-          <enotam :messageId="messageId" :templateID="templateId" :act="act" @close="dialogClose" />
+        <tiny-dialog-box :modal="false" v-if="addVisibility" v-model:visible="addVisibility" title="详情" width="80%"
+          max-height="1000px" top="5%" :close-on-click-modal="true">
+          <enotam :messageId="messageId" :templateID="templateId" :parentId="parentId" :messageType="messageType" :act="act" @close="dialogClose" />
         </tiny-dialog-box>
       </div>
     </div>
@@ -175,6 +176,8 @@ const messageVisibility = ref(false)
 const workflowVisibility = ref(false)
 const addVisibility = ref(false)
 const messageId = ref(0)
+const parentId = ref(0)
+const messageType=ref("")
 const templateId = ref(0)
 const processInstanceId = ref("")
 const flowId = ref("")
@@ -220,19 +223,19 @@ const statusOptions = [
     value: '已发布',
     label: '已发布'
   },
-   {
+  {
     value: '已代替',
     label: '已代替'
   },
-   {
+  {
     value: '已取消',
     label: '已取消'
   },
-   {
+  {
     value: '已完成',
     label: '已完成'
   },
-   {
+  {
     value: '未开始',
     label: '未开始'
   },
@@ -279,7 +282,7 @@ function renderName(h, { row }) {
 const route = useRoute()
 
 // 监听路由参数变化
-watch(() => route.query.workflowStatus, async(newStatus) => {
+watch(() => route.query.workflowStatus, async (newStatus) => {
   if (newStatus) {
     formData.value.workflowStatus = newStatus
     // 可选：自动触发查询
@@ -350,31 +353,39 @@ const editRowEvent = async (row, type) => {
 
   }
   else if (type === "取消") {
-    await publishMessage(publishData).then(async (res) => {
-      console.log("res", res);
-      if (res.code === 200) {
-        Modal.alert({ message: '取消成功', status: 'success' })
-      }
-    })
-    await queryClick();
+    act.value = "add";
+    messageType.value ="cnl"
+    addVisibility.value = true;
+    parentId.value = messageId.value;
+    messageId.value = null;
   }
   else if (type === "代替") {
-    await publishMessage(publishData).then(async (res) => {
-      console.log("res", res);
-      if (res.code === 200) {
-        Modal.alert({ message: '代替成功', status: 'success' })
-      }
-    })
-    await queryClick();
+    // await publishMessage(publishData).then(async (res) => {
+    //   console.log("res", res);
+    //   if (res.code === 200) {
+    //     act.value = "add";
+    //     addVisibility.value = true;
+    //     messageId.value = res.data;
+    //     //Modal.alert({ message: '代替成功', status: 'success' })
+    //   }
+    // })
+    // await queryClick();
+    act.value = "add";
+    messageType.value ="replace"
+    addVisibility.value = true;
+    parentId.value = messageId.value;
+    messageId.value = null;
   }
 }
 // 关闭弹窗
 function dialogClose() {
   messageId.value = 0;
   templateId.value = 0;
+  parentId.value = 0;
   processInstanceId.value = "";
   flowId.value = "0";
   act.value = "";
+  messageType.value = ""
   messageVisibility.value = false;
   workflowVisibility.value = false;
   addVisibility.value = false;
@@ -384,6 +395,7 @@ const fetchConfig = async () => {
   let airspaceList = await queryAirSpaceList();
   airSpaceOptions.value = airspaceList.data;
 }
+
 // 初始化请求数据
 onMounted(async () => {
   // 检查是否有传入的workflowStatus参数

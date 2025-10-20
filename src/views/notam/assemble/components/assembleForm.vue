@@ -325,7 +325,7 @@ import {
   TinyCascader,
   TinyTooltip,
 } from '@opentiny/vue'
-import { queryAirPortAndAirSpace, queryAirPortConfig, queryAirSpaceConfig, queryMessageDetail, postWorkflowId, postMessage, MessageVM, queryDepartmentTreeList } from '@/api/fetchInterface';
+import { queryAirPortAndAirSpace, queryAirPortConfig, queryAirSpaceConfig, queryMessageDetail, postWorkflowId, postMessage, MessageVM, queryDepartmentTreeList, setDepId } from '@/api/fetchInterface';
 import formgenerator from '@/components/formgenerator/index.vue';
 import schedulePicker from '@/components/schedulePicker/index.vue';
 import fgInput from '@/components/fginput/index.vue';
@@ -357,13 +357,17 @@ const props = defineProps({
   templateID: Number,
   templateData: Object,
   messageId: Number,
+  parentId: Number,
   isNoAuth: Boolean,
   act: String,
+  messageType:String
 });
 const { templateID } = toRefs(props);
 const { templateData } = toRefs(props);
+const { parentId } = toRefs(props);
 const { messageId } = toRefs(props);
 const { act } = toRefs(props);
+const { messageType } = toRefs(props);
 // 会商部门/审批部门
 const cascaderConsultationRef = ref()
 const cascaderExamRef = ref()
@@ -592,6 +596,15 @@ watch(
 onMounted(async () => {
   if (templateID.value) {
     fetchData();
+  }
+  console.log(parentId.value);
+  if(isEmpty(messageId.value) && messageType.value === "cnl"){
+    createData.messageType = "取消现有报文"
+    onChangeMessageType()
+  }
+  else if(isEmpty(messageId.value) && messageType.value === "replace"){
+    createData.messageType = "代替现有报文"
+    onChangeMessageType()
   }
   // 用户只会发自己情报区的电报
   createData.qAirSpace = userStore.airSpaceCodeId || "";
@@ -840,7 +853,14 @@ async function onSend() {
       messageData.radius = createData.qRadius;
       messageData.telegramText = createData.telegramText;
       messageData.templateId = templateID.value;
-      messageData.parentId = createData.parentId;
+      // 代替取消报要记录parentid
+      if (messageType.value === 'replace' || messageType.value === 'cnl') {
+        messageData.parentId = parentId.value;
+      }
+      else {
+        messageData.parentId = createData.parentId;
+      }
+      console.log(messageData);
       if (!isEmpty(messageId)) {
         messageData.messageId = messageId.value;
       }
@@ -930,11 +950,25 @@ const createProcess = async () => {
         }
         //console.log(messageWorkflow);
         // 将messageId和workflowId关联起来
-        await postWorkflowId(messageWorkflow).then((res3: any) => {
+        await postWorkflowId(messageWorkflow).then(async (res3: any) => {
           if (res3.code === 200) {
-            Modal.message({ message: '生成通知单成功', status: 'success' })
-            // 自动通知对应q码的部门去填写
-            emit('close', true);
+            // 将审批单位和会商单位关联起来
+            let setDepVM = {
+              messageId: messageId.value,
+              receiveDepId: examineDepList.value[0].id,
+              consultDepId: consultationDepList.value.map(item => item.id).join(','),
+            }
+            await setDepId(setDepVM).then((res4: any) => {
+              if (res4.code === 200) {
+                Modal.message({ message: '生成通知单成功', status: 'success' })
+                // 自动通知对应q码的部门去填写
+                emit('close', true);
+              }
+            }).catch((err: any) => {
+              console.log(err);
+              Modal.message({ message: `通知单生成成功，原因${err}`, status: 'error' })
+            });
+
           }
         }).catch((err: any) => {
           console.log(err);

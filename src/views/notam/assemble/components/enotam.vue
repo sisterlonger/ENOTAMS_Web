@@ -3,9 +3,9 @@
     <tiny-tabs v-if="preCondition" v-model="activeName" tab-style="border-card" size="small">
       <!--报文记录-->
       <tiny-tab-item :key="tabsList[0].name" :title="tabsList[0].title" :name="tabsList[0].name">
-        <assembleForm :messageId="localMessageID" :templateID="localTemplateID" :templateData="templateData"
-          :isNoAuth="isNoAuth" :act="act" :processInstanceId="processInstanceId || '0'" :flowId="flowId || '0'"
-          @close="dialogClose" @createMessage="createMessage" />
+        <assembleForm :messageId="localMessageID" :parentId="parentId" :messageType="messageType" :templateID="localTemplateID"
+          :templateData="templateData" :isNoAuth="isNoAuth" :act="act" :processInstanceId="processInstanceId || '0'"
+          :flowId="flowId || '0'" @close="dialogClose" @createMessage="createMessage" />
       </tiny-tab-item>
       <!--附件记录-->
       <tiny-tab-item :key="tabsList[1].name" :title="tabsList[1].title" :name="tabsList[1].name">
@@ -31,7 +31,7 @@
         <tiny-grid-column field="qCode" title="需发布关联通告的主题" width="100"></tiny-grid-column>
         <tiny-grid-column field="circumstances" title="需发布关联通告的事件场景"></tiny-grid-column>
         <!--选择框-->
-        <tiny-grid-column field="example" width="50%" title="需通知关联通告的所属单位" :editor="{
+        <tiny-grid-column field="sendDepId" width="50%" title="需通知关联通告的所属单位" :editor="{
           component: TinyCascader,
           attrs: {
             filterable: true, clearable: true,
@@ -41,7 +41,7 @@
               value: 'depID',
               label: 'depName',
               emitPath: false,
-              multiple: true,
+              multiple: false,
             },
             placeholder: '请选择所属单位',
             style: { width: '100%' }
@@ -106,15 +106,19 @@ const boxVisibility = ref(false)
 const props = defineProps({
   templateID: Number,
   messageId: Number,
+  parentId: Number,
   processInstanceId: String,
   flowId: String,
   act: String,
+  messageType: String,
 });
 const { templateID } = toRefs(props);
 const { messageId } = toRefs(props);
+const { parentId } = toRefs(props);
 const { processInstanceId } = toRefs(props);
 const { flowId } = toRefs(props);
 const { act } = toRefs(props);
+const { messageType } = toRefs(props);
 // 本地响应式变量存储路由参数,会优先接受路由的query，再接收props
 const localTemplateID = ref<number | undefined>(undefined);
 const localMessageID = ref<number | undefined>(undefined);
@@ -156,6 +160,9 @@ async function dialogClose(status: boolean) {
       if (res.code === 200) {
         tableData = res.data;
         if (tableData.length > 0) {
+          tableData.forEach((item: any) => {
+            item.sendDepId = null;
+          });
           boxVisibility.value = true;
         }
         else {
@@ -201,7 +208,11 @@ async function onSend(createData: any) {
       messageData.radius = createData.qRadius;
       //messageData.telegramText = createData.telegramText;
       messageData.templateId = createData.templateID;
+      // 关联通告的父id就是当前报文id
       messageData.parentId = localMessageID.value;
+      //console.log(tableData);
+      // 单选，如果多选，就会出现错误，错误原因是后端要int
+      messageData.sendDepId = createData.sendDepId;
       await postMessage(messageData).then((res1: any) => {
         if (res1.code === 200) {
           Modal.message({ message: '发送成功', status: 'success' })

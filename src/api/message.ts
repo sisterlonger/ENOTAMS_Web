@@ -36,6 +36,11 @@ export interface PublishVM {
     messageId: number;
     state: string;
 }
+export interface SetDepIdVM {
+    messageId: number;
+    receiveDepId: number;
+    consultDepId: string;
+}
 export function queryMessageList(params: MessageSearch) {
     return axios.get('/message/list', { params });
 }
@@ -60,4 +65,8 @@ export function queryGetRelateMessage(params: { id: number }) {
     return axios.get('/message/getrelatemessage', {
         params,
     });
+}
+
+export function setDepId(data: SetDepIdVM) {
+    return axios.post<SetDepIdVM>('/message/setdepid', data);
 }
