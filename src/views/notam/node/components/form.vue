@@ -43,12 +43,14 @@
                 <tiny-select v-model="createData.qLowerLimit" clearable searchable>
                     <tiny-option value="000">000</tiny-option>
                     <tiny-option value="与F项一致">与F项一致</tiny-option>
+                    <tiny-option value="">空</tiny-option>
                 </tiny-select>
             </tiny-form-item>
             <tiny-form-item label="上限" prop="qUpperLimit" :validate-icon="validateIcon">
                 <tiny-select v-model="createData.qUpperLimit" clearable searchable>
                     <tiny-option value="999">999</tiny-option>
                     <tiny-option value="与G项一致">与G项一致</tiny-option>
+                    <tiny-option value="">空</tiny-option>
                 </tiny-select>
             </tiny-form-item>
             <tiny-form-item label="半径" prop="qRadius" :validate-icon="validateIcon">

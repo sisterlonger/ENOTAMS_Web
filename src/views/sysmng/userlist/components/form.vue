@@ -14,7 +14,6 @@
                 <tiny-select v-model="createData.role" clearable searchable>
                     <tiny-option v-for="item in roleList" :key="item.roleName" :label="item.roleName"
                         :value="item.roleName"></tiny-option>
-
                 </tiny-select>
             </tiny-form-item>
             <tiny-form-item label="部门" prop="depID" :validate-icon="validateIcon">
@@ -57,7 +56,6 @@ import { iconWarning } from '@opentiny/vue-icon';
 import { useWorkFlowStore } from '@/store';
 import workflowaxios from '@/views/workflow/components/workflow-axios';
 import { queryUserDetail, postUser, queryDepartmentTreeList, queryRoleList } from '@/api/fetchInterface';
-import { Avatar } from '@opentiny/vue';
 
 const props = defineProps({
     userID: Number,

@@ -89,7 +89,7 @@
             <tiny-grid-toolbar :buttons="toolbarButtons"></tiny-grid-toolbar>
           </template>
           <tiny-grid-column type="index" width="60"></tiny-grid-column>
-          <tiny-grid-column field="messageId" title="通告号" width="60"></tiny-grid-column>
+          <tiny-grid-column field="messageId" title="通告序列号" width="60"></tiny-grid-column>
           <!-- <tiny-grid-column field="qCode" title="Q码"></tiny-grid-column> -->
           <tiny-grid-column field="airSpaceCodeId" title="发生地" width="10%"></tiny-grid-column>
           <tiny-grid-column field="type" title="报文类型" width="10%"></tiny-grid-column>

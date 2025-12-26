@@ -86,3 +86,7 @@ export function deleteUser(ids: []) {
 export function postUser(data: UserVM) {
   return axios.post<UserVM>('/user/post', data);
 }
+
+export function resetPwdUser(ids: []) {
+  return axios.post('/user/resetpwd', ids);
+}

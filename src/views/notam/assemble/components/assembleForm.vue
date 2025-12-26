@@ -28,7 +28,7 @@
             </tiny-form-item>
           </tiny-col>
           <tiny-col :span="4" v-show="createData.messageType !== '新发报文'">
-            <tiny-form-item label="通告号">
+            <tiny-form-item label="通告序列号">
               <tiny-input v-model="createData.messageId" :disabled="act === 'edit'"> </tiny-input>
             </tiny-form-item>
           </tiny-col>
@@ -225,6 +225,10 @@
           <tiny-row><tiny-col :span="12">
               <exportMessage v-if="showNotice" :formData="createData" :act="'edit'" />
             </tiny-col></tiny-row>
+          <!--序列号-->
+          <tiny-form-item label="提供序列号">
+            <tiny-input v-model="createData.serialNumber" :disabled="act === 'edit'"></tiny-input>
+          </tiny-form-item>
           <!--报文-->
           <tiny-form-item label="通告预览">
             <tiny-input v-model="createData.telegramText" type="textarea" autosize :disabled="act === 'edit'">
@@ -499,6 +503,8 @@ const createData = reactive({
   h_coordinate: '',
   // 电报正文
   telegramText: '',
+  // 序列号
+  serialNumber: '',
 
 })
 // 基准面
@@ -842,7 +848,8 @@ function onAssemble() {
 }
 
 async function onSend() {
-  Modal.confirm(`确认并开始上报流程？确定后将无法编辑！`).then(async (res: string) => {
+  let confirmText = `${isEmpty(createData.serialNumber)?'序列号为空！将使用系统自动生成的序列号':''}确认并开始上报流程？确定后将无法编辑！`
+  Modal.confirm(confirmText).then(async (res: string) => {
     if (res === 'confirm') {
       messageData.qCode = createData.qCode;
       messageData.airSpaceCodeId = createData.qAirSpace;

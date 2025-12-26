@@ -57,11 +57,15 @@
                     <tiny-grid-column field="email" title="邮箱"></tiny-grid-column>
                     <tiny-grid-column title="操作" width="200" align="center">
                         <template #default="data">
-                            <tiny-button size="mini" type="primary" @click="editRowEvent(data.row)">编辑</tiny-button>
+                            <tiny-button size="mini" type="primary"
+                                @click="editRowEvent(data.row, 'edit')">编辑</tiny-button>
+                            <tiny-button size="mini" type="warning"
+                                @click="editRowEvent(data.row, 'reset')">重置密码</tiny-button>
                         </template>
                     </tiny-grid-column>
                 </tiny-grid>
-                <tiny-dialog-box  :modal="false" v-if="boxVisibility" v-model:visible="boxVisibility" title="编辑" width="30%">
+                <tiny-dialog-box :modal="false" v-if="boxVisibility" v-model:visible="boxVisibility" title="编辑"
+                    width="30%">
                     <userForm :userID="userID" @close="dialogClose" />
                 </tiny-dialog-box>
             </div>
@@ -77,7 +81,7 @@ import {
     CollapseItem as TinyCollapseItem, Cascader as TinyCascader,
 } from '@opentiny/vue';
 import router from '@/router';
-import { queryUserList, deleteUser, queryDepartmentTreeList } from '@/api/fetchInterface';
+import { queryUserList, deleteUser, queryDepartmentTreeList, resetPwdUser } from '@/api/fetchInterface';
 import { useWorkFlowStore } from '@/store';
 import workflowaxios from '@/views/workflow/components/workflow-axios';
 import userForm from './components/form.vue';
@@ -128,9 +132,24 @@ async function getData({ page }) {
     })
 }
 // 行操作
-const editRowEvent = (row) => {
-    userID.value = row.userID;
-    boxVisibility.value = true;
+const editRowEvent = (row, type) => {
+    if (type === 'edit') {
+        userID.value = row.userID;
+        boxVisibility.value = true;
+    }
+    else if (type === 'reset') {
+        resetPwdUser([row.userID]).then((res) => {
+            Modal.message({
+                message: '已重置密码，密码为a000000@',
+                status: 'success',
+            });
+        }).catch((err) => {
+            Modal.message({
+                message: `重置密码失败,错误信息为:${err.message}`,
+                status: 'error',
+            });
+        });
+    }
 }
 // 表操作
 const toolbarButtons = ref([

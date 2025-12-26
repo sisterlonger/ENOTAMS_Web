@@ -1,6 +1,6 @@
 <template>
     <div class="demo-form">
-        <tiny-form v-if="preCondition" ref="ruleFormRef" :model="createData" :rules="rules" label-width="100px">
+        <tiny-form v-if="preCondition" ref="ruleFormRef" overflow-title :model="createData" :rules="rules" label-width="200px">
             <tiny-form-item v-if="createData.fullName" label="全称" prop="fullName">
                 <tiny-input v-model="createData.fullName" disabled></tiny-input>
             </tiny-form-item>
@@ -18,6 +18,12 @@
             </tiny-form-item>
             <tiny-form-item v-if="createData.fullName"  label="所属机场" prop="field">
                 <tiny-select v-model="createData.airPortCodeId" placeholder="请选择所属机场" filterable>
+                    <tiny-option v-for="item in airportOptions" :key="item.codeId" :label="item.codeId"
+                        :value="item.codeId"></tiny-option>
+                </tiny-select>
+            </tiny-form-item>
+            <tiny-form-item v-if="createData.fullName && createData.field==='FF'"  label="负责提供情报服务的机场" prop="field">
+                <tiny-select v-model="createData.manageAirPortCodeIds" placeholder="请选择负责提供情报服务的机场" multiple filterable>
                     <tiny-option v-for="item in airportOptions" :key="item.codeId" :label="item.codeId"
                         :value="item.codeId"></tiny-option>
                 </tiny-select>
@@ -83,6 +89,8 @@ const createData = reactive({
     fullName: "",
     airSpaceCodeId: '',
     airPortCodeId: '',
+    // 所负责的机场
+    manageAirPortCodeIds: [],
     // get
     nodes: [],
     // set
