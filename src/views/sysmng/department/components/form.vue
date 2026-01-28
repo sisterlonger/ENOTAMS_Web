@@ -1,6 +1,7 @@
 <template>
     <div class="demo-form">
-        <tiny-form v-if="preCondition" ref="ruleFormRef" overflow-title :model="createData" :rules="rules" label-width="200px">
+        <tiny-form v-if="preCondition" ref="ruleFormRef" overflow-title :model="createData" :rules="rules"
+            label-width="200px">
             <tiny-form-item v-if="createData.fullName" label="全称" prop="fullName">
                 <tiny-input v-model="createData.fullName" disabled></tiny-input>
             </tiny-form-item>
@@ -16,13 +17,13 @@
                         :value="item.codeId"></tiny-option>
                 </tiny-select>
             </tiny-form-item>
-            <tiny-form-item v-if="createData.fullName"  label="所属机场" prop="field">
+            <tiny-form-item v-if="createData.fullName" label="所属机场" prop="field">
                 <tiny-select v-model="createData.airPortCodeId" placeholder="请选择所属机场" filterable>
                     <tiny-option v-for="item in airportOptions" :key="item.codeId" :label="item.codeId"
                         :value="item.codeId"></tiny-option>
                 </tiny-select>
             </tiny-form-item>
-            <tiny-form-item v-if="createData.fullName && createData.field==='FF'"  label="负责提供情报服务的机场" prop="field">
+            <tiny-form-item v-if="createData.fullName && createData.field === 'FF'" label="负责提供情报服务的机场" prop="field">
                 <tiny-select v-model="createData.manageAirPortCodeIds" placeholder="请选择负责提供情报服务的机场" multiple filterable>
                     <tiny-option v-for="item in airportOptions" :key="item.codeId" :label="item.codeId"
                         :value="item.codeId"></tiny-option>
@@ -43,7 +44,7 @@
                 </tiny-button>
             </tiny-form-item>
         </tiny-form>
-        <tiny-dialog-box  :modal="false" v-if="boxVisibility" v-model:visible="boxVisibility" title="编辑" width="30%">
+        <tiny-dialog-box :modal="false" v-if="boxVisibility" v-model:visible="boxVisibility" title="编辑" width="30%">
             <Child :parentDep="createData" @close="dialogClose" />
         </tiny-dialog-box>
     </div>
@@ -64,9 +65,11 @@ import {
 import { iconWarning } from '@opentiny/vue-icon';
 import { queryDepartmentDetail, postDepartment, deleteDepartment, queryAirPortList, queryAirSpaceList } from '@/api/fetchInterface';
 import { useWorkFlowStore } from '@/store';
+import { isEmpty } from '@/utils/string-utils';
 import workflowaxios from '@/views/workflow/components/workflow-axios';
 import qcodeTree from '@/components/qcodeTree/index.vue';
 import Child from './child.vue';
+
 
 const props = defineProps({
     depID: Number,
@@ -147,8 +150,12 @@ const fetchData = async () => {
         createData.nodes = [];
         createData.fullName = data.fullName;
         createData.nodes = data.nodes.map((item: any) => { return item.nodeID });
+        createData.manageAirPortCodeIds = isEmpty(createData.manageAirPortCodeIds) ?
+            [] :
+            createData.manageAirPortCodeIds.split(',').filter(Boolean);
     }
     catch (err) {
+        console.log(err)
         Modal.alert('获取数据错误');
         emit('close');
     }
@@ -195,6 +202,7 @@ function handleSubmit() {
         if (valid) {
             // 配置Q码
             createData.nodeIds = createData.nodes;
+            createData.manageAirPortCodeIds = createData.manageAirPortCodeIds.join(",");
             /*
             // 组装全称--不需要，这个应该是后端处理
             if (createData.fullName.split("-").pop() !== createData.depName) {

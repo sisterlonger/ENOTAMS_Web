@@ -34,12 +34,12 @@
                 </tr>
                 <tr>
                     <td colspan="3">
-                        <span class="print-only">提供序列号：{{ serialNumber }}</span> <!-- 打印时显示 -->
+                        <span class="print-only">通告序列号：{{ formData.notamSn }}</span> <!-- 打印时显示 -->
                         <div class="no-print"> <!-- 非打印时显示输入框 -->
-                            <label for="serialNumberInput">提供序列号：</label>
+                            <label for="serialNumberInput">通告序列号：{{ formData.notamSn }}</label>
                             <tiny-input id="serialNumberInput" :style="{
                                 width: '200px'
-                            }" v-model="serialNumber" placeholder="请输入序列号" v-if="act !== 'detail'"></tiny-input>
+                            }" v-model="formData.notamSn" placeholder="请输入序列号" v-if="act !== 'detail'"></tiny-input>
                         </div>
                     </td>
                     <td colspan="3">生效日期和时间：{{ formatCustomDate(formData.b_time) }}</td>
@@ -79,7 +79,7 @@
                     <td colspan="6" class="u-blod center">6.回执</td>
                 </tr>
                 <tr>
-                    <td colspan="6">提供序列号：{{ serialNumber }}
+                    <td colspan="6">通告序列号：{{ formData.notamSn }}
                         <br>收集单位：{{ pageData.receiveDepName }}
                         <br>收集人：{{ pageData.receiveUserName }}
                         <br>收集时间：{{ formatCustomDate(formattedTime) }}
@@ -109,7 +109,6 @@ const { formData } = toRefs(props);
 const { act } = toRefs(props);
 const preCondition = ref(false);
 const pageData = reactive({});
-const serialNumber = ref(formData.value?.messageId || "");
 const exportPDF = () => {
     let iframeBody = document.getElementById(
         "exportElementProcessOperate"

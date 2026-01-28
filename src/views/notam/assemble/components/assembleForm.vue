@@ -29,7 +29,7 @@
           </tiny-col>
           <tiny-col :span="4" v-show="createData.messageType !== '新发报文'">
             <tiny-form-item label="通告序列号">
-              <tiny-input v-model="createData.messageId" :disabled="act === 'edit'"> </tiny-input>
+              <tiny-input v-model="createData.aftnSn" :disabled="act === 'edit'"> </tiny-input>
             </tiny-form-item>
           </tiny-col>
         </tiny-row>
@@ -130,7 +130,7 @@
                 format="yyMMddHHmm" value-format="yyMMddHHmm" :disabled="act === 'edit'"></tiny-date-picker>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="6" v-if="createData.messageValidType !== 'PERM'">
+          <tiny-col :span="6" v-if="createData.messageValidType !== 'PERM' && createData.messageType !== '代替现有报文' && createData.messageType !== '取消现有报文'">
             <!--时间-->
             <tiny-form-item label="事件失效时间">
               <tiny-date-picker v-model="createData.c_time" type="datetime" placeholder="请选择失效时间（北京时）"
@@ -138,7 +138,7 @@
             </tiny-form-item>
           </tiny-col>
           <tiny-row>
-            <tiny-col :span="12">
+            <tiny-col :span="12" v-if="createData.messageType !== '代替现有报文' && createData.messageType !== '取消现有报文'">
               <!--分段时间-->
               <tiny-form-item label="分段时间">
                 <tiny-input v-model="createData.d_time" placeholder="如分时间段进行，请选择自定义时间（北京时）" :disabled="act === 'edit'"
@@ -226,8 +226,8 @@
               <exportMessage v-if="showNotice" :formData="createData" :act="'edit'" />
             </tiny-col></tiny-row>
           <!--序列号-->
-          <tiny-form-item label="提供序列号">
-            <tiny-input v-model="createData.serialNumber" :disabled="act === 'edit'"></tiny-input>
+          <tiny-form-item label="通告序列号">
+            <tiny-input v-model="createData.notamSn" :disabled="act === 'edit'"></tiny-input>
           </tiny-form-item>
           <!--报文-->
           <tiny-form-item label="通告预览">
@@ -503,8 +503,10 @@ const createData = reactive({
   h_coordinate: '',
   // 电报正文
   telegramText: '',
-  // 序列号
-  serialNumber: '',
+  // 提供序列号
+  notamSn: '',
+  // 通告序列号
+  aftnSn: '',
 
 })
 // 基准面
@@ -848,7 +850,7 @@ function onAssemble() {
 }
 
 async function onSend() {
-  let confirmText = `${isEmpty(createData.serialNumber)?'序列号为空！将使用系统自动生成的序列号':''}确认并开始上报流程？确定后将无法编辑！`
+  let confirmText = `${isEmpty(createData.notamSn)?'序列号为空！将使用系统自动生成的序列号':''}确认并开始上报流程？确定后将无法编辑！`
   Modal.confirm(confirmText).then(async (res: string) => {
     if (res === 'confirm') {
       messageData.qCode = createData.qCode;

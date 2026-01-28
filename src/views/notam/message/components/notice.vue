@@ -101,6 +101,7 @@ const fetchData = async () => {
     try {
         const { data } = await queryMessageDetail({ id: messageId.value });
         Object.assign(formData, data);
+        console.log("formData--------",formData)
     }
     catch (err) {
         console.log(err);
