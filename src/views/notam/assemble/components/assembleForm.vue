@@ -258,7 +258,7 @@
     <tiny-dialog-box :modal="false" v-if="boxDepartmentVisibility" v-model:visible="boxDepartmentVisibility"
       append-to-body title="原始资料上报流程" width="60%" :close-on-click-modal="false">
       <tiny-form label-width="150px">
-        <tiny-form-item label="通告会商单位：">
+        <tiny-form-item label="通告会商单位：" v-if="createData.needConsult == true">
           <template #label>
             <tiny-tooltip type="info" content="通告会商单位仅通知，无需其同意可继续进行流程" placement="top">
               <div>通告会商单位：<tiny-icon-help-solid class="IconHelpSolid"></tiny-icon-help-solid></div>
@@ -287,6 +287,21 @@
               emitPath: false,
               multiple: true
             }" @change="onChangeExamDepList"></tiny-cascader>
+        </tiny-form-item>
+        <tiny-form-item label="通告审批领导部门：">
+          <template #label>
+            <tiny-tooltip type="info" content="审批单位提供意见后方可继续" placement="top">
+              <div>通告审批领导部门：<tiny-icon-help-solid class="IconHelpSolid"></tiny-icon-help-solid></div>
+            </tiny-tooltip>
+          </template>
+          <tiny-cascader ref="cascaderExamLeaderRef" v-model="examLeaderDepIds" :options="departmentTreeData"
+            placeholder="请选择该通告审批领导部门：" filterable :props="{
+              children: 'children',
+              value: 'depID',
+              label: 'depName',
+              emitPath: false,
+              multiple: true
+            }" @change="onChangeExamLeaderDepList"></tiny-cascader>
         </tiny-form-item>
         <tiny-form-item>
           <tiny-button type="primary" @click="createProcess()">确定</tiny-button>
@@ -375,12 +390,17 @@ const { messageType } = toRefs(props);
 // 会商部门/审批部门
 const cascaderConsultationRef = ref()
 const cascaderExamRef = ref()
+const cascaderExamLeaderRef = ref()
 const departmentTreeData = ref([]);
 const consultationDepIds = ref([]);
 const examDepIds = ref([]);
+const examLeaderDepIds = ref([]);
 const consultationDepList = ref([]);
 
 const examineDepList = ref([]);
+const examineLeaderDepList = ref([]);
+
+
 // 视角变量
 const view = ref(false);
 // 引导变量
@@ -465,6 +485,7 @@ const createData = reactive({
   picturePath: '',
   state: '',
   remark: '',
+  needConsult: false,
   // 通告类型
   messageType: '新发报文',
   // 通告号
@@ -697,6 +718,7 @@ const fetchAirPortAndAirSpace = async () => {
 // 请求数据接口方法
 const fetchData = async () => {
   Object.assign(createData, templateData.value);
+  console.log(templateData?.value,"-----------------");
   handleKeyWord();
   if (act.value === 'add') {
     // 加了handleMessage，不知道有没有影响，如果不加，那么parentId等数据不能导入
@@ -896,6 +918,11 @@ const onChangeExamDepList = () => {
   examineDepList.value = checkVal.map((item: any) => { return { id: item.value, type: "dept", name: item.label } })
 }
 
+const onChangeExamLeaderDepList = () => {
+  let checkVal = cascaderExamLeaderRef.value.getCheckedNodes(true);
+  examineLeaderDepList.value = checkVal.map((item: any) => { return { id: item.value, type: "dept", name: item.label } })
+}
+
 // 生成通知单事件
 async function onNotice() {
   // 获取所有通知单列表
@@ -934,14 +961,16 @@ const createProcess = async () => {
       let consultationNumber = workflowFormList.find((item: any) => item.name === "会商数量");
       let examineNumber = workflowFormList.find((item: any) => item.name === "审批部门数量");
       let consultationDep = workflowFormList.find((item: any) => item.name === "需要会签的部门");
-      let examineDep = workflowFormList.find((item: any) => item.name === "需要审批的部门");
+      let examineDep = workflowFormList.find((item: any) => item.name === "需要审批的情报部门");
+      let examineLeaderDep = workflowFormList.find((item: any) => item.name === "情报领导所在的部门");
       let link = workflowFormList.find((item: any) => item.name === "超链接");
-      console.log(consultationNumber, examineNumber, consultationDep, examineDep, link);
+      console.log("------------------examineLeaderDep",examineLeaderDep,consultationNumber, examineNumber, consultationDep, examineDep, link);
       createProcessVM.paramMap = {
         [consultationNumber.id]: consultationDepList.value.length,
         [consultationDep.id]: consultationDepList.value,
         [examineNumber.id]: examineDepList.value.length,
         [examineDep.id]: examineDepList.value,
+        [examineLeaderDep.id]: examineLeaderDepList.value,
         [link.id]: `${import.meta.env.VITE_BASE_URL}/vue-pro/enotam?templateID=${messageData.templateId || createData.templateID}&messageId=${messageId.value}`,
         // 这里需要配置对应用户的id
         startUserMainDeptId: userWorkFlowStore.user.depidId
@@ -965,7 +994,9 @@ const createProcess = async () => {
             let setDepVM = {
               messageId: messageId.value,
               receiveDepId: examineDepList.value[0].id,
-              consultDepId: consultationDepList.value.map(item => item.id).join(','),
+              consultDepId: [...new Set([...consultationDepList.value.map(item => item.id),
+                                          ...examineLeaderDepList.value.map(item => item.id)
+                                        ])].join(','),
             }
             await setDepId(setDepVM).then((res4: any) => {
               if (res4.code === 200) {

@@ -56,6 +56,12 @@
             <tiny-form-item label="半径" prop="qRadius" :validate-icon="validateIcon">
                 <tiny-input v-model="createData.qRadius"></tiny-input>
             </tiny-form-item>
+            <tiny-form-item label="是否需要会商" prop="needConsult" :validate-icon="validateIcon">
+                <tiny-radio-group v-model="createData.needConsult">
+                    <tiny-radio :label="true">是</tiny-radio>
+                    <tiny-radio :label="false">否</tiny-radio>
+                </tiny-radio-group>
+            </tiny-form-item>
             <tiny-form-item label="佐证性材料要求" prop="materials" :validate-icon="validateIcon">
                 <tiny-input v-model="createData.materials" placeholder="用、作分隔符" clearable></tiny-input>
             </tiny-form-item>
@@ -87,7 +93,7 @@ import {
     Numeric as TinyNumeric, Select as TinySelect,
     Option as TinyOption,
     Row as TinyRow,
-    Col as TinyCol,
+    Col as TinyCol,TinyRadio, TinyRadioGroup
 } from '@opentiny/vue'
 import { iconWarning } from '@opentiny/vue-icon';
 import qcodeTree from '@/components/qcodeTree/index.vue';
@@ -104,7 +110,7 @@ const ruleFormRef = ref()
 const validateIcon = ref(iconWarning())
 const createData = reactive({
     templateID: null,
-    circumstances:"",
+    circumstances: "",
     template: '',
     remark: '',
     example: '',
@@ -116,6 +122,7 @@ const createData = reactive({
     qUpperLimit: '',
     qRadius: '',
     materials: "",
+    needConsult: false,
     relatedQCodes: "",
     // get
     relateNodes: [],

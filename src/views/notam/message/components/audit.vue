@@ -75,13 +75,15 @@ const fetchData = async () => {
             let consultationNumber = workflowFormList.find((item: any) => item.name === "会商数量");
             let examineNumber = workflowFormList.find((item: any) => item.name === "审批部门数量");
             let consultationDep = workflowFormList.find((item: any) => item.name === "需要会签的部门");
-            let examineDep = workflowFormList.find((item: any) => item.name === "需要审批的部门");
+            let examineDep = workflowFormList.find((item: any) => item.name === "需要审批的情报部门");
+            let examineLeaderDep = workflowFormList.find((item: any) => item.name === "情报领导所在的部门");
             let link = workflowFormList.find((item: any) => item.name === "超链接");
             let map = {
                 [consultationNumber.id]: consultationNumber.props.value,
                 [consultationDep.id]: consultationDep.props.value,
                 [examineNumber.id]: examineNumber.props.value,
                 [examineDep.id]: examineDep.props.value,
+                [examineLeaderDep.id]: examineLeaderDep.props.value,
                 [link.id]: link.props.value,
             };
             Object.assign(paramMap, map);

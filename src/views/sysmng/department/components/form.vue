@@ -8,6 +8,16 @@
             <tiny-form-item label="部门名" prop="depName">
                 <tiny-input v-model="createData.depName"></tiny-input>
             </tiny-form-item>
+            <tiny-form-item v-if="createData.fullName" label="流程审批部门" prop="manageDepID">
+                <tiny-cascader v-model="createData.manageDepID" :options="departmentOptions" style="width:100%" :props="{
+                    children: 'children',
+                    value: 'depID',
+                    label: 'depName',
+                    emitPath: false,
+                    multiple: true
+                }" autosize filterable clearable>
+                </tiny-cascader>
+            </tiny-form-item>
             <tiny-form-item v-if="createData.fullName" label="专业" prop="field">
                 <tiny-input v-model="createData.field"></tiny-input>
             </tiny-form-item>
@@ -59,11 +69,12 @@ import {
     Button as TinyButton,
     Loading,
     Modal,
+    Cascader as TinyCascader,
     Numeric as TinyNumeric,
     DialogBox as TinyDialogBox, Notify, Select as TinySelect, Option as TinyOption,
 } from '@opentiny/vue';
 import { iconWarning } from '@opentiny/vue-icon';
-import { queryDepartmentDetail, postDepartment, deleteDepartment, queryAirPortList, queryAirSpaceList } from '@/api/fetchInterface';
+import { queryDepartmentDetail, postDepartment, deleteDepartment, queryAirPortList, queryAirSpaceList, queryDepartmentTreeList } from '@/api/fetchInterface';
 import { useWorkFlowStore } from '@/store';
 import { isEmpty } from '@/utils/string-utils';
 import workflowaxios from '@/views/workflow/components/workflow-axios';
@@ -94,6 +105,8 @@ const createData = reactive({
     airPortCodeId: '',
     // 所负责的机场
     manageAirPortCodeIds: [],
+    // 领导部门
+    manageDepID: [],
     // get
     nodes: [],
     // set
@@ -107,6 +120,8 @@ const rules = ref({
         { required: false, message: '必填', trigger: 'blur' },
     ],
 })
+const departmentOptions = ref([
+])
 
 // 加载效果
 const state = reactive<{
@@ -115,6 +130,10 @@ const state = reactive<{
     loading: null,
 });
 
+const getNodeDataSync = async () => {
+    const { data } = await queryDepartmentTreeList();
+    return data.children;
+}
 const fetchConfig = async () => {
     state.loading = Loading.service({
         text: 'loading...',
@@ -126,10 +145,12 @@ const fetchConfig = async () => {
         airportOptions.value = airportList.data;
         let airspaceList = await queryAirSpaceList();
         airspaceOptions.value = airspaceList.data;
+        departmentOptions.value = await getNodeDataSync();
 
     }
     catch (err) {
-        Modal.alert('获取数据错误');
+        console.log(err);
+        Modal.alert(`获取数据错误${err}`);
         emit('close');
     }
     finally {
@@ -153,10 +174,13 @@ const fetchData = async () => {
         createData.manageAirPortCodeIds = isEmpty(createData.manageAirPortCodeIds) ?
             [] :
             createData.manageAirPortCodeIds.split(',').filter(Boolean);
+        createData.manageDepID = isEmpty(createData.manageDepID) ?
+            [] :
+            createData.manageDepID.split(',').filter(Boolean).map(item => Number(item));;
     }
     catch (err) {
-        console.log(err)
-        Modal.alert('获取数据错误');
+        console.log(err);
+        Modal.alert(`获取数据错误${err}`);
         emit('close');
     }
     finally {
@@ -202,7 +226,12 @@ function handleSubmit() {
         if (valid) {
             // 配置Q码
             createData.nodeIds = createData.nodes;
-            createData.manageAirPortCodeIds = createData.manageAirPortCodeIds.join(",");
+            if (createData.manageAirPortCodeIds) {
+                createData.manageAirPortCodeIds = createData.manageAirPortCodeIds.join(",");
+            }
+            if (createData.manageDepID) {
+                createData.manageDepID = createData.manageDepID.join(",");
+            }
             /*
             // 组装全称--不需要，这个应该是后端处理
             if (createData.fullName.split("-").pop() !== createData.depName) {
