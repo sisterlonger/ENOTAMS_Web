@@ -258,6 +258,21 @@
     <tiny-dialog-box :modal="false" v-if="boxDepartmentVisibility" v-model:visible="boxDepartmentVisibility"
       append-to-body title="原始资料上报流程" width="60%" :close-on-click-modal="false">
       <tiny-form label-width="150px">
+        <tiny-form-item label="收集领导单位：">
+          <template #label>
+            <tiny-tooltip type="info" content="收集领导单位提供意见后方可继续" placement="top">
+              <div>收集领导单位：<tiny-icon-help-solid class="IconHelpSolid"></tiny-icon-help-solid></div>
+            </tiny-tooltip>
+          </template>
+          <tiny-cascader ref="cascaderLeaderRef" v-model="leaderDepIds" :options="departmentTreeData"
+            placeholder="请选择该收集领导单位：" filterable clearable :props="{
+              children: 'children',
+              value: 'depID',
+              label: 'depName',
+              emitPath: false,
+              multiple: true
+            }" @change="onChangeLeaderDepList"></tiny-cascader>
+        </tiny-form-item>
         <tiny-form-item label="通告会商单位：" v-if="createData.needConsult == true">
           <template #label>
             <tiny-tooltip type="info" content="通告会商单位仅通知，无需其同意可继续进行流程" placement="top">
@@ -390,15 +405,19 @@ const { messageType } = toRefs(props);
 // 会商部门/审批部门
 const cascaderConsultationRef = ref()
 const cascaderExamRef = ref()
+const cascaderLeaderRef = ref()
 const cascaderExamLeaderRef = ref()
 const departmentTreeData = ref([]);
+const leaderDepIds = ref([]);
 const consultationDepIds = ref([]);
 const examDepIds = ref([]);
 const examLeaderDepIds = ref([]);
 const consultationDepList = ref([]);
 
+const leaderDepList = ref([]);
 const examineDepList = ref([]);
 const examineLeaderDepList = ref([]);
+
 
 
 // 视角变量
@@ -909,6 +928,11 @@ async function onSend() {
     }
   })
 }
+
+const onChangeLeaderDepList = () => {
+  let checkVal = cascaderLeaderRef.value.getCheckedNodes(true);
+  leaderDepList.value = checkVal.map((item: any) => { return { id: item.value, type: "dept", name: item.label } })
+}
 const onChangeConsultationDepList = () => {
   let checkVal = cascaderConsultationRef.value.getCheckedNodes(true);
   consultationDepList.value = checkVal.map((item: any) => { return { id: item.value, type: "dept", name: item.label } })
@@ -960,13 +984,15 @@ const createProcess = async () => {
       // 获取名为超链接的，并且附上templateId和messageid构建的链接
       let consultationNumber = workflowFormList.find((item: any) => item.name === "会商数量");
       let examineNumber = workflowFormList.find((item: any) => item.name === "审批部门数量");
+      let leaderDep = workflowFormList.find((item: any) => item.name === "收集领导所在的部门");
       let consultationDep = workflowFormList.find((item: any) => item.name === "需要会签的部门");
       let examineDep = workflowFormList.find((item: any) => item.name === "需要审批的情报部门");
       let examineLeaderDep = workflowFormList.find((item: any) => item.name === "情报领导所在的部门");
       let link = workflowFormList.find((item: any) => item.name === "超链接");
-      console.log("------------------examineLeaderDep",examineLeaderDep,consultationNumber, examineNumber, consultationDep, examineDep, link);
+      //console.log("------------------examineLeaderDep",examineLeaderDep,consultationNumber, examineNumber, consultationDep, examineDep, link);
       createProcessVM.paramMap = {
         [consultationNumber.id]: consultationDepList.value.length,
+        [leaderDep.id]: leaderDepList.value,
         [consultationDep.id]: consultationDepList.value,
         [examineNumber.id]: examineDepList.value.length,
         [examineDep.id]: examineDepList.value,
@@ -994,7 +1020,8 @@ const createProcess = async () => {
             let setDepVM = {
               messageId: messageId.value,
               receiveDepId: examineDepList.value[0].id,
-              consultDepId: [...new Set([...consultationDepList.value.map(item => item.id),
+              consultDepId: [...new Set([ ...leaderDepList.value.map(item => item.id),
+                                          ...consultationDepList.value.map(item => item.id),
                                           ...examineLeaderDepList.value.map(item => item.id)
                                         ])].join(','),
             }
