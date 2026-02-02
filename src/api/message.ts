@@ -41,6 +41,13 @@ export interface SetDepIdVM {
     receiveDepId: number;
     consultDepId: string;
 }
+export interface CreateWorkflowVM {
+    messageId: number;
+    templateId: string;
+    authUserId:string;
+    authorization:string;
+    flyflowTenantId:string;
+}
 export function queryMessageList(params: MessageSearch) {
     return axios.get('/message/list', { params });
 }
@@ -54,6 +61,9 @@ export function deleteMessage(ids: []) {
 }
 export function postMessage(data: MessageVM) {
     return axios.post<MessageVM>('/message/post', data);
+}
+export function createWorkflow(data: CreateWorkflowVM) {
+    return axios.post<MessageVM>('/message/createworkflow', data);
 }
 export function postWorkflowId(data: MessageWorkflowVM) {
     return axios.post<MessageWorkflowVM>('/message/postworkflowid', data);

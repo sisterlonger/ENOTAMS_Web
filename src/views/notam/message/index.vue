@@ -403,48 +403,6 @@ onMounted(async () => {
     formData.value.workflowStatus = route.query.workflowStatus
   }
   await fetchConfig();
-  // 获取已办、待办、发起
-  // 获取具体某个流程实例的详情
-  // await workflowaxios.get('/process-instance/queryDetailByProcessInstanceId',
-  //       {params:{processInstanceId:"e055348b-5d5c-11f0-a1ba-0242ac150004"}}
-  //     ).then(async (res2: any) => {
-  //       console.log("res2", res2);
-
-  //     }).catch((err: any) => {
-  //       console.log(err);
-  //       Modal.message({ message: `通知单生成失败，原因${err}`, status: 'error' })
-  //     });
-  // 待办
-  // await workflowaxios.post('combination/group/queryTodoTaskList', {
-  //   "pageNum": 1,
-  //   "pageSize": 1000
-  // },).then((res1) => {
-  //   workFlowList.value = workFlowList.value.concat(res1.data.data.records)
-  // }).catch((err) => {
-  //   console.log(err);
-  //   Modal.message({ message: `获取流程详情失败，原因：${err}`, status: 'error' })
-  // });
-  // 发起
-  // await workflowaxios.post('/combination/group/queryInitiatedTaskList', {
-  //   "pageNum": 1,
-  //   "pageSize": 1000
-  // },).then((res1) => {
-  //   workFlowList.value = workFlowList.value.concat(res1.data.data.records)
-  // }).catch((err) => {
-  //   console.log(err);
-  //   Modal.message({ message: `获取流程详情失败，原因：${err}`, status: 'error' })
-  // });
-  // 已办
-  // await workflowaxios.post('/combination/group/queryFinishedTaskList', {
-  //   "pageNum": 1,
-  //   "pageSize": 1000
-  // },).then((res1) => {
-  //   workFlowList.value = workFlowList.value.concat(res1.data.data.records)
-  // }).catch((err) => {
-  //   console.log(err);
-  //   Modal.message({ message: `获取流程详情失败，原因：${err}`, status: 'error' })
-  // });
-  // workFlowList.value = uniqueByProp(workFlowList.value, "processInstanceId")
   preCondition.value = true;
 });
 </script>

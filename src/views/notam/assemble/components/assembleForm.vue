@@ -130,7 +130,8 @@
                 format="yyMMddHHmm" value-format="yyMMddHHmm" :disabled="act === 'edit'"></tiny-date-picker>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="6" v-if="createData.messageValidType !== 'PERM' && createData.messageType !== '代替现有报文' && createData.messageType !== '取消现有报文'">
+          <tiny-col :span="6"
+            v-if="createData.messageValidType !== 'PERM' && createData.messageType !== '代替现有报文' && createData.messageType !== '取消现有报文'">
             <!--时间-->
             <tiny-form-item label="事件失效时间">
               <tiny-date-picker v-model="createData.c_time" type="datetime" placeholder="请选择失效时间（北京时）"
@@ -258,21 +259,6 @@
     <tiny-dialog-box :modal="false" v-if="boxDepartmentVisibility" v-model:visible="boxDepartmentVisibility"
       append-to-body title="原始资料上报流程" width="60%" :close-on-click-modal="false">
       <tiny-form label-width="150px">
-        <tiny-form-item label="收集领导单位：">
-          <template #label>
-            <tiny-tooltip type="info" content="收集领导单位提供意见后方可继续" placement="top">
-              <div>收集领导单位：<tiny-icon-help-solid class="IconHelpSolid"></tiny-icon-help-solid></div>
-            </tiny-tooltip>
-          </template>
-          <tiny-cascader ref="cascaderLeaderRef" v-model="leaderDepIds" :options="departmentTreeData"
-            placeholder="请选择该收集领导单位：" filterable clearable :props="{
-              children: 'children',
-              value: 'depID',
-              label: 'depName',
-              emitPath: false,
-              multiple: true
-            }" @change="onChangeLeaderDepList"></tiny-cascader>
-        </tiny-form-item>
         <tiny-form-item label="通告会商单位：" v-if="createData.needConsult == true">
           <template #label>
             <tiny-tooltip type="info" content="通告会商单位仅通知，无需其同意可继续进行流程" placement="top">
@@ -287,36 +273,6 @@
               emitPath: false,
               multiple: true
             }" @change="onChangeConsultationDepList"></tiny-cascader>
-        </tiny-form-item>
-        <tiny-form-item label="通告审批部门：">
-          <template #label>
-            <tiny-tooltip type="info" content="审批单位提供意见后方可继续" placement="top">
-              <div>通告审批部门：<tiny-icon-help-solid class="IconHelpSolid"></tiny-icon-help-solid></div>
-            </tiny-tooltip>
-          </template>
-          <tiny-cascader ref="cascaderExamRef" v-model="examDepIds" :options="departmentTreeData"
-            placeholder="请选择该通告审批单位" filterable :props="{
-              children: 'children',
-              value: 'depID',
-              label: 'depName',
-              emitPath: false,
-              multiple: true
-            }" @change="onChangeExamDepList"></tiny-cascader>
-        </tiny-form-item>
-        <tiny-form-item label="通告审批领导部门：">
-          <template #label>
-            <tiny-tooltip type="info" content="审批单位提供意见后方可继续" placement="top">
-              <div>通告审批领导部门：<tiny-icon-help-solid class="IconHelpSolid"></tiny-icon-help-solid></div>
-            </tiny-tooltip>
-          </template>
-          <tiny-cascader ref="cascaderExamLeaderRef" v-model="examLeaderDepIds" :options="departmentTreeData"
-            placeholder="请选择该通告审批领导部门：" filterable :props="{
-              children: 'children',
-              value: 'depID',
-              label: 'depName',
-              emitPath: false,
-              multiple: true
-            }" @change="onChangeExamLeaderDepList"></tiny-cascader>
         </tiny-form-item>
         <tiny-form-item>
           <tiny-button type="primary" @click="createProcess()">确定</tiny-button>
@@ -359,7 +315,7 @@ import {
   TinyCascader,
   TinyTooltip,
 } from '@opentiny/vue'
-import { queryAirPortAndAirSpace, queryAirPortConfig, queryAirSpaceConfig, queryMessageDetail, postWorkflowId, postMessage, MessageVM, queryDepartmentTreeList, setDepId } from '@/api/fetchInterface';
+import { queryAirPortAndAirSpace, queryAirPortConfig, queryAirSpaceConfig, queryMessageDetail, postMessage, MessageVM, queryDepartmentTreeList, createWorkflow } from '@/api/fetchInterface';
 import formgenerator from '@/components/formgenerator/index.vue';
 import schedulePicker from '@/components/schedulePicker/index.vue';
 import fgInput from '@/components/fginput/index.vue';
@@ -394,7 +350,7 @@ const props = defineProps({
   parentId: Number,
   isNoAuth: Boolean,
   act: String,
-  messageType:String
+  messageType: String
 });
 const { templateID } = toRefs(props);
 const { templateData } = toRefs(props);
@@ -404,19 +360,10 @@ const { act } = toRefs(props);
 const { messageType } = toRefs(props);
 // 会商部门/审批部门
 const cascaderConsultationRef = ref()
-const cascaderExamRef = ref()
-const cascaderLeaderRef = ref()
-const cascaderExamLeaderRef = ref()
 const departmentTreeData = ref([]);
-const leaderDepIds = ref([]);
 const consultationDepIds = ref([]);
-const examDepIds = ref([]);
-const examLeaderDepIds = ref([]);
 const consultationDepList = ref([]);
 
-const leaderDepList = ref([]);
-const examineDepList = ref([]);
-const examineLeaderDepList = ref([]);
 
 
 
@@ -646,11 +593,11 @@ onMounted(async () => {
     fetchData();
   }
   console.log(parentId.value);
-  if(isEmpty(messageId.value) && messageType.value === "cnl"){
+  if (isEmpty(messageId.value) && messageType.value === "cnl") {
     createData.messageType = "取消现有报文"
     onChangeMessageType()
   }
-  else if(isEmpty(messageId.value) && messageType.value === "replace"){
+  else if (isEmpty(messageId.value) && messageType.value === "replace") {
     createData.messageType = "代替现有报文"
     onChangeMessageType()
   }
@@ -737,7 +684,7 @@ const fetchAirPortAndAirSpace = async () => {
 // 请求数据接口方法
 const fetchData = async () => {
   Object.assign(createData, templateData.value);
-  console.log(templateData?.value,"-----------------");
+  console.log(templateData?.value, "-----------------");
   handleKeyWord();
   if (act.value === 'add') {
     // 加了handleMessage，不知道有没有影响，如果不加，那么parentId等数据不能导入
@@ -891,7 +838,7 @@ function onAssemble() {
 }
 
 async function onSend() {
-  let confirmText = `${isEmpty(createData.notamSn)?'序列号为空！将使用系统自动生成的序列号':''}确认并开始上报流程？确定后将无法编辑！`
+  let confirmText = `${isEmpty(createData.notamSn) ? '序列号为空！将使用系统自动生成的序列号' : ''}确认并开始上报流程？确定后将无法编辑！`
   Modal.confirm(confirmText).then(async (res: string) => {
     if (res === 'confirm') {
       messageData.qCode = createData.qCode;
@@ -929,127 +876,49 @@ async function onSend() {
   })
 }
 
-const onChangeLeaderDepList = () => {
-  let checkVal = cascaderLeaderRef.value.getCheckedNodes(true);
-  leaderDepList.value = checkVal.map((item: any) => { return { id: item.value, type: "dept", name: item.label } })
-}
 const onChangeConsultationDepList = () => {
   let checkVal = cascaderConsultationRef.value.getCheckedNodes(true);
   consultationDepList.value = checkVal.map((item: any) => { return { id: item.value, type: "dept", name: item.label } })
-}
-const onChangeExamDepList = () => {
-  let checkVal = cascaderExamRef.value.getCheckedNodes(true);
-  examineDepList.value = checkVal.map((item: any) => { return { id: item.value, type: "dept", name: item.label } })
-}
-
-const onChangeExamLeaderDepList = () => {
-  let checkVal = cascaderExamLeaderRef.value.getCheckedNodes(true);
-  examineLeaderDepList.value = checkVal.map((item: any) => { return { id: item.value, type: "dept", name: item.label } })
 }
 
 // 生成通知单事件
 async function onNotice() {
   // 获取所有通知单列表
   // 弹出选择框（选择对应的部门）
-  boxDepartmentVisibility.value = true;
   const { data } = await queryDepartmentTreeList();
   //departmentTreeData.value = { data: data.children };
   departmentTreeData.value = data.children;
-
+  // 有会商需求，才显示弹窗
+  console.log("needConsult",createData.needConsult);
+  if (createData.needConsult) {
+    boxDepartmentVisibility.value = true;
+  }
+  // 没有会商需求就直接自动生成
+  else {
+    createProcess();
+  }
 }
 // 创建流程
 const createProcess = async () => {
-  // 获取工作流流程列表
-  await workflowaxios.get('/combination/group/listCurrentUserStartGroup?hidden=false', {
-  }).then(async (res: any) => {
-    let workflowList = res.data.data[0].items;
-    let createProcessVM = {
-      flowId: "",
-      uniqueId: "",
-      paramMap: {},
+  let vm = {
+    messageId: messageId.value,
+    templateId: messageData.templateId,
+    consultationDepIds: consultationDepList.value.map(item => item.id).join(","),
+    authUserId: workflowaxios.defaults.headers.common.AuthUserId,
+    authorization: workflowaxios.defaults.headers.common.Authorization,
+    flyflowTenantId: workflowaxios.defaults.headers.common.FlyflowTenantId || "1"
+
+  }
+  await createWorkflow(vm).then((res1: any) => {
+    if (res1.code === 200) {
+      Modal.message({ message: '发送成功', status: 'success' })
+      boxDepartmentVisibility.value = false;
+      emit('close', false);
     }
-    workflowList.forEach((item: any) => {
-      if (item.name.includes("会商")) {
-        createProcessVM.uniqueId = item.uniqueId;
-        createProcessVM.flowId = item.flowId;
-      }
-    });
-
-    // 填入表单对应的内容
-    await workflowaxios.post('/form/getFormDetail', {
-      flowId: createProcessVM.flowId,
-      from: "start",
-    }).then(async (res1: any) => {
-      let workflowFormList = res1.data.data.formList;
-      // 获取名为超链接的，并且附上templateId和messageid构建的链接
-      let consultationNumber = workflowFormList.find((item: any) => item.name === "会商数量");
-      let examineNumber = workflowFormList.find((item: any) => item.name === "审批部门数量");
-      let leaderDep = workflowFormList.find((item: any) => item.name === "收集领导所在的部门");
-      let consultationDep = workflowFormList.find((item: any) => item.name === "需要会签的部门");
-      let examineDep = workflowFormList.find((item: any) => item.name === "需要审批的情报部门");
-      let examineLeaderDep = workflowFormList.find((item: any) => item.name === "情报领导所在的部门");
-      let link = workflowFormList.find((item: any) => item.name === "超链接");
-      //console.log("------------------examineLeaderDep",examineLeaderDep,consultationNumber, examineNumber, consultationDep, examineDep, link);
-      createProcessVM.paramMap = {
-        [consultationNumber.id]: consultationDepList.value.length,
-        [leaderDep.id]: leaderDepList.value,
-        [consultationDep.id]: consultationDepList.value,
-        [examineNumber.id]: examineDepList.value.length,
-        [examineDep.id]: examineDepList.value,
-        [examineLeaderDep.id]: examineLeaderDepList.value,
-        [link.id]: `${import.meta.env.VITE_BASE_URL}/vue-pro/enotam?templateID=${messageData.templateId || createData.templateID}&messageId=${messageId.value}`,
-        // 这里需要配置对应用户的id
-        startUserMainDeptId: userWorkFlowStore.user.depidId
-      };
-
-      // 创建流程
-      await workflowaxios.post('/process-instance/startProcessInstance',
-        createProcessVM
-      ).then(async (res2: any) => {
-        //console.log("res2", res2);
-        // 对应表flyflow_process_instance_record-process_instance_id
-        let messageWorkflow = {
-          messageId: messageId.value,
-          workflowId: res2.data.data,
-        }
-        //console.log(messageWorkflow);
-        // 将messageId和workflowId关联起来
-        await postWorkflowId(messageWorkflow).then(async (res3: any) => {
-          if (res3.code === 200) {
-            // 将审批单位和会商单位关联起来
-            let setDepVM = {
-              messageId: messageId.value,
-              receiveDepId: examineDepList.value[0].id,
-              consultDepId: [...new Set([ ...leaderDepList.value.map(item => item.id),
-                                          ...consultationDepList.value.map(item => item.id),
-                                          ...examineLeaderDepList.value.map(item => item.id)
-                                        ])].join(','),
-            }
-            await setDepId(setDepVM).then((res4: any) => {
-              if (res4.code === 200) {
-                Modal.message({ message: '生成通知单成功', status: 'success' })
-                // 自动通知对应q码的部门去填写
-                emit('close', true);
-              }
-            }).catch((err: any) => {
-              console.log(err);
-              Modal.message({ message: `通知单生成成功，原因${err}`, status: 'error' })
-            });
-
-          }
-        }).catch((err: any) => {
-          console.log(err);
-          Modal.message({ message: `通知单生成失败，原因${err}`, status: 'error' })
-        });
-      }).catch((err: any) => {
-        console.log(err);
-        Modal.message({ message: `通知单生成失败，原因${err}`, status: 'error' })
-      });
-    })
-    boxDepartmentVisibility.value = false;
-    emit('close', false);
-
-  })
+  }).catch((err: any) => {
+    console.log(err);
+    Modal.message({ message: `发送失败，原因${err}`, status: 'error' })
+  });
 };
 // 获取配置项
 const airspaceConfigTypes = [

@@ -109,24 +109,6 @@ const getFlyflowToken = async (mobile: string) => {
       "Authorization": res.data.data.tokenValue,
     }
     console.log("rest", res);
-
-    /*
-    workflowaxios.get('/login/loginByToken', {
-      params: {
-        token: res.data.data.tokenValue
-      }
-    }).then((res2: any) => {
-      userWorkFlowStore.updateUserInfo({ loginId: res.data.data.loginId, tokenValue: res2.data.data.tokenValue, });
-      workflowaxios.get('/user/getCurrentUserDetail', {
-      }).then((res1: any) => {
-        console.log(res2.data.data.tokenValue);
-        userWorkFlowStore.updateUserInfo({ loginId: res.data.data.loginId, tokenValue: res2.data.data.tokenValue, depidId: res1.data.data.deptIdList[0] });
-      })
-    });*/
-
-
-    
-    
     workflowaxios.get('/user/getCurrentUserDetail', {
     }).then((res1: any) => {
       userWorkFlowStore.updateUserInfo({ loginId: res.data.data.loginId, tokenValue: res.data.data.tokenValue, depidId: res1.data.data.deptIdList[0] });
