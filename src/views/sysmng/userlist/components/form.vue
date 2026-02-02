@@ -79,6 +79,9 @@ const createData = reactive({
     depID: '',
     mobile: "",
     email: '',
+    flyflowTenantId: '',
+    authUserId: '',
+    authorization: '',
 });
 const roleList = reactive([])
 const userWorkFlowStore = useWorkFlowStore();
@@ -160,46 +163,12 @@ const emit = defineEmits(['close']);
 function handleSubmit() {
     ruleFormRef.value.validate(async (valid) => {
         if (valid) {
+            createData.flyflowTenantId = '1';
+            createData.authUserId = userWorkFlowStore.user.loginId;
+            createData.authorization = userWorkFlowStore.user.tokenValue;
             await postUser(createData).then((res) => {
-                workflowaxios.defaults.headers.common = {
-                    'Flyflow-Tenant-Id': '1',
-                    'AuthUserId': userWorkFlowStore.user.loginId,
-                    "Authorization": userWorkFlowStore.user.tokenValue,
-                }
-                let userData = {
-                    avatarUrl: "http://127.0.0.1:26859/file/show/2025-04-15/f400e509de9f42f9a3d6b23ab48887db.jpeg",
-                    // todo 需要获取depid的list
-                    deptIdList: [String(createData.depID)],
-                    name: createData.userName,
-                    phone: createData.mobile,
-                    roleIds: ["ROOT"],
-                    status: "1",
-                    id: res.data,
-                }
-                // 修改
-                if (userID.value) {
-                    workflowaxios.put('/user/edit',
-                        userData).then((res1: any) => {
-                            if (res1.data.ok) {
-                                emit('close');
-                            }
-                            else {
-                                Modal.alert('提交失败!');
-                            }
-                        })
-                }
-                // 新增
-                else {
-                    workflowaxios.post('/user/create',
-                        userData).then((res1: any) => {
-                            if (res1.data.ok) {
-                                emit('close');
-                            }
-                            else {
-                                Modal.alert('提交失败!');
-                            }
-                        })
-                }
+                Modal.alert('提交成功!');
+                emit('close');
             });
         } else {
             Modal.alert('提交失败!');

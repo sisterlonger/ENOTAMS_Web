@@ -40,6 +40,9 @@ export interface UserVM {
   rank?: string;
   mobile?: string;
   email?: string;
+  flyflowTenantId: string;
+  authUserId: string;
+  authorization: string;
 }
 
 export function login(data: LoginData) {

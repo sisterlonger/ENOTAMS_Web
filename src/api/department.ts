@@ -14,6 +14,9 @@ export interface DepartmentVM {
     Grade: number;
     FullName: string;
     Field: string;
+    FlyflowTenantId: string;
+    AuthUserId: string;
+    Authorization: string;
 }
 
 export function queryDepartmentList(params: DepartmentSearch) {

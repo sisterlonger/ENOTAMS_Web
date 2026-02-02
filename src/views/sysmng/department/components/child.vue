@@ -43,9 +43,6 @@ import {
 } from '@opentiny/vue'
 import { postDepartment, queryAirSpaceList } from '@/api/fetchInterface';
 import { useWorkFlowStore } from '@/store';
-import workflowaxios from '@/views/workflow/components/workflow-axios';
-import airport from '@/router/routes/modules/airport';
-import airspace from '@/router/routes/modules/airspace';
 
 
 const props = defineProps({
@@ -67,9 +64,26 @@ const createData = reactive({
     airPortCodeId: "",
     grade: parentDep.value.grade + 1,
     fullName: "",
+    flyflowTenantId: "",
+    authUserId: "",
+    authorization: "",
 })
 const fullName = computed(() => {
-    return `${parentDep.value.fullName}-${createData.depName}`
+    // 确保 createData.depName 存在
+    const depName = createData.depName || '';
+    
+    // 如果父部门有全名
+    if (parentDep.value?.fullName) {
+        return `${parentDep.value.fullName}-${depName}`;
+    }
+    
+    // 如果父部门只有部门名
+    if (parentDep.value?.depName) {
+        return `${parentDep.value.depName}-${depName}`;
+    }
+    
+    // 如果都没有，只返回当前部门名
+    return depName;
 })
 const rules = ref({
     dicType: [{ required: true, message: '必填', trigger: 'change' }],
@@ -100,32 +114,11 @@ function handleSubmit() {
     ruleFormRef.value.validate(async (valid) => {
         if (valid) {
             createData.fullName = fullName;
+            createData.flyflowTenantId = '1';
+            createData.authUserId = userWorkFlowStore.user.loginId;
+            createData.authorization = userWorkFlowStore.user.tokenValue;
             await postDepartment(createData).then(res => {
-                workflowaxios.defaults.headers.common = {
-                    'Flyflow-Tenant-Id': '1',
-                    'AuthUserId': userWorkFlowStore.user.loginId,
-                    "Authorization": userWorkFlowStore.user.tokenValue,
-                }
-                let deptData = {
-                    id: String(res.data),
-                    // 部门id路径，从根到当前叶的父级
-                    //rootIdList: res.data.rootIdList,
-                    parentId: String(createData.parentDepID),
-                    name: createData.depName,
-                    // todo直属领导
-                    leaderUser: [],
-                    status: "1",
-                    sort: 1,
-                    weight: 1,
-                }
-                workflowaxios.post('/dept/create', deptData).then((res1) => {
-                    if (res1.data.ok === false) {
-                        Modal.alert('提交失败!');
-                    }
-                    else {
-                        Modal.alert('提交成功!');
-                    }
-                });
+                Modal.alert('提交成功!');
             });
             emit('close');
         } else {
