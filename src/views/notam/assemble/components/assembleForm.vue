@@ -154,7 +154,7 @@
         <tiny-divider content-position="left" offset="5%" font-size="20px" content-background-color="#1476ff"
           content-color="#ffffff">请选择或输入原始资料内容的必填项目和选填项目</tiny-divider>
         <!--E项-->
-        <div style="margin: 1%;">事件场景:此模板用于发布新增的地空通信管制席位情况，需输入新增席位名称、中英文呼号和频率等信息生成原始资料通知单,可选择输入该设施所属机场。</div>
+        <div style="margin: 1%;">事件场景:{{createData.circumstances}}</div>
         <tiny-form-item v-show="act === 'add'" label-width="0px">
           <tiny-collapse v-model="activeNames" class="demo-collapse-wrap">
             <tiny-collapse-item title="必填项" name="必填项">
@@ -227,7 +227,7 @@
               <exportMessage v-if="showNotice" :formData="createData" :act="'edit'" />
             </tiny-col></tiny-row>
           <!--序列号-->
-          <tiny-form-item label="通告序列号">
+          <tiny-form-item label="提供序列号">
             <tiny-input v-model="createData.notamSn" :disabled="act === 'edit'"></tiny-input>
           </tiny-form-item>
           <!--报文-->
@@ -259,14 +259,29 @@
     <tiny-dialog-box :modal="false" v-if="boxDepartmentVisibility" v-model:visible="boxDepartmentVisibility"
       append-to-body title="原始资料上报流程" width="60%" :close-on-click-modal="false">
       <tiny-form label-width="150px">
-        <tiny-form-item label="通告会商单位：" v-if="createData.needConsult == true">
+        <tiny-form-item label="审批单位或领导：">
           <template #label>
-            <tiny-tooltip type="info" content="通告会商单位仅通知，无需其同意可继续进行流程" placement="top">
-              <div>通告会商单位：<tiny-icon-help-solid class="IconHelpSolid"></tiny-icon-help-solid></div>
+            <tiny-tooltip type="info" content="审批单位或领导提供意见后方可继续" placement="top">
+              <div>审批单位或领导：<tiny-icon-help-solid class="IconHelpSolid"></tiny-icon-help-solid></div>
+            </tiny-tooltip>
+          </template>
+          <tiny-cascader ref="cascaderLeaderRef" v-model="leaderDepIds" :options="departmentTreeData"
+            placeholder="请选择需要审批该通告的单位或领导，可多选" filterable clearable :props="{
+              children: 'children',
+              value: 'depID',
+              label: 'depName',
+              emitPath: false,
+              multiple: true
+            }" @change="onChangeLeaderDepList"></tiny-cascader>
+        </tiny-form-item>
+        <tiny-form-item label="送阅单位或领导：" v-if="createData.needConsult == true">
+          <template #label>
+            <tiny-tooltip type="info" content="仅通知该单位或个人，无需其同意可继续进行流程" placement="top">
+              <div>送阅单位或领导：<tiny-icon-help-solid class="IconHelpSolid"></tiny-icon-help-solid></div>
             </tiny-tooltip>
           </template>
           <tiny-cascader ref="cascaderConsultationRef" v-model="consultationDepIds" :options="departmentTreeData"
-            placeholder="请选择该通告会商单位" filterable clearable :props="{
+            placeholder="请选择需要知晓该通告的单位或领导，无需其审批" filterable clearable :props="{
               children: 'children',
               value: 'depID',
               label: 'depName',
@@ -359,10 +374,13 @@ const { messageId } = toRefs(props);
 const { act } = toRefs(props);
 const { messageType } = toRefs(props);
 // 会商部门/审批部门
+const cascaderLeaderRef = ref();
 const cascaderConsultationRef = ref()
 const departmentTreeData = ref([]);
+const leaderDepIds = ref([]);
 const consultationDepIds = ref([]);
 const consultationDepList = ref([]);
+const leaderDepList = ref([]);
 
 
 
@@ -472,6 +490,7 @@ const createData = reactive({
   qLat: '',
   qLong: '',
   qRadius: '',
+  circumstances: '',
   // A项
   a_airSpace: '',
   // B项
@@ -839,6 +858,7 @@ function onAssemble() {
 
 async function onSend() {
   let confirmText = `${isEmpty(createData.notamSn) ? '序列号为空！将使用系统自动生成的序列号' : ''}确认并开始上报流程？确定后将无法编辑！`
+  //let materialsText = 
   Modal.confirm(confirmText).then(async (res: string) => {
     if (res === 'confirm') {
       messageData.qCode = createData.qCode;
@@ -875,7 +895,10 @@ async function onSend() {
     }
   })
 }
-
+const onChangeLeaderDepList = () => {
+  let checkVal = cascaderLeaderRef.value.getCheckedNodes(true);
+  leaderDepList.value = checkVal.map((item: any) => { return { id: item.value, type: "dept", name: item.label } })
+}
 const onChangeConsultationDepList = () => {
   let checkVal = cascaderConsultationRef.value.getCheckedNodes(true);
   consultationDepList.value = checkVal.map((item: any) => { return { id: item.value, type: "dept", name: item.label } })
@@ -903,6 +926,7 @@ const createProcess = async () => {
   let vm = {
     messageId: messageId.value,
     templateId: messageData.templateId,
+    leaderDepIds: leaderDepList.value.map(item => item.id).join(","),
     consultationDepIds: consultationDepList.value.map(item => item.id).join(","),
     authUserId: workflowaxios.defaults.headers.common.AuthUserId,
     authorization: workflowaxios.defaults.headers.common.Authorization,

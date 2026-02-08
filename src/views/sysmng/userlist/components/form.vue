@@ -54,7 +54,6 @@ import {
 } from '@opentiny/vue'
 import { iconWarning } from '@opentiny/vue-icon';
 import { useWorkFlowStore } from '@/store';
-import workflowaxios from '@/views/workflow/components/workflow-axios';
 import { queryUserDetail, postUser, queryDepartmentTreeList, queryRoleList } from '@/api/fetchInterface';
 
 const props = defineProps({
