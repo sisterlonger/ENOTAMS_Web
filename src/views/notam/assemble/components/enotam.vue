@@ -8,7 +8,7 @@
           :flowId="flowId || '0'" @close="dialogClose" @createMessage="createMessage" />
       </tiny-tab-item>
       <!--附件记录-->
-      <tiny-tab-item :key="tabsList[1].name" :title="tabsList[1].title" :name="tabsList[1].name">
+      <tiny-tab-item v-if="false" :key="tabsList[1].name" :title="tabsList[1].title" :name="tabsList[1].name">
         <materials :messageId="localMessageID" :templateID="localTemplateID" :isNoAuth="isNoAuth" :act="act">
         </materials>
       </tiny-tab-item>

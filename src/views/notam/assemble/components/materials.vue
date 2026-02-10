@@ -2,15 +2,15 @@
     <div v-if="preCondition">
         <div v-for="(item, index) in materials" :key="index">
             <div class="title">{{ item.title }}</div>
-            <tiny-file-upload :ref="`upload${item.title}`" :action="item.action" :data="requestData"
+            <tiny-file-upload :ref="`upload${item.title}`" :http-request="(params) => httpRequest(params, item)"
                 :file-list="item.fileList" list-type="saas" :open-download-file="true" :headers='header'
-                :before-remove="beforeRemove" prompt-tip  :disabled="act === 'detail'"
+                :before-remove="beforeRemove" prompt-tip :disabled="act === 'detail'"
                 @download-file="handleDownloadFile" @success="onSuccess" @error="onError">
             </tiny-file-upload>
         </div>
         <div>
-            <div class="title">参考附件</div>
-            <tiny-select v-model="attachment" :options="attachmentOptions" placeholder="请选择需要参考的附件"
+            <div class="title">参考的航空情报资料列表</div>
+            <tiny-select v-model="attachment" :options="attachmentOptions" placeholder="请选择该通知单参考的航空情报资料列表"
                 clearable></tiny-select>
             <iframe v-show="attachment" :src="attachment" width="100%" height="600px" type="application/pdf" />
         </div>
@@ -18,14 +18,14 @@
 </template>
 
 <script setup>
-import { ref, reactive, defineProps, toRefs, onMounted, watch } from 'vue'
-import { TinyFileUpload, Modal, TinySelect } from '@opentiny/vue'
-import { downloadFile, queryMessageDetail, queryTemplateDetail, deleteFile, updateFile } from '@/api/fetchInterface';
+import { ref, reactive, defineProps,defineEmits, toRefs, onMounted, watch } from 'vue'
+import { TinyFileUpload, Modal, TinySelect, TinyModal } from '@opentiny/vue'
+import { downloadFile, queryMessageDetail, queryTemplateDetail, deleteFile, updateFile, uploadFile } from '@/api/fetchInterface';
 import { saveAs } from 'file-saver';
 import { getToken } from '@/utils/auth';
 import { isEmpty } from '@/utils/string-utils';
 
-
+const emit = defineEmits(['changeFiles']);
 const props = defineProps({
     templateID: Number,
     messageId: Number,
@@ -40,8 +40,9 @@ const materials = ref([]);
 const preCondition = ref(false);
 // 上传接口的参数
 const requestData = ref({
-    messageId: messageId.value || 0,
-    materialType: "",
+    //messageId: messageId.value || 0,
+    //materialType: "",
+
 })
 const header = ref({ Authorization: `Bearer ${getToken()}` })
 // 删除文件VM
@@ -111,25 +112,12 @@ const onError = async (res, file) => {
 // 下载事件
 const handleDownloadFile = async (file) => {
     let requestFileName = "";
-    if (!file.name.includes('/')) {
-        let getCurrentDate = () => {
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0'); // 月份从0开始
-            const day = String(now.getDate()).padStart(2, '0');
-            return `${year}${month}${day}`;
-        };
-
-        // 获取日期前缀
-        const datePrefix = getCurrentDate();
-        requestFileName = `${datePrefix}/${file.name}`
-    }
-    else {
-        requestFileName = file.names
-    }
+    requestFileName = file.url
+    console.log(file);
+    console.log(requestFileName);
     try {
         // 该文件名附带日期
-        const response = await downloadFile({ fileName: requestFileName });
+        const response = await downloadFile({ objectName: requestFileName });
 
         // 手动处理文件下载
         const contentDisposition = response.headers['content-disposition'];
@@ -154,47 +142,73 @@ const handleDownloadFile = async (file) => {
     }
 };
 // 移除前事件
-function beforeRemove(file) {
+// 修改 beforeRemove 函数
+function beforeRemove(file, fileList) {
+    console.log('文件:', file)
+    console.log('文件列表:', fileList)
+    console.log('materials:', materials.value)
     return new Promise((resolve, reject) => {
-        Modal.confirm(`确定移除 ${file.name}?`).then(async (res) => {
+        TinyModal.confirm(`确定移除 ${file.name}？`).then((res) => {
+            //res === 'confirm' ? resolve() : reject(new Error('取消移除'))
             if (res === 'confirm') {
-                resolve();
-                deleteFileVM.fileId = file.id;
-                deleteFileVM.url = file.url;
-                await deleteFile(deleteFileVM).then((res1) => {
-                    if (res1.code === 200) {
-                        Modal.message({ message: '删除成功', status: 'success' })
-                        resolve()
+                materials.value.forEach(item => {
+                    if (!isEmpty(item.fileList) && item.fileList.length > 0) {
+                        item.fileList.forEach(fileItem => {
+                            if (fileItem.id === file.id) {
+                                item.fileList.splice(item.fileList.indexOf(fileItem), 1)
+                            }
+                        })
                     }
-                    else {
-                        Modal.message({ message: '删除失败', status: 'error' })
-                        resolve()
-                    }
-                }).catch((error) => {
-                    reject(new Error(`删除失败！原因:${error}`))
-                });
-                resolve();
+                })
+                console.log('materials.value:', materials.value)
+                Modal.message({ message: '删除成功', status: 'success' })
+                emit('changeFiles',materials.value);
             }
-            else {
-                reject(new Error('取消移除'))
-            }
+
         })
     })
 }
+
+// 上传接口相关函数
+const httpRequest = reactive((params, item) => {
+    const { file } = params;
+    console.log(item)
+    return new Promise((resolve, reject) => {
+        // 移除 await，直接使用 Promise 链
+        uploadFile(file)
+            .then((res1) => {
+                if (res1.code === 200) {
+                    Modal.message({ message: '上传成功', status: 'success' })
+                    item.fileList.push({ name: res1.data.fileName, url: res1.data.folderPath + res1.data.fileName, id: res1.data.fileId })
+                    console.log("materials.value",materials.value)
+                    emit('changeFiles',materials.value);
+                    resolve()
+                } else {
+                    Modal.message({ message: '上传失败', status: 'error' })
+                    console.log(res1, materials)
+                    resolve()
+                }
+            })
+            .catch((error) => {
+                console.log(error)
+                reject(new Error(`上传失败！原因:${error}`))
+            })
+    })
+})
 const handleNoFile = (files) => {
     // 该模板下的附件类型
-            if (!isEmpty(templateData.materials)) {
-                let titleList = templateData.materials.split("、");
-                titleList.forEach((title) => {
-                    let subFiles = files.filter((item) => item.materialType === title);
-                    let subFileList = [];
-                    if (subFiles && subFiles.length > 0) {
-                        subFiles.forEach((item) => { subFileList.push({ name: item.fileName, url: item.url, id: item.fileId }) })
-                    }
-                    materials.value.push({ title, fileList: subFileList || [], action: `${import.meta.env.VITE_API_BASE_URL}/file/upload?messageId=${messageId.value}&materialType=${title}` });
-                });
+    if (!isEmpty(templateData.materials)) {
+        let titleList = templateData.materials.split("、");
+        titleList.forEach((title) => {
+            let subFiles = files.filter((item) => item.materialType === title);
+            let subFileList = [];
+            if (subFiles && subFiles.length > 0) {
+                subFiles.forEach((item) => { subFileList.push({ name: item.fileName, url: item.url, id: item.fileId }) })
             }
-            materials.value.push({ title: '其他', fileList: [] });
+            materials.value.push({ title, fileList: subFileList || [], action: `${import.meta.env.VITE_API_BASE_URL}/api/file/minio/upload` });
+        });
+    }
+    materials.value.push({ title: '其他', fileList: [] });
 }
 // 请求数据接口方法
 const fetchData = async () => {
@@ -215,7 +229,7 @@ const fetchData = async () => {
                     if (subFiles && subFiles.length > 0) {
                         subFiles.forEach((item) => { subFileList.push({ name: item.fileName, url: item.url, id: item.fileId }) })
                     }
-                    materials.value.push({ title, fileList: subFileList || [], action: `${import.meta.env.VITE_API_BASE_URL}/file/upload?messageId=${messageId.value}&materialType=${title}` });
+                    materials.value.push({ title, fileList: subFileList || [], action: `${import.meta.env.VITE_API_BASE_URL}/api/file/minio/upload` });
                 });
             }
             // 处理【其他】附件
@@ -224,7 +238,7 @@ const fetchData = async () => {
             if (otherFiles && otherFiles.length > 0) {
                 otherFiles.forEach((item) => { otherFileList.push({ name: item.fileName, url: item.url, id: item.fileId }) })
             }
-            materials.value.push({ title: '其他', fileList: otherFileList || [], action: `${import.meta.env.VITE_API_BASE_URL}/file/upload?messageId=${messageId.value}&materialType=其他` });
+            materials.value.push({ title: '其他', fileList: otherFileList || [], action: `${import.meta.env.VITE_API_BASE_URL}/api/file/minio/upload` });
         }
         // 无文件,和无通告号一样处理
         else {
@@ -233,7 +247,7 @@ const fetchData = async () => {
     }
     // 无通告号,新增
     else {
-       handleNoFile(files)
+        handleNoFile(files)
     }
     preCondition.value = true;
 };

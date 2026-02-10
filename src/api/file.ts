@@ -4,24 +4,20 @@ export interface FileVM {
     url: string;
     fileId?: number;
 }
-export function downloadFile(params: { fileName: string }) {
-  return axios.get('/file/download', {
+export function downloadFile(params: { objectName: string }) {
+  return axios.get('/api/file/minio/download', {
     params,
     responseType: 'blob',
   });
 }
 
-export function uploadFile(params: {
-  file: File;           // 文件对象
-}) {
+// 修改函数定义，直接接收 file 参数
+export function uploadFile(file: File) {
   const formData = new FormData()
-  //console.log("params", params);
-  formData.append('file', params.file)
-  //console.log(formData)
+  formData.append('file', file)
 
-  return axios.post('/file/upload', formData, {
+  return axios.post('/api/file/minio/upload', formData, {
     headers: {
-      //'Content-Type': 'multipart/form-data',
       'Accept': '*/*',
     },
   })

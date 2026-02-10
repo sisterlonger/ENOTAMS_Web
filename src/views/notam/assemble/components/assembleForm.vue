@@ -154,7 +154,7 @@
         <tiny-divider content-position="left" offset="5%" font-size="20px" content-background-color="#1476ff"
           content-color="#ffffff">请选择或输入原始资料内容的必填项目和选填项目</tiny-divider>
         <!--E项-->
-        <div style="margin: 1%;">事件场景:{{createData.circumstances}}</div>
+        <div style="margin: 1%;">事件场景:{{ createData.circumstances }}</div>
         <tiny-form-item v-show="act === 'add'" label-width="0px">
           <tiny-collapse v-model="activeNames" class="demo-collapse-wrap">
             <tiny-collapse-item title="必填项" name="必填项">
@@ -217,6 +217,13 @@
           </tiny-form-item>
         </tiny-col>
       </tiny-row>
+      <tiny-row class="guide-box2">
+        <tiny-divider content-position="left" offset="5%" font-size="20px" content-background-color="#1476ff"
+          content-color="#ffffff">佐证材料</tiny-divider>
+        <materials :messageId="messageId" :templateID="templateID" :isNoAuth="isNoAuth" :act="act"
+          @changeFiles="changeFiles">
+        </materials>
+      </tiny-row>
       <tiny-row class="guide-box4">
         <tiny-divider content-position="left" offset="5%" font-size="20px" content-background-color="#1476ff"
           content-color="#ffffff">原始资料通知单以及预览</tiny-divider>
@@ -274,10 +281,10 @@
               multiple: true
             }" @change="onChangeLeaderDepList"></tiny-cascader>
         </tiny-form-item>
-        <tiny-form-item label="送阅单位或领导：" v-if="createData.needConsult == true">
+        <tiny-form-item label="抄送单位或领导：" v-if="createData.needConsult == true">
           <template #label>
             <tiny-tooltip type="info" content="仅通知该单位或个人，无需其同意可继续进行流程" placement="top">
-              <div>送阅单位或领导：<tiny-icon-help-solid class="IconHelpSolid"></tiny-icon-help-solid></div>
+              <div>抄送单位或领导：<tiny-icon-help-solid class="IconHelpSolid"></tiny-icon-help-solid></div>
             </tiny-tooltip>
           </template>
           <tiny-cascader ref="cascaderConsultationRef" v-model="consultationDepIds" :options="departmentTreeData"
@@ -330,6 +337,7 @@ import {
   TinyCascader,
   TinyTooltip,
 } from '@opentiny/vue'
+import { h } from 'vue'
 import { queryAirPortAndAirSpace, queryAirPortConfig, queryAirSpaceConfig, queryMessageDetail, postMessage, MessageVM, queryDepartmentTreeList, createWorkflow } from '@/api/fetchInterface';
 import formgenerator from '@/components/formgenerator/index.vue';
 import schedulePicker from '@/components/schedulePicker/index.vue';
@@ -340,6 +348,9 @@ import { iconHelpSolid } from '@opentiny/vue-icon'
 import { useUserStore, useWorkFlowStore } from '@/store';
 import { isEmpty } from '@/utils/string-utils';
 import exportMessage from './export.vue';
+import materials from './materials.vue';
+
+
 
 
 const TinyIconHelpSolid = iconHelpSolid()
@@ -381,7 +392,8 @@ const leaderDepIds = ref([]);
 const consultationDepIds = ref([]);
 const consultationDepList = ref([]);
 const leaderDepList = ref([]);
-
+const materialList = ref([]);
+const materialCount = ref(0);
 
 
 
@@ -856,10 +868,27 @@ function onAssemble() {
   console.log("showNotice.value", showNotice.value);
 }
 
+
 async function onSend() {
-  let confirmText = `${isEmpty(createData.notamSn) ? '序列号为空！将使用系统自动生成的序列号' : ''}确认并开始上报流程？确定后将无法编辑！`
-  //let materialsText = 
-  Modal.confirm(confirmText).then(async (res: string) => {
+  let prefix1 = ''
+  let prefix2 = ''
+  if (isEmpty(createData.notamSn)) {
+    prefix1 = '提供序列号为空！如不填入，将使用系统自动生成的序列号！'
+  }
+  if (materialCount.value === 0) {
+    prefix2 += '未上传佐证材料!请核实是否不需要上传佐证材料？'
+  }
+
+  let confirmText = h('div', [
+  h('span', { style: 'color: #f00;font-size: 18px;' }, prefix1),
+  prefix1 === '' ? '' :h('br'),
+  prefix1 === '' ? '' :h('br'),
+  h('span', { style: 'color: #f00;font-size: 18px;' }, prefix2),
+  prefix2 === '' ? '' :h('br'),
+  prefix2 === '' ? '' :h('br'),
+  h('span', { style: 'font-size: 18px; color: #666;' }, '点确认将开始上报流程，确定后将无法修改！点取消将返回编辑！')
+])
+  Modal.confirm({ title: '请注意！', message: confirmText}).then(async (res: string) => {
     if (res === 'confirm') {
       messageData.qCode = createData.qCode;
       messageData.airSpaceCodeId = createData.qAirSpace;
@@ -912,7 +941,7 @@ async function onNotice() {
   //departmentTreeData.value = { data: data.children };
   departmentTreeData.value = data.children;
   // 有会商需求，才显示弹窗
-  console.log("needConsult",createData.needConsult);
+  console.log("needConsult", createData.needConsult);
   if (createData.needConsult) {
     boxDepartmentVisibility.value = true;
   }
@@ -1144,7 +1173,18 @@ function onResizePdf() {
   }
 }
 
-
+// 材料列表更新函数
+const changeFiles = (files: any) => {
+  materialList.value = files;
+  //console.log(materialList.value);
+  materialCount.value = 0;
+  materialList.value.forEach(item => {
+    if (!isEmpty(item) && !isEmpty(item.fileList) && item.fileList.length > 0) {
+      materialCount.value += item.fileList.length;
+    }
+  })
+  //console.log(materialCount.value);
+}
 
 
 </script>

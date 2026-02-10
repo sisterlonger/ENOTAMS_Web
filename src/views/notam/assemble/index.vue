@@ -2,7 +2,12 @@
     <div class="container">
         <Breadcrumb v-show="false" :items="['menu.publish', 'menu.assemble']" />
         <div class="content">
-            <div style="margin: 10px;color:brown;font-size: 30px;">请选择发布通告的主题和内容</div>
+            <tiny-divider content-position="left" offset="5%" font-size="30px" height="40px" content-background-color="#1476ff"
+                content-color="#ffffff">即将开始引导式原始资料填报</tiny-divider>
+
+            <!-- <tiny-divider status="info"></tiny-divider> -->
+            <div style="margin: 10px;color:#1476ff;font-size: 30px; margin-left: 6%;">请选择发布通告的主题和内容</div>
+
             <div class="content-main">
                 <tiny-layout>
                     <tiny-row>
@@ -24,7 +29,7 @@
 
 <script setup>
 import { reactive, ref } from 'vue';
-import { TreeMenu as TinyTreeMenu, Layout as TinyLayout, Row as TinyRow, Col as TinyCol, TinySticky } from '@opentiny/vue';
+import { TreeMenu as TinyTreeMenu, Layout as TinyLayout, Row as TinyRow, Col as TinyCol, TinySticky, TinyDivider } from '@opentiny/vue';
 import { useUserStore } from '@/store';
 import { queryNodeTree, queryNodeTemplate } from '@/api/fetchInterface';
 import templateTable from './components/templateTable.vue';
