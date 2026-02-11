@@ -272,14 +272,15 @@
               <div>审批单位或领导：<tiny-icon-help-solid class="IconHelpSolid"></tiny-icon-help-solid></div>
             </tiny-tooltip>
           </template>
-          <tiny-cascader ref="cascaderLeaderRef" v-model="leaderDepIds" :options="departmentTreeData"
+          <tiny-cascader ref="cascaderLeaderRef" v-model="leaderNodes" :options="departmentTreeData"
             placeholder="请选择需要审批该通告的单位或领导，可多选" filterable clearable :props="{
               children: 'children',
-              value: 'depID',
-              label: 'depName',
+              value: 'userID',
+              label: 'userName',
+              disabled: 'disabled',
               emitPath: false,
               multiple: true
-            }" @change="onChangeLeaderDepList"></tiny-cascader>
+            }" @change="onChangeLeaderNodeList"></tiny-cascader>
         </tiny-form-item>
         <tiny-form-item label="抄送单位或领导：" v-if="createData.needConsult == true">
           <template #label>
@@ -287,14 +288,15 @@
               <div>抄送单位或领导：<tiny-icon-help-solid class="IconHelpSolid"></tiny-icon-help-solid></div>
             </tiny-tooltip>
           </template>
-          <tiny-cascader ref="cascaderConsultationRef" v-model="consultationDepIds" :options="departmentTreeData"
+          <tiny-cascader ref="cascaderConsultationRef" v-model="consultationNodes" :options="departmentTreeData"
             placeholder="请选择需要知晓该通告的单位或领导，无需其审批" filterable clearable :props="{
               children: 'children',
-              value: 'depID',
-              label: 'depName',
+              value: 'userID',
+              label: 'userName',
+              disabled: 'disabled',
               emitPath: false,
               multiple: true
-            }" @change="onChangeConsultationDepList"></tiny-cascader>
+            }" @change="onChangeConsultationNodeList"></tiny-cascader>
         </tiny-form-item>
         <tiny-form-item>
           <tiny-button type="primary" @click="createProcess()">确定</tiny-button>
@@ -338,7 +340,7 @@ import {
   TinyTooltip,
 } from '@opentiny/vue'
 import { h } from 'vue'
-import { queryAirPortAndAirSpace, queryAirPortConfig, queryAirSpaceConfig, queryMessageDetail, postMessage, MessageVM, queryDepartmentTreeList, createWorkflow } from '@/api/fetchInterface';
+import { queryAirPortAndAirSpace, queryAirPortConfig, queryAirSpaceConfig, queryMessageDetail, postMessage, MessageVM, queryDepartmentTreeList, queryUserTreeList, createWorkflow } from '@/api/fetchInterface';
 import formgenerator from '@/components/formgenerator/index.vue';
 import schedulePicker from '@/components/schedulePicker/index.vue';
 import fgInput from '@/components/fginput/index.vue';
@@ -388,10 +390,10 @@ const { messageType } = toRefs(props);
 const cascaderLeaderRef = ref();
 const cascaderConsultationRef = ref()
 const departmentTreeData = ref([]);
-const leaderDepIds = ref([]);
-const consultationDepIds = ref([]);
-const consultationDepList = ref([]);
-const leaderDepList = ref([]);
+const leaderNodes = ref([]);
+const consultationNodes = ref([]);
+const consultationNodeList = ref([]);
+const leaderNodeList = ref([]);
 const materialList = ref([]);
 const materialCount = ref(0);
 
@@ -880,15 +882,15 @@ async function onSend() {
   }
 
   let confirmText = h('div', [
-  h('span', { style: 'color: #f00;font-size: 18px;' }, prefix1),
-  prefix1 === '' ? '' :h('br'),
-  prefix1 === '' ? '' :h('br'),
-  h('span', { style: 'color: #f00;font-size: 18px;' }, prefix2),
-  prefix2 === '' ? '' :h('br'),
-  prefix2 === '' ? '' :h('br'),
-  h('span', { style: 'font-size: 18px; color: #666;' }, '点确认将开始上报流程，确定后将无法修改！点取消将返回编辑！')
-])
-  Modal.confirm({ title: '请注意！', message: confirmText}).then(async (res: string) => {
+    h('span', { style: 'color: #f00;font-size: 18px;' }, prefix1),
+    prefix1 === '' ? '' : h('br'),
+    prefix1 === '' ? '' : h('br'),
+    h('span', { style: 'color: #f00;font-size: 18px;' }, prefix2),
+    prefix2 === '' ? '' : h('br'),
+    prefix2 === '' ? '' : h('br'),
+    h('span', { style: 'font-size: 18px; color: #666;' }, '点确认将开始上报流程，确定后将无法修改！点取消将返回编辑！')
+  ])
+  Modal.confirm({ title: '请注意！', message: confirmText }).then(async (res: string) => {
     if (res === 'confirm') {
       messageData.qCode = createData.qCode;
       messageData.airSpaceCodeId = createData.qAirSpace;
@@ -924,20 +926,23 @@ async function onSend() {
     }
   })
 }
-const onChangeLeaderDepList = () => {
+const onChangeLeaderNodeList = () => {
   let checkVal = cascaderLeaderRef.value.getCheckedNodes(true);
-  leaderDepList.value = checkVal.map((item: any) => { return { id: item.value, type: "dept", name: item.label } })
+  console.log(checkVal);
+  leaderNodeList.value = checkVal.map((item: any) => { return { id: item.value, type: "user", name: item.label,parentId: item.parent.value, } })
 }
-const onChangeConsultationDepList = () => {
+const onChangeConsultationNodeList = () => {
   let checkVal = cascaderConsultationRef.value.getCheckedNodes(true);
-  consultationDepList.value = checkVal.map((item: any) => { return { id: item.value, type: "dept", name: item.label } })
+  console.log(checkVal);
+  consultationNodeList.value = checkVal.map((item: any) => { return { id: item.value, type: "user", name: item.label, parentId: item.parent.value } })
 }
 
 // 生成通知单事件
 async function onNotice() {
   // 获取所有通知单列表
   // 弹出选择框（选择对应的部门）
-  const { data } = await queryDepartmentTreeList();
+  const { data } = await queryUserTreeList();
+  console.log(data);
   //departmentTreeData.value = { data: data.children };
   departmentTreeData.value = data.children;
   // 有会商需求，才显示弹窗
@@ -955,8 +960,10 @@ const createProcess = async () => {
   let vm = {
     messageId: messageId.value,
     templateId: messageData.templateId,
-    leaderDepIds: leaderDepList.value.map(item => item.id).join(","),
-    consultationDepIds: consultationDepList.value.map(item => item.id).join(","),
+    leaderNodes: leaderNodeList.value.map(item => item.id).join(","),
+    consultationNodes: consultationNodeList.value.map(item => item.id).join(","),
+    leaderParentNodes: [...new Set(leaderNodeList.value.map(node => node.parentId))].map(id => id / 10000).join(','),
+    consultationParentNodes:  [...new Set(consultationNodeList.value.map(node => node.parentId))].map(id => id / 10000).join(','),
     authUserId: workflowaxios.defaults.headers.common.AuthUserId,
     authorization: workflowaxios.defaults.headers.common.Authorization,
     flyflowTenantId: workflowaxios.defaults.headers.common.FlyflowTenantId || "1"

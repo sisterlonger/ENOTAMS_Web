@@ -82,6 +82,10 @@ export function queryUserList(params: UserSearch) {
   return axios.get('/user/list', { params });
 }
 
+export function queryUserTreeList() {
+    return axios.get('/user/treelist');
+}
+
 export function deleteUser(ids: []) {
   return axios.post('/user/delete', ids);
 }
@@ -93,3 +97,5 @@ export function postUser(data: UserVM) {
 export function resetPwdUser(ids: []) {
   return axios.post('/user/resetpwd', ids);
 }
+
+
