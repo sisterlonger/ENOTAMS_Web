@@ -973,7 +973,7 @@ const createProcess = async () => {
     if (res1.code === 200) {
       Modal.message({ message: '发送成功', status: 'success' })
       boxDepartmentVisibility.value = false;
-      emit('close', false);
+      emit('close', true);
     }
   }).catch((err: any) => {
     console.log(err);

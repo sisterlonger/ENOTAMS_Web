@@ -3,9 +3,10 @@
     <tiny-tabs v-if="preCondition" v-model="activeName" tab-style="border-card" size="small">
       <!--报文记录-->
       <tiny-tab-item :key="tabsList[0].name" :title="tabsList[0].title" :name="tabsList[0].name">
-        <assembleForm :messageId="localMessageID" :parentId="parentId" :messageType="messageType" :templateID="localTemplateID"
-          :templateData="templateData" :isNoAuth="isNoAuth" :act="act" :processInstanceId="processInstanceId || '0'"
-          :flowId="flowId || '0'" @close="dialogClose" @createMessage="createMessage" />
+        <assembleForm :messageId="localMessageID" :parentId="parentId" :messageType="messageType"
+          :templateID="localTemplateID" :templateData="templateData" :isNoAuth="isNoAuth" :act="act"
+          :processInstanceId="processInstanceId || '0'" :flowId="flowId || '0'" @close="dialogClose"
+          @createMessage="createMessage" />
       </tiny-tab-item>
       <!--附件记录-->
       <tiny-tab-item v-if="false" :key="tabsList[1].name" :title="tabsList[1].title" :name="tabsList[1].name">
@@ -31,7 +32,7 @@
         <tiny-grid-column field="qCode" title="需发布关联通告的主题" width="100"></tiny-grid-column>
         <tiny-grid-column field="circumstances" title="需发布关联通告的事件场景"></tiny-grid-column>
         <!--选择框-->
-        <tiny-grid-column field="sendDepId" width="50%" title="需通知关联通告的所属单位" :editor="{
+        <tiny-grid-column ref="cascaderDepRef" field="sendDepId" width="50%" title="需通知关联通告的所属单位" :editor="{
           component: TinyCascader,
           attrs: {
             filterable: true, clearable: true,
@@ -41,12 +42,12 @@
               value: 'depID',
               label: 'depName',
               emitPath: false,
-              multiple: false,
+              multiple: true,
             },
             placeholder: '请选择所属单位',
             style: { width: '100%' }
           },
-        }"></tiny-grid-column>
+        }"  :format-text="formatMulti"></tiny-grid-column>
       </tiny-grid>
     </tiny-dialog-box>
   </div>
@@ -129,6 +130,7 @@ const basicGridRef = ref(null)
 const preCondition = ref(false);
 const departmentTreeData = ref([]);
 const userStore = useUserStore();
+const cascaderDepRef = ref()
 // 请求数据接口方法
 const fetchData = async () => {
   state.loading = Loading.service({
@@ -153,11 +155,13 @@ const fetchData = async () => {
 async function dialogClose(status: boolean) {
   // status代表成功发送通告
   // 如果status为true且配置了关联通告，需要关联通告
+  console.log(status, templateData.value.templateID);
   if (status && !isEmpty(templateData.value.templateID)) {
     preCondition.value = false;
     // 有关联通告才需要填写
     await queryByTemplateIdTemplateDetail({ templateId: templateData.value.templateID }).then((res: any) => {
       if (res.code === 200) {
+        console.log("tableData", tableData);
         tableData = res.data;
         if (tableData.length > 0) {
           tableData.forEach((item: any) => {
@@ -183,6 +187,8 @@ function createMessage(id: number) {
 async function toolbarButtonClickEvent({ code }) {
   // 用于多选行，获取已选中的数据，该方法默认返回拷贝的数据，如果需要返回原始响应式数据，则需加上入参 true，如 getSelectRecords(true)
   let data = basicGridRef.value.getSelectRecords(true)
+  console.log(data);
+  // ----------------------处理成列表
   if (code === "relate") {
     await data.forEach(async (item: any) => {
       await onSend(item)
@@ -225,6 +231,17 @@ async function onSend(createData: any) {
     }
   })
 }
+
+function formatMulti(value) {
+  // 其中有data、row、cellValue
+  // if (Array.isArray(cellValue) && cellValue.length) {
+  //   const selected = options.value.filter((item) => ~cellValue.indexOf(item.id))
+  //   return selected.map((item) => item.name).join(';')
+  // }
+  console.log(value)
+  return ''
+}
+
 // 初始化请求数据
 onMounted(async () => {
   let queryParams = route.query;
@@ -239,6 +256,7 @@ onMounted(async () => {
   }
   const { data } = await queryDepartmentTreeList();
   departmentTreeData.value = data.children;
+  //dialogClose(true);
   // // 测试用，后面删除
   // await queryByTemplateIdTemplateDetail({ templateId: templateData.value.templateID }).then((res: any) => {
   //   if (res.code === 200) {

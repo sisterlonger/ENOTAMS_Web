@@ -36,18 +36,33 @@ export interface PublishVM {
     messageId: number;
     state: string;
 }
-export interface SetDepIdVM {
-    messageId: number;
-    receiveDepId: number;
-    consultDepId: string;
-}
 export interface CreateWorkflowVM {
     messageId: number;
     templateId: string;
-    authUserId:string;
-    authorization:string;
-    flyflowTenantId:string;
+    authUserId: string;
+    authorization: string;
+    flyflowTenantId: string;
 }
+// 定义返回数据类型
+export interface ProgressRequest {
+    processInstanceId: string;
+    flowId: string;
+    flyflowTenantId?: string; // 可选，后端默认"1"
+    authUserId?: string;      // 可选
+    authorization?: string;   // 可选
+}
+// 定义返回数据类型
+export interface WorkflowAuditRequest {
+    processInstanceId: string;
+    flowId: string;
+    taskId: string;
+    approveDesc: string;
+    approveResult: string;
+    flyflowTenantId?: string; // 可选，后端默认"1"
+    authUserId?: string;      // 可选
+    authorization?: string;   // 可选
+}
+
 export function queryMessageList(params: MessageSearch) {
     return axios.get('/message/list', { params });
 }
@@ -68,6 +83,9 @@ export function createWorkflow(data: CreateWorkflowVM) {
 export function postWorkflowId(data: MessageWorkflowVM) {
     return axios.post<MessageWorkflowVM>('/message/postworkflowid', data);
 }
+export function queryGetWorkflowProgress(data: ProgressRequest) {
+    return axios.post<ProgressRequest>('/message/getworkflowprogress', data);
+}
 export function publishMessage(data: PublishVM) {
     return axios.post<PublishVM>('/message/publish', data);
 }
@@ -77,6 +95,6 @@ export function queryGetRelateMessage(params: { id: number }) {
     });
 }
 
-export function setDepId(data: SetDepIdVM) {
-    return axios.post<SetDepIdVM>('/message/setdepid', data);
+export function SubmitWorkflowAudit(data: WorkflowAuditRequest) {
+    return axios.post<WorkflowAuditRequest>('/message/submitworkflowaudit', data);
 }
