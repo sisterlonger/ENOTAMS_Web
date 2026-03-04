@@ -134,7 +134,7 @@
         </tiny-dialog-box>
         <!--新增的关联通告-->
         <tiny-dialog-box :modal="false" v-if="addVisibility" v-model:visible="addVisibility" title="详情" width="80%"
-          max-height="1000px" top="5%" :close-on-click-modal="true">
+          max-height="1000px" top="5%" :close-on-click-modal="false">
           <enotam :messageId="messageId" :templateID="templateId" :parentId="parentId" :messageType="messageType" :act="act" @close="dialogClose" />
         </tiny-dialog-box>
       </div>

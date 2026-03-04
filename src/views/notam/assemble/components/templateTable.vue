@@ -14,7 +14,7 @@
       </tiny-grid-column>
     </tiny-grid>
     <tiny-dialog-box :modal="false" v-if="boxVisibility" v-model:visible="boxVisibility" title="需要发布通告的内容" width="80%"
-      max-height="1000px" top="5%" :close-on-click-modal="true">
+      max-height="1000px" top="5%" :close-on-click-modal="false">
       <enotam :templateID="templateID" act='add' @close="dialogClose" />
     </tiny-dialog-box>
   </div>

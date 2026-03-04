@@ -232,14 +232,56 @@ async function onSend(createData: any) {
   })
 }
 
+// 处理选择的部门
 function formatMulti(value) {
-  // 其中有data、row、cellValue
-  // if (Array.isArray(cellValue) && cellValue.length) {
-  //   const selected = options.value.filter((item) => ~cellValue.indexOf(item.id))
-  //   return selected.map((item) => item.name).join(';')
-  // }
-  console.log(value)
-  return ''
+  console.log(value);
+  console.log("cellValue", value.cellValue);
+  console.log(value.column.editor.attrs.options);
+  
+  // 使用对象解构
+  const { cellValue: depIds } = value;
+  const { options } = value.column.editor.attrs;
+  
+  // 如果cellValue不是数组或为空，直接返回空字符串
+  if (!Array.isArray(depIds) || depIds.length === 0) {
+    return '';
+  }
+  
+  // 递归查找所有节点，建立depID到fullName的映射
+  const depIdToFullNameMap = {};
+  
+  // 递归遍历树的函数 - 使用 forEach 替代 for...of
+  function traverseTree(nodes) {
+    if (!Array.isArray(nodes)) {
+      return;
+    }
+    
+    nodes.forEach((node) => {
+      // 将当前节点的depID和fullName存入映射表
+      if (node.depID !== undefined && node.fullName !== undefined) {
+        depIdToFullNameMap[node.depID] = node.fullName;
+      }
+      
+      // 递归遍历子节点
+      if (node.children && Array.isArray(node.children)) {
+        traverseTree(node.children);
+      }
+    });
+  }
+  
+  // 开始遍历选项树
+  traverseTree(options);
+  
+  // 根据depIds获取对应的fullName
+  const fullNames = depIds
+    .map(depId => depIdToFullNameMap[depId]) // 转换为fullName
+    .filter(fullName => fullName !== undefined && fullName !== null && fullName !== ''); // 过滤掉无效值
+  
+  console.log("映射表:", depIdToFullNameMap);
+  console.log("找到的fullNames:", fullNames);
+  
+  // 用逗号分隔并返回
+  return fullNames.join(',');
 }
 
 // 初始化请求数据

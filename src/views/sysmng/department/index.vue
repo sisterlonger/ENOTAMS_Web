@@ -5,6 +5,7 @@
       <div class="content-main">
         <tiny-layout>
           <tiny-button type="primary" style="margin: 10px" @click="stepStart">开始引导</tiny-button>
+          <tiny-button type="success" style="margin: 10px" @click="onAdd">新增根节点</tiny-button>
           <tiny-guide :show-step="showStep" :dom-data="domData"></tiny-guide>
           <tiny-row>
             <tiny-col :span="3">
@@ -18,23 +19,51 @@
         </tiny-layout>
       </div>
     </div>
+    <tiny-dialog-box :modal="false" v-if="addPreCondition" v-model:visible="addPreCondition" title="请填写新增部门信息"
+      width="90%">
+      <div>test</div>
+      <Child :parentDep="createData" @close="dialogClose" />
+    </tiny-dialog-box>
   </div>
 </template>
 
 <script setup>
 import { reactive, ref, watch } from 'vue';
-import { TreeMenu as TinyTreeMenu, Layout as TinyLayout, Row as TinyRow, Col as TinyCol, Guide as TinyGuide, Button as TinyButton, } from '@opentiny/vue';
+import { TreeMenu as TinyTreeMenu, Layout as TinyLayout, Row as TinyRow, Col as TinyCol, Guide as TinyGuide, Button as TinyButton, DialogBox as TinyDialogBox, } from '@opentiny/vue';
 import { useUserStore } from '@/store';
 import { queryDepartmentTreeList, queryDepartmentDetail } from '@/api/fetchInterface';
 import department from './components/department.vue';
+import Child from './components/child.vue';
 
 
 const userStore = useUserStore();
 const preCondition = ref(true);
+const addPreCondition = ref(false);
 const tableData = reactive({});
 const mapField = reactive({
   id: 'depID',
   label: 'depName',
+})
+
+const createData = reactive({
+    depID: null,
+    depName: '',
+    field: '',
+    parentDepID: null,
+    depCode: "",
+    parentDepCode: "ROOT",
+    grade: 0,
+    fullName: "",
+    airSpaceCodeId: '',
+    airPortCodeId: '',
+    // 所负责的机场
+    manageAirPortCodeIds: [],
+    // 领导部门
+    manageDepID: [],
+    // get
+    nodes: [],
+    // set
+    nodeIds: [],
 })
 
 const showStep = ref(false);
@@ -82,6 +111,17 @@ const domData = ref([
 function stepStart() {
   showStep.value = !showStep.value
 }
+// 新增部门
+const onAdd = async () => {
+  addPreCondition.value = true;
+}
+
+// 关闭弹窗
+function dialogClose() {
+    addPreCondition.value = false;
+}
+
+
 // 刷新函数
 const refresh = async () => {
   preCondition.value = false;
