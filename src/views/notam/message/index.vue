@@ -115,9 +115,9 @@
                 @click="editRowEvent(data.row, '处理')">处理</tiny-button>
               <tiny-button v-show="data.row.status === '已完成'" v-track="'发布'" size="mini" type="success"
                 @click="editRowEvent(data.row, '发布')">发布</tiny-button>
-              <tiny-button v-show="data.row.status === '已发布'" v-track="'代替'" size="mini" type="primary"
+              <tiny-button v-show="data.row.status === '已发布' && data.row.type !== '取消现有报文'" v-track="'代替'" size="mini" type="primary"
                 @click="editRowEvent(data.row, '代替')">代替报</tiny-button>
-              <tiny-button v-show="data.row.status === '已发布'" v-track="'取消'" size="mini" type="primary"
+              <tiny-button v-show="data.row.status === '已发布' && data.row.type !== '取消现有报文'" v-track="'取消'" size="mini" type="primary"
                 @click="editRowEvent(data.row, '取消')">取消报</tiny-button>
             </template>
           </tiny-grid-column>

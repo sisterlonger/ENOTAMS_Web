@@ -77,6 +77,9 @@ export function deleteMessage(ids: []) {
 export function postMessage(data: MessageVM) {
     return axios.post<MessageVM>('/message/post', data);
 }
+export function postBatchMessage(data:  MessageVM[]) {
+    return axios.post<MessageVM[]>('/message/batchpost', data);
+}
 export function createWorkflow(data: CreateWorkflowVM) {
     return axios.post<MessageVM>('/message/createworkflow', data);
 }

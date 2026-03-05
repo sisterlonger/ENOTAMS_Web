@@ -22,6 +22,7 @@ const useUserStore = defineStore('user', {
     email:'',
     mobile:'',
     depName:'',
+    depID:'',
     fullName:'',
     field:'',
     roleName:'',

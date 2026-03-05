@@ -4,13 +4,13 @@
             <!--PDF预览的内容-->
             <tiny-tab-item :key="tabsList[0].name" :title="tabsList[0].title" :name="tabsList[0].name">
                 <exportMessage :formData="formData" :act="'detail'" />
-                <materials :messageId="messageId" :templateID="templateID" :isNoAuth="isNoAuth" :act="act"></materials>
+                <materials :messageId="messageId" :templateID="templateID" :isNoAuth="isNoAuth" :act="materialsAct"></materials>
                 <audit v-if="act === 'edit'" :processInstanceId="processInstanceId" :flowId="flowId" :taskId="taskId"
                     @close="dialogClose" />
             </tiny-tab-item>
             <!--附件记录-->
             <tiny-tab-item v-if="false" :key="tabsList[1].name" :title="tabsList[1].title" :name="tabsList[1].name">
-                <materials :messageId="messageId" :templateID="templateID" :isNoAuth="isNoAuth" :act="act"></materials>
+                <materials :messageId="messageId" :templateID="templateID" :isNoAuth="isNoAuth" :act="materialsAct"></materials>
             </tiny-tab-item>
             <!--流程记录-->
             <tiny-tab-item :key="tabsList[2].name" :title="tabsList[2].title" :name="tabsList[2].name">
@@ -91,6 +91,7 @@ const formData = reactive({});
 const isNoAuth = ref(false);
 const preCondition = ref(false);
 const departmentTreeData = ref([]);
+const materialsAct = ref('detail');
 const userStore = useUserStore();
 // 请求数据接口方法
 const fetchData = async () => {
@@ -102,7 +103,13 @@ const fetchData = async () => {
     try {
         const { data } = await queryMessageDetail({ id: messageId.value });
         Object.assign(formData, data);
-        console.log("formData--------",formData)
+        console.log("formData--------", formData)
+        // 控制附件的操控权限
+        materialsAct.value = act.value
+        console.log("$$$$$$$$$$$$$$$$$$$", userStore.userInfo.depID,data.sendDepId);
+        if (data.sendDepId === userStore.userInfo.depID) {
+            materialsAct.value = "edit"
+        }
     }
     catch (err) {
         console.log(err);
@@ -126,6 +133,7 @@ onMounted(async () => {
         isNoAuth.value = true;
     }
     await fetchData();
+    console.log(materialsAct.value,act.value);
     preCondition.value = true;
     const { data } = await queryDepartmentTreeList();
     departmentTreeData.value = data.children;

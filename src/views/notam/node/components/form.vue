@@ -39,14 +39,20 @@
                     <tiny-option value="W">W</tiny-option>
                 </tiny-select>
             </tiny-form-item>
-            <tiny-form-item label="下限" prop="qLowerLimit" :validate-icon="validateIcon">
+            <tiny-form-item label="是否需要上下限" prop="isLowerLimit" :validate-icon="validateIcon">
+                <tiny-radio-group v-model="isLowerLimit" @change="onChangeIsLowerLimit">
+                    <tiny-radio :label="true">是</tiny-radio>
+                    <tiny-radio :label="false">否</tiny-radio>
+                </tiny-radio-group>
+            </tiny-form-item>
+            <tiny-form-item v-if="isLowerLimit === true"  label="下限" prop="qLowerLimit" :validate-icon="validateIcon">
                 <tiny-select v-model="createData.qLowerLimit" clearable searchable>
                     <tiny-option value="000">000</tiny-option>
                     <tiny-option value="与F项一致">与F项一致</tiny-option>
                     <tiny-option value="">空</tiny-option>
                 </tiny-select>
             </tiny-form-item>
-            <tiny-form-item label="上限" prop="qUpperLimit" :validate-icon="validateIcon">
+            <tiny-form-item v-if="isLowerLimit === true"  label="上限" prop="qUpperLimit" :validate-icon="validateIcon">
                 <tiny-select v-model="createData.qUpperLimit" clearable searchable>
                     <tiny-option value="999">999</tiny-option>
                     <tiny-option value="与G项一致">与G项一致</tiny-option>
@@ -129,6 +135,8 @@ const createData = reactive({
     // set
     relateNodeIds: [],
 })
+// 上下限开关
+const isLowerLimit = ref(true)
 const rules = ref({
     circumstances: [{ required: true, message: '必填', trigger: 'change' }],
     template: [{ required: true, message: '必填', trigger: 'change' }],
@@ -207,6 +215,14 @@ const getQCodePermission = (checkedData: any) => {
 function resetForm() {
     ruleFormRef.value.resetFields()
 }
+
+const onChangeIsLowerLimit = () => {
+    if (isLowerLimit.value === false) {
+        createData.qLowerLimit = '';
+        createData.qUpperLimit = '';
+    }
+}
+
 </script>
 
 <style scoped></style>

@@ -13,7 +13,7 @@
         </tiny-input>
       </tiny-form-item>
 
-      <div class="login-form-options">
+      <div class="login-form-options" v-if = false>
         <tiny-checkbox style="color:#fff">{{ $t('login.form.rememberPassword') }}</tiny-checkbox>
         <div>
           <tiny-link style="color:#fff" type="primary" class="divide-line">|</tiny-link>

@@ -194,7 +194,7 @@
         </tiny-form-item>
         <tiny-col :span="4">
           <!--影响高度范围-->
-          <tiny-form-item label="影响高度范围" v-if="createData.qLowerLimit !== null">
+          <tiny-form-item label="影响高度范围" v-if="!isEmpty(createData.qLowerLimit)">
             <tiny-select v-model="createData.baseType" value-field="fg" text-field="fg" :grid-op="baseTypeOption"
               render-type="grid" :disabled="act === 'edit'" @change="onChangeBaseType()" placeholder="请选择影响到的高度">
             </tiny-select>
@@ -202,7 +202,7 @@
         </tiny-col>
         <tiny-col :span="4">
           <!--下限-->
-          <tiny-form-item label="下限" v-if="createData.qLowerLimit !== null">
+          <tiny-form-item label="下限" v-if="!isEmpty(createData.qLowerLimit)">
             <tiny-input v-model="createData.f_lowerLimit" placeholder="输入高度下限数值"
               :disabled="createData.baseType.split('-')[0] == 'SFC' || createData.baseType.split('-')[0] == 'GND' || act === 'edit'"
               @click="onFocusFG('F')"></tiny-input>
@@ -210,7 +210,7 @@
         </tiny-col>
         <tiny-col :span="4">
           <!--上限-->
-          <tiny-form-item label="上限" v-if="createData.qLowerLimit !== null">
+          <tiny-form-item label="上限" v-if="!isEmpty(createData.qLowerLimit)">
             <tiny-input v-model="createData.g_upperLimit" placeholder="输入高度上限数值"
               :disabled="createData.baseType.split('-')[1] === 'UNL' || act === 'edit'"
               @click="onFocusFG('G')"></tiny-input>
@@ -861,7 +861,7 @@ function onAssemble() {
   let eText = `E)${eFormData.result}`;
   let fgText = "";
   // 如果F、G项为空时，F\G项为空字符串
-  if (createData.qLowerLimit !== null && (createData.f_lowerLimit || createData.g_upperLimit)) {
+  if (!isEmpty(createData.qLowerLimit) && (createData.f_lowerLimit || createData.g_upperLimit)) {
     fgText = `\nF)${createData.f_lowerLimit} G)${createData.g_upperLimit}`
   }
   createData.telegramText = `${qText}\n${abcText}${dText}\n${eText}${fgText}`;
@@ -908,10 +908,15 @@ async function onSend() {
       else {
         messageData.parentId = createData.parentId;
       }
-      console.log(messageData);
       if (!isEmpty(messageId)) {
         messageData.messageId = messageId.value;
       }
+      messageData.materials = [{ fileId: 87, materialType: "测试1" }];
+      // materialList.value.forEach(item => {
+      //   if (item.fileList.length > 0) {
+      //     messageData.materials.push({ fileId: item.fileList[0].id, materialType: item.title })
+      //   }
+      // });
       await postMessage(messageData).then((res1: any) => {
         if (res1.code === 200) {
           Modal.message({ message: '发送成功', status: 'success' })
@@ -929,7 +934,7 @@ async function onSend() {
 const onChangeLeaderNodeList = () => {
   let checkVal = cascaderLeaderRef.value.getCheckedNodes(true);
   console.log(checkVal);
-  leaderNodeList.value = checkVal.map((item: any) => { return { id: item.value, type: "user", name: item.label,parentId: item.parent.value, } })
+  leaderNodeList.value = checkVal.map((item: any) => { return { id: item.value, type: "user", name: item.label, parentId: item.parent.value, } })
 }
 const onChangeConsultationNodeList = () => {
   let checkVal = cascaderConsultationRef.value.getCheckedNodes(true);
@@ -963,7 +968,7 @@ const createProcess = async () => {
     leaderNodes: leaderNodeList.value.map(item => item.id).join(","),
     consultationNodes: consultationNodeList.value.map(item => item.id).join(","),
     leaderParentNodes: [...new Set(leaderNodeList.value.map(node => node.parentId))].map(id => id / 10000).join(','),
-    consultationParentNodes:  [...new Set(consultationNodeList.value.map(node => node.parentId))].map(id => id / 10000).join(','),
+    consultationParentNodes: [...new Set(consultationNodeList.value.map(node => node.parentId))].map(id => id / 10000).join(','),
     authUserId: workflowaxios.defaults.headers.common.AuthUserId,
     authorization: workflowaxios.defaults.headers.common.Authorization,
     flyflowTenantId: workflowaxios.defaults.headers.common.FlyflowTenantId || "1"

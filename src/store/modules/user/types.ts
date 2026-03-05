@@ -7,6 +7,7 @@ export interface UserInfo {
   roleName: string;
   roleID: number;
   depName?: string;
+  depID?: string;
   fullName?: string;
   field?:string;
   rank?: string;

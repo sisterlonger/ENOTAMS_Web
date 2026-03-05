@@ -56,7 +56,7 @@
 <script setup lang="ts">
 import { ref, toRefs, defineProps, defineEmits, reactive, onMounted } from 'vue'
 import { TinyTabs, TinyTabItem, Modal, Loading, DialogBox as TinyDialogBox, TinyGrid, TinyGridColumn, Button as TinyButton, TinyGridToolbar, TinyCascader } from '@opentiny/vue'
-import { queryTemplateDetail, queryByTemplateIdTemplateDetail, postMessage, queryDepartmentTreeList } from '@/api/fetchInterface';
+import { queryTemplateDetail, queryByTemplateIdTemplateDetail, postBatchMessage, queryDepartmentTreeList } from '@/api/fetchInterface';
 import { useRouter } from 'vue-router';
 import { isEmpty } from '@/utils/string-utils';
 import { useUserStore } from '@/store';
@@ -184,59 +184,78 @@ function createMessage(id: number) {
   localMessageID.value = id;
 }
 // 列表按钮函数
+// 列表按钮函数
 async function toolbarButtonClickEvent({ code }) {
   // 用于多选行，获取已选中的数据，该方法默认返回拷贝的数据，如果需要返回原始响应式数据，则需加上入参 true，如 getSelectRecords(true)
+  // 勾选的才会去关联发送
   let data = basicGridRef.value.getSelectRecords(true)
-  console.log(data);
+  //let data1 = basicGridRef.value.getData();
   // ----------------------处理成列表
+  console.log(data);
+  //console.log(data1);
   if (code === "relate") {
-    await data.forEach(async (item: any) => {
-      await onSend(item)
+    // 1. 检查是否勾选了数据
+    if (!data || data.length === 0) {
+      Modal.message({ message: '请先勾选要发送的数据', status: 'warning' });
+      return;
+    }
+    
+    // 2. 检查每个元素中的sendDepId是否为空
+    const hasEmptySendDepId = data.some((item: any) => {
+      // 根据实际情况调整判断条件
+      return !item.sendDepId || item.sendDepId.length === 0;
+    });
+    
+    if (hasEmptySendDepId) {
+      Modal.message({ message: '勾选的数据中存在未选择部门的情况，请检查', status: 'warning' });
+      return;
+    }
+    
+    // 提取qCode列表，不截取，全部展示
+    const qCodeList = data.map((item: any) => item.qCode).join('、');
+    
+    // 批量发送逻辑
+    Modal.confirm(`确认并开始上报关联通告（${qCodeList}），共 ${data.length} 条？确定后将无法编辑！`).then(async (res: string) => {
+      if (res === 'confirm') {
+        // 构建批量消息数据数组
+        let messageList = data.map((item: any) => {
+          let messageData: any = {};
+          messageData.qCode = item.qCode;
+          messageData.airSpaceCodeId = userStore.airSpaceCodeId || "";
+          messageData.type = "新发报文";
+          messageData.radius = item.qRadius;
+          messageData.templateId = item.templateID;
+          messageData.parentId = localMessageID.value;
+          // 注意：这里使用了consultDepId，但上面检查的是sendDepId
+          // 如果sendDepId和consultDepId是同一个字段，请保持一致
+          messageData.consultDepId = item.sendDepId.join(",");
+          return messageData;
+        });
+        console.log("messageList--------------------",messageList)
+        // 调用批量接口
+        await postBatchMessage(messageList).then((res1: any) => {
+          if (res1.code === 200) {
+            Modal.message({ message: '发送成功', status: 'success' })
+            emit('close')
+          }
+        }).catch((err: any) => {
+          console.log(err);
+          Modal.message({ message: `发送失败，原因${err}`, status: 'error' })
+        });
+      }
     })
-    // 不填了，直接发送给对应的人员去填写
   }
   else {
     preCondition.value = false;
     emit('close')
   }
 }
-// 发送关联通告函数
-async function onSend(createData: any) {
-  Modal.confirm(`确认并开始上报关联通告${createData.qCode}？确定后将无法编辑！`).then(async (res: string) => {
-    if (res === 'confirm') {
-      let messageData: any = {}
-      messageData.qCode = createData.qCode;
-      messageData.airSpaceCodeId = userStore.airSpaceCodeId || "";;
-      messageData.type = "新发报文";
-      //messageData.validType = createData.messageValidType;
-      //messageData.lat = createData.qLat;
-      //messageData.long = createData.qLong;
-      messageData.radius = createData.qRadius;
-      //messageData.telegramText = createData.telegramText;
-      messageData.templateId = createData.templateID;
-      // 关联通告的父id就是当前报文id
-      messageData.parentId = localMessageID.value;
-      //console.log(tableData);
-      // 单选，如果多选，就会出现错误，错误原因是后端要int
-      messageData.sendDepId = createData.sendDepId;
-      await postMessage(messageData).then((res1: any) => {
-        if (res1.code === 200) {
-          Modal.message({ message: '发送成功', status: 'success' })
-        }
-      }).catch((err: any) => {
-        console.log(err);
-        Modal.message({ message: `发送失败，原因${err}`, status: 'error' })
-      });
-      emit('close')
-    }
-  })
-}
 
 // 处理选择的部门
 function formatMulti(value) {
-  console.log(value);
-  console.log("cellValue", value.cellValue);
-  console.log(value.column.editor.attrs.options);
+  //console.log(value);
+  //console.log("cellValue", value.cellValue);
+  //console.log("options",value.column.editor.attrs.options);
   
   // 使用对象解构
   const { cellValue: depIds } = value;

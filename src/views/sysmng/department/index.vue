@@ -21,7 +21,6 @@
     </div>
     <tiny-dialog-box :modal="false" v-if="addPreCondition" v-model:visible="addPreCondition" title="请填写新增部门信息"
       width="90%">
-      <div>test</div>
       <Child :parentDep="createData" @close="dialogClose" />
     </tiny-dialog-box>
   </div>
