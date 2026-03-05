@@ -12,6 +12,8 @@
         :modal-overlay-opening-radius="100">开始引导</tiny-button>
       <tiny-button type="danger" @click="onChangeView" :modal-overlay-opening-padding="100"
         :modal-overlay-opening-radius="100">切换视角</tiny-button>
+      <tiny-button v-if="!isEmpty(createData.parentId) && createData.parentId !== 0" type="success" @click="onRead" :modal-overlay-opening-padding="100"
+        :modal-overlay-opening-radius="100">查看关联的源通告</tiny-button>
       <tiny-guide :show-step="showStep" :dom-data="domData"></tiny-guide>
       <tiny-row class="guide-box1">
         <tiny-divider content-position="left" offset="5%" font-size="20px" content-background-color="#1476ff"
@@ -263,6 +265,12 @@
       width="35%" :close-on-click-modal="false">
       <fgInput :baseType='baseType' :fgType='fgType' @fgChange="changeFG" @close="dialogClose" />
     </tiny-dialog-box>
+    <!--查看关联的源通告-->
+    <tiny-dialog-box :modal="false" v-if="workflowVisibility" v-model:visible="workflowVisibility" title="源通告"
+      width="80%" max-height="1000px" top="5%" :close-on-click-modal="true">
+      <exportMessage :formData="messageFormData" :act="'detail'" />
+    </tiny-dialog-box>
+    <!--审批流程选择-->
     <tiny-dialog-box :modal="false" v-if="boxDepartmentVisibility" v-model:visible="boxDepartmentVisibility"
       append-to-body title="原始资料上报流程" width="60%" :close-on-click-modal="false">
       <tiny-form label-width="150px">
@@ -396,6 +404,7 @@ const consultationNodeList = ref([]);
 const leaderNodeList = ref([]);
 const materialList = ref([]);
 const materialCount = ref(0);
+
 
 
 
@@ -562,6 +571,11 @@ const boxDVisibility = ref(false)
 const boxFVisibility = ref(false)
 const boxGVisibility = ref(false)
 const boxDepartmentVisibility = ref(false);
+
+// 关联通告弹窗显示变量
+const workflowVisibility = ref(false);
+const messageFormData = reactive({});
+
 // 通告类型
 const messageTypeOption = ref(['新发报文', '代替现有报文', '取消现有报文']);
 // 报文有效期类型
@@ -1089,6 +1103,7 @@ function dialogClose() {
   boxFVisibility.value = false;
   boxGVisibility.value = false;
   boxDepartmentVisibility.value = false;
+  workflowVisibility.value = false;
   fgType.value = "";
 }
 // FG项弹窗打开事件
@@ -1171,6 +1186,20 @@ function stepStart() {
 function onChangeView() {
   view.value = !view.value
 }
+// 查看源通告
+const onRead = async () => {
+  try {
+        const { data: detailData } = await queryMessageDetail({ id: createData.parentId });
+        Object.assign(messageFormData, detailData);
+        console.log("messageFormData--------", messageFormData)
+        workflowVisibility.value = true;
+    }
+    catch (err) {
+        console.log(err);
+        Modal.alert('获取数据错误');
+    }
+}
+
 // 放大缩小PDF
 function onResizePdf() {
   if (pdfState.value === "缩小") {

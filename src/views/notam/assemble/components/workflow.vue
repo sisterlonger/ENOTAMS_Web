@@ -26,13 +26,20 @@
           max-height="1000px" top="5%" :close-on-click-modal="true">
           <enotam :messageId="messageId" :templateID="templateId" :parentId="parentId" :messageType="messageType" :act="act" @close="dialogClose" />
         </tiny-dialog-box> -->
+
+        <!--先这样，用export应付，后续再用notice-->
+        <tiny-dialog-box :modal="false" v-if="workflowVisibility" v-model:visible="workflowVisibility" title="详情"
+            width="80%" max-height="1000px" top="5%" :close-on-click-modal="true">
+            <exportMessage :formData="formData" :act="'detail'" />
+        </tiny-dialog-box>
     </div>
 </template>
 
 <script setup lang="ts">
 import { ref, toRefs, reactive, defineProps, onMounted } from 'vue'
-import { queryGetRelateMessage, queryGetWorkflowProgress } from '@/api/fetchInterface';
+import { queryGetRelateMessage, queryGetWorkflowProgress, queryMessageDetail } from '@/api/fetchInterface';
 import { TinyTimeLine, Modal, TinyGrid, TinyGridColumn, Button as TinyButton, } from '@opentiny/vue'
+import exportMessage from '@/views/notam/assemble/components/export.vue';
 import workflowaxios from '@/views/workflow/components/workflow-axios';
 
 const props = defineProps({
@@ -44,7 +51,7 @@ const props = defineProps({
 const { processInstanceId, flowId, messageId } = toRefs(props);
 const workflowVisibility = ref(false)
 const act = ref("")
-
+const formData = reactive({});
 
 // 使用reactive创建响应式数组
 const data = reactive<Array<{ name: string, time: string, type: string }>>([]);
@@ -56,8 +63,21 @@ let preCondition = ref(false)
 const queryRowEvent = async (row: any, type: string) => {
     if (type === "详情") {
         // 递归用当前页面去打开下一个关联通告
+        fetchData(row.messageId)
         workflowVisibility.value = true;
         act.value = "detail";
+    }
+}
+// 请求关联通告接口方法
+const fetchData = async (id: any) => {
+    try {
+        const { data: detailData } = await queryMessageDetail({ id });
+        Object.assign(formData, detailData);
+        console.log("formData--------", formData)
+    }
+    catch (err) {
+        console.log(err);
+        Modal.alert('获取数据错误');
     }
 }
 const getWorkflowProgress = async () => {
@@ -121,10 +141,10 @@ const getRelateMessage = async () => {
         tableData = res.data;
         tableData.forEach((item: any) => {
             if (item.parentId === messageId) {
-                item.status = "子"
+                item.status = "此条记录为下游"
             }
             else {
-                item.status = "父"
+                item.status = "此条记录为上游"
             }
         });
         console.log(tableData)
