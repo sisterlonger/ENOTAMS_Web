@@ -115,10 +115,10 @@
                 @click="editRowEvent(data.row, '处理')">处理</tiny-button>
               <tiny-button v-show="data.row.status === '已完成'" v-track="'发布'" size="mini" type="success"
                 @click="editRowEvent(data.row, '发布')">发布</tiny-button>
-              <tiny-button v-show="data.row.status === '已发布' && data.row.type !== '取消现有报文'" v-track="'代替'" size="mini" type="primary"
-                @click="editRowEvent(data.row, '代替')">代替报</tiny-button>
-              <tiny-button v-show="data.row.status === '已发布' && data.row.type !== '取消现有报文'" v-track="'取消'" size="mini" type="primary"
-                @click="editRowEvent(data.row, '取消')">取消报</tiny-button>
+              <tiny-button v-show="data.row.status === '已发布' && data.row.type !== '取消现有报文'" v-track="'代替'" size="mini"
+                type="primary" @click="editRowEvent(data.row, '代替')">代替报</tiny-button>
+              <tiny-button v-show="data.row.status === '已发布' && data.row.type !== '取消现有报文'" v-track="'取消'" size="mini"
+                type="primary" @click="editRowEvent(data.row, '取消')">取消报</tiny-button>
             </template>
           </tiny-grid-column>
         </tiny-grid>
@@ -135,7 +135,16 @@
         <!--新增的关联通告-->
         <tiny-dialog-box :modal="false" v-if="addVisibility" v-model:visible="addVisibility" title="详情" width="80%"
           max-height="1000px" top="5%" :close-on-click-modal="false">
-          <enotam :messageId="messageId" :templateID="templateId" :parentId="parentId" :messageType="messageType" :act="act" @close="dialogClose" />
+          <enotam :messageId="messageId" :templateID="templateId" :parentId="parentId" :messageType="messageType"
+            :act="act" @close="dialogClose" />
+        </tiny-dialog-box>
+        <!--通告序列号填写-->
+        <tiny-dialog-box :modal="false" v-if="publishVisibility" v-model:visible="publishVisibility" title="请输入通告序列号"
+          width="30%" max-height="500px" top="35%">
+          <tiny-row style="margin-bottom: 10px;">
+          <tiny-col :span="8"><tiny-input v-model="aftnSn" placeholder="请输入通告序列号" style="width: 100%;" /></tiny-col>
+          <tiny-col :span="4"><tiny-button type="primary" @click="publishClick">确定</tiny-button></tiny-col>
+          </tiny-row>
         </tiny-dialog-box>
       </div>
     </div>
@@ -175,13 +184,15 @@ const tableData = ref([
 const messageVisibility = ref(false)
 const workflowVisibility = ref(false)
 const addVisibility = ref(false)
+const publishVisibility = ref(false)
 const messageId = ref(0)
 const parentId = ref(0)
-const messageType=ref("")
+const messageType = ref("")
 const templateId = ref(0)
 const processInstanceId = ref("")
 const flowId = ref("")
 const taskId = ref("")
+const aftnSn = ref("")
 const formData = ref({
   qCode: "",
   airSpaceCodeId: "",
@@ -343,18 +354,12 @@ const editRowEvent = async (row, type) => {
     workflowVisibility.value = true;
   }
   else if (type === "发布") {
-    await publishMessage(publishData).then(async (res) => {
-      console.log("res", res);
-      if (res.code === 200) {
-        Modal.alert({ message: '发布成功', status: 'success' })
-      }
-    })
-    await queryClick();
+    publishVisibility.value = true;
 
   }
   else if (type === "取消") {
     act.value = "add";
-    messageType.value ="cnl"
+    messageType.value = "cnl"
     addVisibility.value = true;
     parentId.value = messageId.value;
     messageId.value = null;
@@ -371,11 +376,27 @@ const editRowEvent = async (row, type) => {
     // })
     // await queryClick();
     act.value = "add";
-    messageType.value ="replace"
+    messageType.value = "replace"
     addVisibility.value = true;
     parentId.value = messageId.value;
     messageId.value = null;
   }
+}
+// 提交发布事件
+async function publishClick() {
+  let publishData = {
+    messageId: messageId.value,
+    state: `已发布`,
+    aftnSn: aftnSn.value
+  }
+  await publishMessage(publishData).then(async (res) => {
+    console.log("res", res);
+    if (res.code === 200) {
+      Modal.alert({ message: '发布成功', status: 'success' })
+    }
+  })
+  dialogClose()
+  await queryClick();
 }
 // 关闭弹窗
 function dialogClose() {
@@ -389,6 +410,7 @@ function dialogClose() {
   messageVisibility.value = false;
   workflowVisibility.value = false;
   addVisibility.value = false;
+  publishVisibility.value = false;
   queryClick();
 }
 const fetchConfig = async () => {
