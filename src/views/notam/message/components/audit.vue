@@ -28,6 +28,7 @@ import {
     Numeric as TinyNumeric,
 } from '@opentiny/vue'
 import { iconWarning } from '@opentiny/vue-icon';
+import { isEmpty } from '@/utils/string-utils';
 import { SubmitWorkflowAudit } from '@/api/fetchInterface';
 import workflowaxios from '@/views/workflow/components/workflow-axios';
 
@@ -63,6 +64,10 @@ onMounted(async () => {
 const emit = defineEmits(['close']);
 
 async function handleSubmit(approveState: boolean) {
+    if(isEmpty(createData.approveDesc)){
+        Modal.alert('请填写审批意见！');
+        return;
+    }
     // 构建请求参数
     const auditRequest = {
         flowId: props.flowId,

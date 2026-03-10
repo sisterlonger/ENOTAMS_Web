@@ -1,7 +1,7 @@
 <template>
     <div>
         <tiny-row v-if="preCondition">
-            <tiny-form ref="ruleFormRef" :model="formData" :rules="formRules" :label-width="formStyle.width || '100px'" overflow-title>
+            <tiny-form ref="ruleFormRef" :model="formData" :rules="formRules" :label-width="formStyle.width || '200px'" overflow-title>
                 <div v-for="(item, index) in formFields" :key="'field' + index">
                     <tiny-form-item v-if="!item.hidden" :label="keyWordLabel[index]" :prop="item.prop">
                         <!--输入组件-->
@@ -74,7 +74,7 @@ const formRules = reactive({});
 const formData = reactive({});
 const submitFormData = reactive({});
 const keyList = reactive({});
-const formStyle = reactive({ width: '100px', span: 6 });
+const formStyle = reactive({ width: '200px', span: 6 });
 const preCondition = ref(false);
 const eData = ref({
 

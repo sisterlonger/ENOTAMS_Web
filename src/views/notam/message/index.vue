@@ -113,7 +113,7 @@
                 @click="editRowEvent(data.row, '详情')">详情</tiny-button>
               <tiny-button v-show="data.row.workflowStatus === '待办'" v-track="'处理'" size="mini" type="warning"
                 @click="editRowEvent(data.row, '处理')">处理</tiny-button>
-              <tiny-button v-show="data.row.status === '已完成'" v-track="'发布'" size="mini" type="success"
+              <tiny-button v-show="data.row.status === '已完成' && (userStore.userInfo.roleName.includes('情报员') || userStore.userInfo.roleName.includes('最高级管理员')) " v-track="'发布'" size="mini" type="success"
                 @click="editRowEvent(data.row, '发布')">发布</tiny-button>
               <tiny-button v-show="data.row.status === '已发布' && data.row.type !== '取消现有报文'" v-track="'代替'" size="mini"
                 type="primary" @click="editRowEvent(data.row, '代替')">代替报</tiny-button>
@@ -160,12 +160,15 @@ import {
 import { queryMessageList, queryAirSpaceList, publishMessage } from '@/api/fetchInterface';
 import { isEmpty } from '@/utils/string-utils';
 import { useRoute } from 'vue-router'
+import router from '@/router';
 
+import { useUserStore } from '@/store';
 import workflowaxios from '@/views/workflow/components/workflow-axios';
 import notice from '@/views/notam/message/components/notice.vue';
 import enotam from '@/views/notam/assemble/components/enotam.vue';
 import messageForm from './components/form.vue';
 
+const userStore = useUserStore();
 const pagerConfig = ref({
   attrs: {
     currentPage: 1,
@@ -219,6 +222,10 @@ const workflowStatusOptions = [
   {
     value: '已办',
     label: '已办'
+  },
+  {
+    value: '抄送',
+    label: '抄送'
   },
   {
     value: '未开始',

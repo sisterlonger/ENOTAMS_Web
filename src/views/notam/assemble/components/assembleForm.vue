@@ -1,6 +1,6 @@
 <template>
   <div>
-    <tiny-form v-if="preCondition" overflow-title label-width="120px" :rules="rules">
+    <tiny-form v-if="preCondition" overflow-title label-width="200px" :rules="rules">
       <!--可以添加选项-->
       <tiny-floatbar v-if="false" :style="floatSize">
         <ul>
@@ -12,8 +12,8 @@
         :modal-overlay-opening-radius="100">开始引导</tiny-button>
       <tiny-button type="danger" @click="onChangeView" :modal-overlay-opening-padding="100"
         :modal-overlay-opening-radius="100">切换视角</tiny-button>
-      <tiny-button v-if="!isEmpty(createData.parentId) && createData.parentId !== 0" type="success" @click="onRead" :modal-overlay-opening-padding="100"
-        :modal-overlay-opening-radius="100">查看关联的源通告</tiny-button>
+      <tiny-button v-if="!isEmpty(createData.parentId) && createData.parentId !== 0" type="success" @click="onRead"
+        :modal-overlay-opening-padding="100" :modal-overlay-opening-radius="100">查看关联的源通告</tiny-button>
       <tiny-guide :show-step="showStep" :dom-data="domData"></tiny-guide>
       <tiny-row class="guide-box1">
         <tiny-divider content-position="left" offset="5%" font-size="20px" content-background-color="#1476ff"
@@ -618,7 +618,9 @@ const messageData: MessageVM = {
   lat: '',
   long: '',
   radius: '',
-  telegramText: ""
+  telegramText: "",
+  startTime: "",
+  endTime: "",
 };
 const showNotice = ref(false);
 
@@ -667,6 +669,10 @@ const handleMessage = async () => {
     createData.telegramText = data.telegramText;
     createData.templateID = data.templateId;
     createData.parentId = data.parentId;
+    if(!isEmpty(data.startTime)){
+      createData.b_time = data.startTime;
+      createData.c_time = data.endTime;
+    };
     console.log(data, createData.parentId);
     // 当已经提交后，不显示E项
     // 解析正文并赋值B、C、D、F、G项
@@ -915,6 +921,8 @@ async function onSend() {
       messageData.radius = createData.qRadius;
       messageData.telegramText = createData.telegramText;
       messageData.templateId = templateID.value;
+      messageData.startTime = createData.b_time;
+      messageData.endTime = createData.c_time;
       // 代替取消报要记录parentid
       if (messageType.value === 'replace' || messageType.value === 'cnl') {
         messageData.parentId = parentId.value;
@@ -925,17 +933,19 @@ async function onSend() {
       if (!isEmpty(messageId)) {
         messageData.messageId = messageId.value;
       }
-      messageData.materials = [{ fileId: 87, materialType: "测试1" }];
-      // materialList.value.forEach(item => {
-      //   if (item.fileList.length > 0) {
-      //     messageData.materials.push({ fileId: item.fileList[0].id, materialType: item.title })
-      //   }
-      // });
+      ////messageData.materials = [{ fileId: 87, materialType: "测试1" }];
+      console.log("messageData", messageData, materialList.value);
+      messageData.materials = [];
+      materialList.value.forEach(item => {
+        if (item.fileList.length > 0) {
+          messageData.materials.push({ fileId: item.fileList[0].id, materialType: item.title })
+        }
+      });
       await postMessage(messageData).then((res1: any) => {
         if (res1.code === 200) {
           Modal.message({ message: '发送成功', status: 'success' })
           messageId.value = res1.data;
-          emit('createMessage', res1.data);
+          emit('createMessage', res1.data, messageData);
           onNotice();
         }
       }).catch((err: any) => {
@@ -1189,15 +1199,15 @@ function onChangeView() {
 // 查看源通告
 const onRead = async () => {
   try {
-        const { data: detailData } = await queryMessageDetail({ id: createData.parentId });
-        Object.assign(messageFormData, detailData);
-        console.log("messageFormData--------", messageFormData)
-        workflowVisibility.value = true;
-    }
-    catch (err) {
-        console.log(err);
-        Modal.alert('获取数据错误');
-    }
+    const { data: detailData } = await queryMessageDetail({ id: createData.parentId });
+    Object.assign(messageFormData, detailData);
+    console.log("messageFormData--------", messageFormData)
+    workflowVisibility.value = true;
+  }
+  catch (err) {
+    console.log(err);
+    Modal.alert('获取数据错误');
+  }
 }
 
 // 放大缩小PDF

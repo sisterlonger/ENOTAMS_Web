@@ -47,7 +47,7 @@
             placeholder: '请选择所属单位',
             style: { width: '100%' }
           },
-        }"  :format-text="formatMulti"></tiny-grid-column>
+        }" :format-text="formatMulti"></tiny-grid-column>
       </tiny-grid>
     </tiny-dialog-box>
   </div>
@@ -123,6 +123,7 @@ const { messageType } = toRefs(props);
 // 本地响应式变量存储路由参数,会优先接受路由的query，再接收props
 const localTemplateID = ref<number | undefined>(undefined);
 const localMessageID = ref<number | undefined>(undefined);
+const assbleFormMessageData = reactive({});
 
 const templateData = ref({});
 const isNoAuth = ref(false);
@@ -180,8 +181,11 @@ async function dialogClose(status: boolean) {
   }
 }
 
-function createMessage(id: number) {
+function createMessage(id: number, data: any) {
   localMessageID.value = id;
+  console.log("ass--------------",assbleFormMessageData);
+  Object.assign(assbleFormMessageData, data);
+
 }
 // 列表按钮函数
 // 列表按钮函数
@@ -199,21 +203,21 @@ async function toolbarButtonClickEvent({ code }) {
       Modal.message({ message: '请先勾选要发送的数据', status: 'warning' });
       return;
     }
-    
+
     // 2. 检查每个元素中的sendDepId是否为空
     const hasEmptySendDepId = data.some((item: any) => {
       // 根据实际情况调整判断条件
       return !item.sendDepId || item.sendDepId.length === 0;
     });
-    
+
     if (hasEmptySendDepId) {
       Modal.message({ message: '勾选的数据中存在未选择部门的情况，请检查', status: 'warning' });
       return;
     }
-    
+
     // 提取qCode列表，不截取，全部展示
     const qCodeList = data.map((item: any) => item.qCode).join('、');
-    
+
     // 批量发送逻辑
     Modal.confirm(`确认并开始上报关联通告（${qCodeList}），共 ${data.length} 条？确定后将无法编辑！`).then(async (res: string) => {
       if (res === 'confirm') {
@@ -226,12 +230,16 @@ async function toolbarButtonClickEvent({ code }) {
           messageData.radius = item.qRadius;
           messageData.templateId = item.templateID;
           messageData.parentId = localMessageID.value;
+          // ###############差时间
+          messageData.validType = assbleFormMessageData.validType;
+          messageData.startTime = assbleFormMessageData.startTime;
+          messageData.endTime = assbleFormMessageData.endTime;
           // 注意：这里使用了consultDepId，但上面检查的是sendDepId
           // 如果sendDepId和consultDepId是同一个字段，请保持一致
           messageData.consultDepId = item.sendDepId.join(",");
           return messageData;
         });
-        console.log("messageList--------------------",messageList)
+        console.log("messageList--------------------", messageList)
         // 调用批量接口
         await postBatchMessage(messageList).then((res1: any) => {
           if (res1.code === 200) {
@@ -256,49 +264,49 @@ function formatMulti(value) {
   //console.log(value);
   //console.log("cellValue", value.cellValue);
   //console.log("options",value.column.editor.attrs.options);
-  
+
   // 使用对象解构
   const { cellValue: depIds } = value;
   const { options } = value.column.editor.attrs;
-  
+
   // 如果cellValue不是数组或为空，直接返回空字符串
   if (!Array.isArray(depIds) || depIds.length === 0) {
     return '';
   }
-  
+
   // 递归查找所有节点，建立depID到fullName的映射
   const depIdToFullNameMap = {};
-  
+
   // 递归遍历树的函数 - 使用 forEach 替代 for...of
   function traverseTree(nodes) {
     if (!Array.isArray(nodes)) {
       return;
     }
-    
+
     nodes.forEach((node) => {
       // 将当前节点的depID和fullName存入映射表
       if (node.depID !== undefined && node.fullName !== undefined) {
         depIdToFullNameMap[node.depID] = node.fullName;
       }
-      
+
       // 递归遍历子节点
       if (node.children && Array.isArray(node.children)) {
         traverseTree(node.children);
       }
     });
   }
-  
+
   // 开始遍历选项树
   traverseTree(options);
-  
+
   // 根据depIds获取对应的fullName
   const fullNames = depIds
     .map(depId => depIdToFullNameMap[depId]) // 转换为fullName
     .filter(fullName => fullName !== undefined && fullName !== null && fullName !== ''); // 过滤掉无效值
-  
+
   console.log("映射表:", depIdToFullNameMap);
   console.log("找到的fullNames:", fullNames);
-  
+
   // 用逗号分隔并返回
   return fullNames.join(',');
 }

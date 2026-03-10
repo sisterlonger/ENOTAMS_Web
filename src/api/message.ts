@@ -27,6 +27,8 @@ export interface MessageVM {
     templateId: number;
     workflowId: number;
     parentId: number;
+    startTime: string;
+    endTime: string;
 }
 export interface MessageWorkflowVM {
     messageId: number;
