@@ -105,9 +105,17 @@ const getWorkflowProgress = async () => {
             // 使用 placeholder 作为节点名，如果不存在则使用 name
             const nodeName = item.name;
 
-            // 获取人员名称
+            // 获取人员名称（优先从评论的user对象中获取）
             let safeNamesString = '';
-            if (item.userVoList && item.userVoList.length > 0) {
+            if (item.approveDescList && item.approveDescList.length > 0) {
+                const firstDesc = item.approveDescList[0];
+                // 从 desc 同级的 user 对象中获取 name
+                if (firstDesc.user && firstDesc.user.name) {
+                    safeNamesString = firstDesc.user.name;
+                }
+            }
+            // 如果没有评论人，再回退到从 userVoList 获取（作为备选）
+            if (!safeNamesString && item.userVoList && item.userVoList.length > 0) {
                 safeNamesString = item.userVoList
                     .map((user: any) => user.name || '')
                     .filter((name: any) => name)
