@@ -21,9 +21,9 @@
                                 </tiny-col>
                                 <tiny-col :span="4">
                                     <tiny-form-item label="部门">
-                                        <tiny-cascader v-model="formData.depName" :options="departmentOptions"
+                                        <tiny-cascader v-model="formData.depID" :options="departmentOptions"
                                             style="width:100%"
-                                            :props="{ emitPath: false, value: 'depName', label: 'depName', expandTrigger: 'hover' }"
+                                            :props="{ emitPath: false, value: 'depID', label: 'depName', expandTrigger: 'hover' }"
                                             autosize filterable clearable>
                                         </tiny-cascader>
                                     </tiny-form-item>

@@ -4,17 +4,19 @@
             <!--PDF预览的内容-->
             <tiny-tab-item :key="tabsList[0].name" :title="tabsList[0].title" :name="tabsList[0].name">
                 <exportMessage :formData="formData" :act="'detail'" />
-                <materials :messageId="messageId" :templateID="templateID" :isNoAuth="isNoAuth" :act="materialsAct"></materials>
-                <audit v-if="act === 'edit'" :processInstanceId="processInstanceId" :flowId="flowId" :taskId="taskId"
-                    @close="dialogClose" />
+                <materials :messageId="messageId" :templateID="templateID" :isNoAuth="isNoAuth" :act="materialsAct">
+                </materials>
+                <audit v-if="act === 'edit' && afterCondition" :processInstanceId="processInstanceId" :flowId="flowId" :taskId="taskId"
+                    :isInitiator="isInitiator" :isRecipient="isRecipient" :nodeName="nodeName" :messageId="messageId" @close="dialogClose" />
             </tiny-tab-item>
             <!--附件记录-->
             <tiny-tab-item v-if="false" :key="tabsList[1].name" :title="tabsList[1].title" :name="tabsList[1].name">
-                <materials :messageId="messageId" :templateID="templateID" :isNoAuth="isNoAuth" :act="materialsAct"></materials>
+                <materials :messageId="messageId" :templateID="templateID" :isNoAuth="isNoAuth" :act="materialsAct">
+                </materials>
             </tiny-tab-item>
             <!--流程记录-->
             <tiny-tab-item :key="tabsList[2].name" :title="tabsList[2].title" :name="tabsList[2].name">
-                <workflow :processInstanceId="processInstanceId" :flowId="flowId" :messageId="messageId">
+                <workflow :processInstanceId="processInstanceId" :flowId="flowId" :taskId="taskId" :messageId="messageId" @getCurrentNode="getCurrentNode">
                 </workflow>
             </tiny-tab-item>
         </tiny-tabs>
@@ -90,9 +92,13 @@ const { act } = toRefs(props);
 const formData = reactive({});
 const isNoAuth = ref(false);
 const preCondition = ref(false);
+const afterCondition = ref(false);
 const departmentTreeData = ref([]);
 const materialsAct = ref('detail');
 const userStore = useUserStore();
+const isInitiator = ref(false);
+const isRecipient = ref(false);
+const nodeName = ref('');
 // 请求数据接口方法
 const fetchData = async () => {
     state.loading = Loading.service({
@@ -106,9 +112,12 @@ const fetchData = async () => {
         console.log("formData--------", formData)
         // 控制附件的操控权限
         materialsAct.value = act.value
-        console.log("$$$$$$$$$$$$$$$$$$$", userStore.userInfo.depID,data.sendDepId);
         if (data.sendDepId === userStore.userInfo.depID) {
             materialsAct.value = "edit"
+            isInitiator.value = true;
+        }
+        if (data.receiveDepId === userStore.userInfo.depID) {
+            isRecipient.value = true;
         }
     }
     catch (err) {
@@ -125,6 +134,11 @@ function dialogClose() {
     emit('close');
 }
 
+function getCurrentNode(node:any) {
+    console.log(node)
+    nodeName.value = node;
+    afterCondition.value = true;
+}
 
 // 初始化请求数据
 onMounted(async () => {
@@ -133,9 +147,10 @@ onMounted(async () => {
         isNoAuth.value = true;
     }
     await fetchData();
-    console.log(materialsAct.value,act.value);
+    console.log(materialsAct.value, act.value);
     preCondition.value = true;
     const { data } = await queryDepartmentTreeList();
     departmentTreeData.value = data.children;
 });
+
 </script>

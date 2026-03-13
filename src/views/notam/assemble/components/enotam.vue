@@ -183,7 +183,6 @@ async function dialogClose(status: boolean) {
 
 function createMessage(id: number, data: any) {
   localMessageID.value = id;
-  console.log("ass--------------",assbleFormMessageData);
   Object.assign(assbleFormMessageData, data);
 
 }

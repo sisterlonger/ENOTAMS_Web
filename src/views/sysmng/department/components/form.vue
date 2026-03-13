@@ -15,7 +15,7 @@
                     label: 'depName',
                     emitPath: false,
                     multiple: true
-                }" autosize filterable clearable>
+                }" autosize filterable clearable placeholder="流程的上级部门">
                 </tiny-cascader>
             </tiny-form-item>
             <tiny-form-item v-if="createData.fullName" label="专业" prop="field">

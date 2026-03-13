@@ -36,19 +36,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref, toRefs, reactive, defineProps, onMounted } from 'vue'
+import { ref, toRefs, reactive, defineProps, onMounted,defineEmits } from 'vue'
 import { queryGetRelateMessage, queryGetWorkflowProgress, queryMessageDetail } from '@/api/fetchInterface';
 import { TinyTimeLine, Modal, TinyGrid, TinyGridColumn, Button as TinyButton, } from '@opentiny/vue'
 import exportMessage from '@/views/notam/assemble/components/export.vue';
 import workflowaxios from '@/views/workflow/components/workflow-axios';
+import task from '@/router/routes/modules/task';
 
 const props = defineProps({
     processInstanceId: String,
     flowId: String,
+    taskId: String,
     messageId: Number
 });
 
-const { processInstanceId, flowId, messageId } = toRefs(props);
+const { processInstanceId, flowId, messageId, taskId } = toRefs(props);
 const workflowVisibility = ref(false)
 const act = ref("")
 const formData = reactive({});
@@ -57,6 +59,8 @@ const formData = reactive({});
 const data = reactive<Array<{ name: string, time: string, type: string }>>([]);
 let tableData = reactive<any>;
 let preCondition = ref(false)
+// 定义派发事件
+const emit = defineEmits(['getCurrentNode']);
 
 
 // 行操作
@@ -84,6 +88,7 @@ const getWorkflowProgress = async () => {
     await queryGetWorkflowProgress({
         processInstanceId: processInstanceId.value,
         flowId: flowId.value,
+        taskId: taskId.value,
         authUserId: workflowaxios.defaults.headers.common.AuthUserId,
         authorization: workflowaxios.defaults.headers.common.Authorization,
         flyflowTenantId: workflowaxios.defaults.headers.common.FlyflowTenantId || "1"
@@ -94,39 +99,78 @@ const getWorkflowProgress = async () => {
             1: 'info',
             2: 'success'
         };
-        res.data.forEach((item: any) => {
-            // 一级
-            if (item.status !== 0 && item.userVoList.length > 0) {
-                let safeNamesString = item.userVoList
-                    .map((user: any) => user.name || '') // 如果name可能为空则添加空字符串
-                    .filter((name: any) => name)        // 过滤掉空值
-                    .join(',');
 
-                data.push({
-                    name: `${item.name}${safeNamesString === '' ? '' : `【${safeNamesString}】`}`,
-                    time: item.showTimeStr,
-                    type: statusMap[item.status] || 'danger'
+        // 构建节点信息的函数
+        const buildNode = (item: any) => {
+            // 使用 placeholder 作为节点名，如果不存在则使用 name
+            const nodeName = item.name;
+
+            // 获取人员名称
+            let safeNamesString = '';
+            if (item.userVoList && item.userVoList.length > 0) {
+                safeNamesString = item.userVoList
+                    .map((user: any) => user.name || '')
+                    .filter((name: any) => name)
+                    .join(',');
+            }
+
+            // 获取评论内容
+            let comment = '';
+            if (item.approveDescList && item.approveDescList.length > 0) {
+                const firstDesc = item.approveDescList[0];
+                try {
+                    const descObj = typeof firstDesc.desc === 'string'
+                        ? JSON.parse(firstDesc.desc)
+                        : firstDesc.desc;
+                    comment = descObj.content || '';
+                } catch (e) {
+                    comment = firstDesc.desc || '';
+                }
+            }
+
+            // 构建显示名称
+            let displayName = nodeName;
+            if (safeNamesString) {
+                displayName += `【${safeNamesString}】`;
+            }
+            if (comment) {
+                displayName += ` 评论：${comment}`;
+            }
+            if (item.status === 1) {
+                console.log(nodeName);
+                emit('getCurrentNode', nodeName);
+            }
+            return {
+                name: displayName,
+                time: item.showTimeStr || '',
+                type: statusMap[item.status] || 'danger'
+            };
+        };
+
+        // 递归处理节点函数
+        const processNode = (node: any) => {
+            if (node.status !== 0) {
+                data.push(buildNode(node));
+            }
+
+            // 递归处理分支
+            if (node.branch && node.branch.length > 0) {
+                node.branch.forEach((branch: any) => {
+                    if (branch.children && branch.children.length > 0) {
+                        branch.children.forEach((child: any) => {
+                            processNode(child);
+                        });
+                    }
                 });
             }
-            // 二级
-            // 目前只支持一级分支，以后再搞更深层的
-            if (item.status !== 0) {
-                item.branch.forEach((branch: any) => {
-                    branch.children.forEach((child: any) => {
-                        let safeNamesString = child.userVoList
-                            .map((user: any) => user.name || '') // 如果name可能为空则添加空字符串
-                            .filter((name: any) => name)        // 过滤掉空值
-                            .join(',');
-                        data.push({
-                            name: `${child.name}${safeNamesString === '' ? '' : `【${safeNamesString}】`}`,
-                            time: child.showTimeStr,
-                            type: statusMap[child.status] || 'danger'
-                        })
-                    })
-                })
-            }
+        };
+
+        // 处理所有节点
+        res.data.forEach((item: any) => {
+            processNode(item);
         });
-        console.log(res);
+
+        console.log('处理后的时间线数据:', data);
     }).catch((err: any) => {
         console.log(err)
     });
