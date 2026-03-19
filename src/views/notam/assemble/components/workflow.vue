@@ -104,7 +104,6 @@ const getWorkflowProgress = async () => {
         const buildNode = (item: any) => {
             // 使用 placeholder 作为节点名，如果不存在则使用 name
             const nodeName = item.name;
-
             // 获取人员名称（优先从评论的user对象中获取）
             let safeNamesString = '';
             if (item.approveDescList && item.approveDescList.length > 0) {
@@ -136,6 +135,27 @@ const getWorkflowProgress = async () => {
                 }
             }
 
+            // 获取时间 - 优先使用 showTime，如果不存在则使用 showTimeStr
+            let timeStr = '';
+            // 只有 status 为 2 的节点才显示时间
+            if (item.status === 2) {
+                if (item.showTime) {
+                    // 直接从 showTime 获取，格式为 "2026-03-13 10:02:43"
+                    timeStr = item.showTime;
+                } else if (item.userVoList && item.userVoList.length > 0) {
+                    // 如果节点没有 showTime，尝试从 userVoList 中获取第一个有 showTime 的用户的时间
+                    const userWithTime = item.userVoList.find((user: any) => user.showTime);
+                    if (userWithTime) {
+                        timeStr = userWithTime.showTime;
+                    }
+                } else if (item.showTimeStr) {
+                    timeStr = item.showTimeStr;
+                }
+            } else {
+                // status 为 1 的节点，时间设置为空字符串
+                timeStr = '';
+            }
+
             // 构建显示名称
             let displayName = nodeName;
             if (safeNamesString) {
@@ -150,7 +170,7 @@ const getWorkflowProgress = async () => {
             }
             return {
                 name: displayName,
-                time: item.showTimeStr || '',
+                time: timeStr, // 使用获取到的时间
                 type: statusMap[item.status] || 'danger'
             };
         };
@@ -192,7 +212,7 @@ const getRelateMessage = async () => {
     }).then(async (res: any) => {
         tableData = res.data;
         tableData.forEach((item: any) => {
-            if (item.parentId === messageId) {
+            if (item.parentId === messageId.value) {
                 item.status = "此条记录为下游"
             }
             else {

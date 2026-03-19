@@ -42,11 +42,11 @@
                             }" v-model="formData.notamSn" placeholder="请输入提供序列号" v-if="act !== 'detail'"></tiny-input>
                         </div>
                     </td>
-                    <td colspan="3">生效日期和时间：{{ formatCustomDate(formData.b_time) }}</td>
+                    <td colspan="3">生效日期和时间：{{ formData.messageType === '新发报文' || formData.type==='新发报文'?formatCustomDate(formData.b_time)||formatCustomDate(formData.startTime):'立即生效' }}</td>
                 </tr>
                 <tr>
                     <td colspan="3">共1页</td>
-                    <td colspan="3">失效日期和时间：{{ formatCustomDate(formData.c_time) }}</td>
+                    <td colspan="3">失效日期和时间：{{ formatCustomDate(formData.c_time)|| formatCustomDate(formData.endTime) }}</td>
                 </tr>
                 <tr>
                     <td colspan="6">
@@ -57,7 +57,7 @@
                 <tr>
                     <td colspan="6">
                         <pre
-                            style="white-space: pre-wrap; margin: 0; font-family: inherit;">内容：<br>{{ pageData.e_data || pageData.telegramText }} </pre>
+                            style="white-space: pre-wrap; margin: 0; font-family: inherit;">内容：<br>NOTAM{{formData.type==='代替现有报文'?'R ':formData.type==='取消现有报文'?'C ':' '}}{{pageData.aftnSn}}<br>{{ pageData.e_data || telegramTextWithoutFirstLine }} </pre>
                     </td>
                 </tr>
                 <tr>
@@ -92,7 +92,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, toRefs, defineProps, defineEmits, reactive, onMounted } from 'vue'
+import { ref, toRefs, defineProps, defineEmits, reactive, onMounted,computed } from 'vue'
 import { TinyButton, TinyInput } from '@opentiny/vue'
 import { queryDepartmentDetail, queryUserDetail } from '@/api/fetchInterface';
 import { useUserStore } from '@/store';
@@ -171,7 +171,32 @@ const exportPDF = () => {
 // 使用 ref 来创建响应式的格式化时间变量
 const formattedTime = ref('');
 
-
+// 为了满足空管部隐藏Q项的需求
+// 计算属性：返回去掉第一行后的文本
+const telegramTextWithoutFirstLine = computed({
+  get() {
+    if (!pageData.telegramText) return ''
+    
+    // 将文本按行分割
+    const lines = pageData.telegramText.split('\n')
+    
+    // 去掉第一行，然后重新组合
+    if (lines.length > 1) {
+      return lines.slice(1).join('\n')
+    }
+    
+    // 如果只有一行，返回空字符串
+    return ''
+  },
+  set(value) {
+    // 获取原始的第一行
+    const originalLines = (pageData.telegramText || '').split('\n')
+    const firstLine = originalLines.length > 0 ? originalLines[0] : ''
+    
+    // 使用模板字符串重新组合：第一行 + 新的内容
+    pageData.telegramText = `${firstLine}${value ? `\n${value}` : ''}`
+  }
+})
 // 定义一个更新 formattedTime 的函数
 const updateTime = () => {
     console.log(pageData.createTime)
@@ -201,6 +226,7 @@ const getUserAndDepartmentInfo = async () => {
                 pageData.receiveDepName = res.data.fullName || res.data.depName
             })
         }
+        console.log(pageData.receiveUserId,'情报人员id')
         if (!isEmpty(pageData.sendUserId)) {
             await queryUserDetail({ id: pageData.sendUserId }).then((res) => {
                 pageData.sendUserName = res.data.userName

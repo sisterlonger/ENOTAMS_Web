@@ -3,6 +3,8 @@
     <tiny-tabs v-if="preCondition" v-model="activeName" tab-style="border-card" size="small">
       <!--报文记录-->
       <tiny-tab-item :key="tabsList[0].name" :title="tabsList[0].title" :name="tabsList[0].name">
+        <div v-if="!isEmpty(parentId) && (messageType === 'cnl' || messageType === 'replace')">本单{{messageType === 'cnl'?'取消':'代替'}}了【{{
+          parentMessageFormData.notamSn }}】的原始资料通知单，及发布的【{{ parentMessageFormData.aftnSn }}】</div>
         <assembleForm :messageId="localMessageID" :parentId="parentId" :messageType="messageType"
           :templateID="localTemplateID" :templateData="templateData" :isNoAuth="isNoAuth" :act="act"
           :processInstanceId="processInstanceId || '0'" :flowId="flowId || '0'" @close="dialogClose"
@@ -56,7 +58,7 @@
 <script setup lang="ts">
 import { ref, toRefs, defineProps, defineEmits, reactive, onMounted } from 'vue'
 import { TinyTabs, TinyTabItem, Modal, Loading, DialogBox as TinyDialogBox, TinyGrid, TinyGridColumn, Button as TinyButton, TinyGridToolbar, TinyCascader } from '@opentiny/vue'
-import { queryTemplateDetail, queryByTemplateIdTemplateDetail, postBatchMessage, queryDepartmentTreeList } from '@/api/fetchInterface';
+import { queryTemplateDetail, queryByTemplateIdTemplateDetail, postBatchMessage, queryDepartmentTreeList, queryMessageDetail } from '@/api/fetchInterface';
 import { useRouter } from 'vue-router';
 import { isEmpty } from '@/utils/string-utils';
 import { useUserStore } from '@/store';
@@ -132,6 +134,7 @@ const preCondition = ref(false);
 const departmentTreeData = ref([]);
 const userStore = useUserStore();
 const cascaderDepRef = ref()
+const parentMessageFormData = ref({})
 // 请求数据接口方法
 const fetchData = async () => {
   state.loading = Loading.service({
@@ -142,6 +145,10 @@ const fetchData = async () => {
   try {
     const { data } = await queryTemplateDetail({ id: localTemplateID.value });
     templateData.value = data;
+    console.log(parentId, parentId.value);
+    if (!isEmpty(parentId.value)) {
+      await getParentMessage()
+    }
   }
   catch (err) {
     console.log(err);
@@ -238,7 +245,7 @@ async function toolbarButtonClickEvent({ code }) {
           messageData.consultDepId = item.sendDepId.join(",");
           return messageData;
         });
-        console.log("messageList--------------------", messageList)
+        //console.log("messageList--------------------", messageList)
         // 调用批量接口
         await postBatchMessage(messageList).then((res1: any) => {
           if (res1.code === 200) {
@@ -309,7 +316,11 @@ function formatMulti(value) {
   // 用逗号分隔并返回
   return fullNames.join(',');
 }
-
+// 获取父通告的信息
+async function getParentMessage() {
+  const { data: detailData } = await queryMessageDetail({ id: parentId.value });
+  Object.assign(parentMessageFormData.value, detailData);
+}
 // 初始化请求数据
 onMounted(async () => {
   let queryParams = route.query;

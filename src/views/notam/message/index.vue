@@ -42,16 +42,16 @@
                   </tiny-form-item>
                 </tiny-col>
                 <tiny-col :span="4">
-                  <tiny-form-item label="处理状态">
-                    <tiny-select v-model="formData.workflowStatus" placeholder="请选择处理状态" filterable clearable>
+                  <tiny-form-item label="任务状态">
+                    <tiny-select v-model="formData.workflowStatus" placeholder="请选择任务状态" filterable clearable>
                       <tiny-option v-for="item in workflowStatusOptions" :key="item.label" :label="item.label"
                         :value="item.value"></tiny-option>
                     </tiny-select>
                   </tiny-form-item>
                 </tiny-col>
                 <tiny-col :span="4">
-                  <tiny-form-item label="状态">
-                    <tiny-select v-model="formData.status" placeholder="请选择状态" filterable clearable>
+                  <tiny-form-item label="流程进度">
+                    <tiny-select v-model="formData.status" placeholder="请选择流程进度" filterable clearable>
                       <tiny-option v-for="item in statusOptions" :key="item.label" :label="item.label"
                         :value="item.value"></tiny-option>
                     </tiny-select>
@@ -96,8 +96,8 @@
           <tiny-grid-column field="telegramText" title="主要内容(E项)" show-overflow></tiny-grid-column>
           <tiny-grid-column field="createTime" title="创建时间" width="11%" :renderer="renderName"></tiny-grid-column>
           <tiny-grid-column field="taskAssignShow" title="当前处理人" width="10%"></tiny-grid-column>
-          <tiny-grid-column field="workflowStatus" title="处理状态"></tiny-grid-column>
-          <tiny-grid-column field="status" title="状态" width="10%">
+          <tiny-grid-column field="workflowStatus" title="任务状态"></tiny-grid-column>
+          <tiny-grid-column field="status" title="流程进度" width="10%">
             <template #default="data">
               <tiny-tag size="mini" :type="data.row.buttonType" effect="dark">{{
                 data.row.status }}</tiny-tag>
@@ -205,7 +205,7 @@ const formData = ref({
   createTime: "",
   long: "",
   taskAssignShow: "",
-  workflowStatus: "",
+  workflowStatus: "待办",
   timeRange: [],
 })
 let workFlowList = ref([]);
@@ -224,6 +224,10 @@ const workflowStatusOptions = [
   {
     value: '抄送',
     label: '抄送'
+  },
+  {
+    value: '发起',
+    label: '发起'
   },
   {
     value: '未开始',
@@ -329,7 +333,6 @@ async function getData({ page }) {
   formData.value.FlyflowTenantId = workflowaxios.defaults.headers.common.FlyflowTenantId
   let response = await queryMessageList(formData.value);
   tableData.value = response.data;
-  console.log(response.data);
   return Promise.resolve({
     result: tableData.value,
     page: { total: response.count },
@@ -356,6 +359,8 @@ const editRowEvent = async (row, type) => {
   }
   else if (type === "处理关联通告") {
     act.value = "add";
+    messageType.value = "relate"
+    parentId.value = row.parentId;
     addVisibility.value = true;
   }
   else if (type === "处理") {

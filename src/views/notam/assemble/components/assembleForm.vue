@@ -22,7 +22,8 @@
           <tiny-col :span="8">
             <tiny-form-item label="通告类型">
               <!--单选框-->
-              <tiny-radio-group v-model="createData.messageType" :disabled="act === 'edit'"
+              <tiny-radio-group v-model="createData.messageType"
+                :disabled="act === 'edit' || messageType != 'cnl' || messageType != 'replace'"
                 @change="onChangeMessageType">
                 <tiny-radio-button v-for="(item, index) in messageTypeOption" :label="item" :value="item"
                   :key="index"></tiny-radio-button>
@@ -100,6 +101,7 @@
           </tiny-col>
         </tiny-row>
       </tiny-row>
+      <!-- <tiny-row class="guide-box2" v-show="messageType !== 'cnl' && messageType !== 'replace'"> -->
       <tiny-row class="guide-box2">
         <tiny-divider content-position="left" offset="5%" font-size="20px" content-background-color="#1476ff"
           content-color="#ffffff">发生地与生效期</tiny-divider>
@@ -116,7 +118,7 @@
               </tiny-select>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="7">
+          <tiny-col :span="7" v-show="messageType !== 'cnl' && messageType !== 'replace'">
             <!--生效时间-->
             <tiny-form-item label="事件是否有明确的生效时间">
               <tiny-radio-group v-model="createData.messageValidType" size="mini" :disabled="act === 'edit'">
@@ -125,15 +127,14 @@
               </tiny-radio-group>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="6">
+          <tiny-col :span="6" v-show="messageType !== 'cnl' && messageType !== 'replace'">
             <!--时间-->
             <tiny-form-item label="事件生效时间">
               <tiny-date-picker v-model="createData.b_time" type="datetime" placeholder="请选择生效时间（北京时）"
                 format="yyMMddHHmm" value-format="yyMMddHHmm" :disabled="act === 'edit'"></tiny-date-picker>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="6"
-            v-if="createData.messageValidType !== 'PERM' && createData.messageType !== '代替现有报文' && createData.messageType !== '取消现有报文'">
+          <tiny-col :span="6" v-show="(createData.messageValidType !== 'PERM' && createData.messageType !== '取消现有报文')">
             <!--时间-->
             <tiny-form-item label="事件失效时间">
               <tiny-date-picker v-model="createData.c_time" type="datetime" placeholder="请选择失效时间（北京时）"
@@ -240,8 +241,12 @@
             <tiny-input v-model="createData.notamSn" :disabled="act === 'edit'"></tiny-input>
           </tiny-form-item>
           <!--报文-->
-          <tiny-form-item label="通告预览">
+          <!-- <tiny-form-item label="通告预览">
             <tiny-input v-model="createData.telegramText" type="textarea" autosize :disabled="act === 'edit'">
+            </tiny-input>
+          </tiny-form-item> -->
+          <tiny-form-item label="通告预览">
+            <tiny-input v-model="telegramTextWithoutFirstLine" type="textarea" autosize :disabled="act === 'edit'">
             </tiny-input>
           </tiny-form-item>
         </tiny-col>
@@ -316,7 +321,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, defineProps, toRefs, onMounted, toRaw, watch } from 'vue'
+import { ref, reactive, defineProps, toRefs, onMounted, toRaw, watch,computed} from 'vue'
 import {
   Collapse as TinyCollapse,
   CollapseItem as TinyCollapseItem,
@@ -499,7 +504,7 @@ const createData = reactive({
   messageId: '',
   parentId: 0,
   // 报文生效类型
-  messageValidType: 'NEITHER',
+  messageValidType: '',
   // F/G项的基准面
   baseType: "",
   // Q项
@@ -641,7 +646,6 @@ onMounted(async () => {
   if (templateID.value) {
     fetchData();
   }
-  console.log(parentId.value);
   if (isEmpty(messageId.value) && messageType.value === "cnl") {
     createData.messageType = "取消现有报文"
     onChangeMessageType()
@@ -669,7 +673,7 @@ const handleMessage = async () => {
     createData.telegramText = data.telegramText;
     createData.templateID = data.templateId;
     createData.parentId = data.parentId;
-    if(!isEmpty(data.startTime)){
+    if (!isEmpty(data.startTime)) {
       createData.b_time = data.startTime;
       createData.c_time = data.endTime;
     };
@@ -822,21 +826,21 @@ function onAssemble() {
   // 新发报文代替现有报文必须要有b、c项
   // c项的末尾必须不是0000
   // 事件生效时间必须小于事件失效时间
-
   // NEITHER必须填B、C项
-  if (createData.messageValidType !== 'PERM' && (isEmpty(createData.b_time) || isEmpty(createData.c_time))) {
+  // 代替报和取消报的生效时间为当前时间，失效时间是取消报为无，代替报为可选
+  if ((createData.messageValidType !== 'PERM' && createData.messageValidType !== '') && (isEmpty(createData.b_time) || isEmpty(createData.c_time))) {
     Modal.alert('请填写事件生效时间和事件失效时间');
     return;
   }
-  if (createData.messageValidType !== 'PERM' && createData.c_time.includes('0000')) {
+  if ((createData.messageValidType !== 'PERM' && createData.messageValidType !== '') && createData.c_time.includes('0000')) {
     Modal.alert('事件失效时间的时分不能为00:00');
     return;
   }
-  if (createData.messageValidType !== 'PERM' && createData.c_time < createData.b_time) {
+  if ((createData.messageValidType !== 'PERM' && createData.messageValidType !== '') && createData.c_time < createData.b_time) {
     Modal.alert('事件失效时间不能大于事件生效时间');
     return;
   }
-  if (createData.messageValidType === 'PERM' && isEmpty(createData.b_time)) {
+  if ((createData.messageValidType === 'PERM' ||  createData.messageValidType === '')  && isEmpty(createData.b_time)) {
     Modal.alert('请填写事件生效时间');
     return;
   }
@@ -865,9 +869,13 @@ function onAssemble() {
   let qText = `Q)${createData.qAirSpace}/${createData.qCode}/${createData.qFlightType}/${createData.qTarget}/${createData.qReach}/${createData.qLowerLimit}/${createData.qUpperLimit}/${createData.qLat}${createData.qLong}${createData.qRadius}`;
   // PERM时，C项为空,C项不能够选择0000时间，只能是2359
   // C的文本
+  console.log(createData.b_time,createData.c_time);
   let cText = "";
-  if (createData.messageValidType === "PERM") {
+  if (createData.messageValidType === "PERM" && createData.messageType === "新发报文") {
     cText = "PERM";
+  }
+  else if (createData.messageValidType === "PERM" && createData.messageType !== "新发报文") {
+    cText = "";
   }
   else if (createData.messageValidType === "EST") {
     cText = `${createData.c_time || ''} EST`;
@@ -875,7 +883,7 @@ function onAssemble() {
   else {
     cText = `${createData.c_time || ''}`;
   }
-  let abcText = `A)${createData.a_airSpace} B)${createData.b_time || ''} C)${cText}`;
+  let abcText = `A)${createData.a_airSpace} B)${createData.b_time || ''} ${isEmpty(cText) ? '' : `C)${cText}`}`;
   //let abcText = `A)${createData.a_airSpace} B)${createData.b_time || ''} C)${createData.messageValidType === "NEITHER" ? createData.messageValidType : createData.c_time || ''}`;
   let dText = isEmpty(createData.d_time) ? "" : `\nD)${createData.d_time}`;
   let eText = `E)${eFormData.result}`;
@@ -1050,6 +1058,33 @@ function uniqueByProperty(array: any, key: any) {
     return true;
   });
 };
+// 为了满足空管部隐藏Q项的需求
+// 计算属性：返回去掉第一行后的文本
+const telegramTextWithoutFirstLine = computed({
+  get() {
+    if (!createData.telegramText) return ''
+    
+    // 将文本按行分割
+    const lines = createData.telegramText.split('\n')
+    
+    // 去掉第一行，然后重新组合
+    if (lines.length > 1) {
+      return lines.slice(1).join('\n')
+    }
+    
+    // 如果只有一行，返回空字符串
+    return ''
+  },
+  set(value) {
+    // 获取原始的第一行
+    const originalLines = (createData.telegramText || '').split('\n')
+    const firstLine = originalLines.length > 0 ? originalLines[0] : ''
+    
+    // 使用模板字符串重新组合：第一行 + 新的内容
+    createData.telegramText = `${firstLine}${value ? `\n${value}` : ''}`
+  }
+})
+
 // A-E、Q。A项改变事件，触发了静态数据变化。只有A项和Q项可以触发静态数据变化
 async function onChangeA() {
   // 选择情报区-NDB、VOR/DME、限制区、管制区
@@ -1166,10 +1201,14 @@ function onChangeBaseType() {
 }
 // 改变通告类型事件
 function onChangeMessageType() {
-  if (createData.messageType === "代替现有报文" || createData.messageType === "代替现有报文") {
+  messageValidTypeOption.value.push({ text: '立即生效', label: '' })
+  // 代替报和取消报的b项为当前时间，c项为空
+  if (createData.messageType === "代替现有报文" || createData.messageType === "取消现有报文") {
     createData.b_time = getCurrentFormattedTime();
+    createData.c_time = "";
+    createData.messageValidType = "";
   }
-  console.log(createData.b_time);
+  console.log(createData.b_time, createData.c_time);
 }
 function getCurrentFormattedTime() {
   const date = new Date();

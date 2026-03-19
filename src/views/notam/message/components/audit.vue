@@ -1,6 +1,6 @@
 <template>
     <div class="demo-form" v-if="preCondition">
-        <tiny-form ref="ruleFormRef" :model="createData" :rules="rules" label-width="150px" style="margin-top: 20px;">
+        <tiny-form ref="ruleFormRef" :model="createData" :rules="rules" label-width="150px" overflow-title style="margin-top: 20px;">
             <tiny-form-item v-if="addSignature" label="加批领导：">
                 <template #label>
                     <tiny-tooltip type="info" content="加批领导提供意见后方可继续" placement="top">
@@ -151,7 +151,8 @@ async function handleSubmit(approveState: boolean) {
         Modal.alert('请填写意见！');
         return;
     }
-    if (isEmpty(createData.aftnSn) && showAftnSn) {
+    console.log("通告号校验",isEmpty(createData.aftnSn) ,showAftnSn.value);
+    if (isEmpty(createData.aftnSn) && showAftnSn.value) {
         Modal.alert('请填写通告号！');
         return;
     }
