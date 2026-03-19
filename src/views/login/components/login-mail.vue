@@ -85,9 +85,8 @@ const rules = computed(() => {
 });
 
 const loginMail = reactive({
-  // TODO 上线要改
-  userCode: 'admin',
-  userPwd: 'admin',
+  userCode: '',
+  userPwd: '',
   rememberPassword: true,
 });
 

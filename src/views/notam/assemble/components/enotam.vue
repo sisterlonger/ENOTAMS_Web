@@ -328,6 +328,7 @@ onMounted(async () => {
     isNoAuth.value = true;
   }
   localTemplateID.value = Number(queryParams.templateID as string) || templateID.value;
+  console.log(localTemplateID.value,templateID.value,"localTemplateID");
   localMessageID.value = Number(queryParams.messageId as string) || messageId.value;
   if (localTemplateID.value) {
     await fetchData();

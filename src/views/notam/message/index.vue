@@ -126,11 +126,11 @@
         </tiny-dialog-box>
         <!--已有流程的notice-->
         <tiny-dialog-box :modal="false" v-if="workflowVisibility" v-model:visible="workflowVisibility" title="详情"
-          width="80%" max-height="1000px" top="5%" :close-on-click-modal="true">
+          width="80%" max-height="1000px" top="5%" :close-on-click-modal="false">
           <notice :messageId="messageId" :templateID="templateId" :processInstanceId="processInstanceId"
             :flowId="flowId" :taskId="taskId" :act="act" @close="dialogClose" />
         </tiny-dialog-box>
-        <!--新增的关联通告-->
+        <!--新增的关联通告（新发和代替、取消）-->
         <tiny-dialog-box :modal="false" v-if="addVisibility" v-model:visible="addVisibility" title="详情" width="80%"
           max-height="1000px" top="5%" :close-on-click-modal="false">
           <enotam :messageId="messageId" :templateID="templateId" :parentId="parentId" :messageType="messageType"
@@ -140,8 +140,8 @@
         <tiny-dialog-box :modal="false" v-if="publishVisibility" v-model:visible="publishVisibility" title="请输入通告序列号"
           width="30%" max-height="500px" top="35%">
           <tiny-row style="margin-bottom: 10px;">
-          <tiny-col :span="8"><tiny-input v-model="aftnSn" placeholder="请输入通告序列号" style="width: 100%;" /></tiny-col>
-          <tiny-col :span="4"><tiny-button type="primary" @click="publishClick">确定</tiny-button></tiny-col>
+            <tiny-col :span="8"><tiny-input v-model="aftnSn" placeholder="请输入通告序列号" style="width: 100%;" /></tiny-col>
+            <tiny-col :span="4"><tiny-button type="primary" @click="publishClick">确定</tiny-button></tiny-col>
           </tiny-row>
         </tiny-dialog-box>
       </div>
@@ -374,6 +374,7 @@ const editRowEvent = async (row, type) => {
   else if (type === "取消") {
     act.value = "add";
     messageType.value = "cnl"
+    templateId.value = 751;
     addVisibility.value = true;
     parentId.value = messageId.value;
     messageId.value = null;

@@ -30,7 +30,7 @@
               </tiny-radio-group>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="4" v-show="createData.messageType !== '新发报文'">
+          <tiny-col :span="4" v-if="false" v-show="createData.messageType !== '新发报文'">
             <tiny-form-item label="通告序列号">
               <tiny-input v-model="createData.aftnSn" :disabled="act === 'edit'"> </tiny-input>
             </tiny-form-item>
@@ -272,7 +272,7 @@
     </tiny-dialog-box>
     <!--查看关联的源通告-->
     <tiny-dialog-box :modal="false" v-if="workflowVisibility" v-model:visible="workflowVisibility" title="源通告"
-      width="80%" max-height="1000px" top="5%" :close-on-click-modal="true">
+      width="80%" max-height="1000px" top="5%" :close-on-click-modal="false">
       <exportMessage :formData="messageFormData" :act="'detail'" />
     </tiny-dialog-box>
     <!--审批流程选择-->

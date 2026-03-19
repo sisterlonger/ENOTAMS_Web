@@ -57,7 +57,7 @@
                 <tr>
                     <td colspan="6">
                         <pre
-                            style="white-space: pre-wrap; margin: 0; font-family: inherit;">内容：<br>NOTAM{{formData.type==='代替现有报文'?'R ':formData.type==='取消现有报文'?'C ':' '}}{{pageData.aftnSn}}<br>{{ pageData.e_data || telegramTextWithoutFirstLine }} </pre>
+                            style="white-space: pre-wrap; margin: 0; font-family: inherit;">内容：<br>NOTAM{{formData.type==='代替现有报文'?'R 代替':formData.type==='取消现有报文'?'C 取消':' '}}{{pageData.aftnSn}}<br>{{ pageData.e_data || telegramTextWithoutFirstLine }} </pre>
                     </td>
                 </tr>
                 <tr>
@@ -73,7 +73,7 @@
                     <td colspan="6">提供的航空情报原始数据内容真实、数据准确、全面。</td>
                 </tr>
                 <tr>
-                    <td colspan="6">负责人签名:{{ pageData.userSign }}</td>
+                    <td colspan="6">负责人签名:{{ pageData.leaderUserName }}</td>
                 </tr>
                 <tr>
                     <td colspan="6" class="u-blod center">6.回执</td>
@@ -83,7 +83,7 @@
                         <br>收集单位：{{ pageData.receiveDepName }}
                         <br>收集人：{{ pageData.receiveUserName }}
                         <br>收集时间：{{ formatCustomDate(formattedTime) }}
-                        <br>备注：{{ pageData.remark }}
+                        <br>备注：{{ pageData.comment }}
                     </td>
                 </tr>
             </table>
@@ -237,6 +237,12 @@ const getUserAndDepartmentInfo = async () => {
             await queryUserDetail({ id: pageData.receiveUserId }).then((res) => {
                 pageData.receiveUserName = res.data.userName
                 pageData.receiveUserMobile = res.data.mobile
+            })
+        }
+        if (!isEmpty(pageData.leaderUserId)) {
+            await queryUserDetail({ id: pageData.leaderUserId }).then((res) => {
+                pageData.leaderUserName = res.data.userName
+                pageData.leaderUserMobile = res.data.mobile
             })
         }
 

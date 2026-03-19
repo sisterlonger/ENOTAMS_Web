@@ -29,7 +29,7 @@
 
         <!--先这样，用export应付，后续再用notice-->
         <tiny-dialog-box :modal="false" v-if="workflowVisibility" v-model:visible="workflowVisibility" title="详情"
-            width="80%" max-height="1000px" top="5%" :close-on-click-modal="true">
+            width="80%" max-height="1000px" top="5%" :close-on-click-modal="false">
             <exportMessage :formData="formData" :act="'detail'" />
         </tiny-dialog-box>
     </div>
