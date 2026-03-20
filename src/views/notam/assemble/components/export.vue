@@ -27,7 +27,7 @@
                 </tr>
                 <tr>
                     <td colspan="3">收集单位：{{ pageData.receiveDepName }}</td>
-                    <td colspan="3">联系传真：</td>
+                    <td colspan="3">联系传真：{{ pageData.receiveUserFax }}</td>
                 </tr>
                 <tr>
                     <td colspan="6" class="u-blod center">3.提供内容</td>
@@ -42,11 +42,16 @@
                             }" v-model="formData.notamSn" placeholder="请输入提供序列号" v-if="act !== 'detail'"></tiny-input>
                         </div>
                     </td>
-                    <td colspan="3">生效日期和时间：{{ formData.messageType === '新发报文' || formData.type==='新发报文'?formatCustomDate(formData.b_time)||formatCustomDate(formData.startTime):'立即生效' }}</td>
+                    <td colspan="3">生效日期和时间：{{ formData.messageType === '新发报文' ||
+                        formData.type === '新发报文' ? formatCustomDate(formData.b_time) ||
+                    formatCustomDate(formData.startTime) : '立即生效'
+                    }}</td>
                 </tr>
                 <tr>
                     <td colspan="3">共1页</td>
-                    <td colspan="3">失效日期和时间：{{ formatCustomDate(formData.c_time)|| formatCustomDate(formData.endTime) }}</td>
+                    <td colspan="3">失效日期和时间：{{ formatCustomDate(formData.c_time) || formatCustomDate(formData.endTime)
+                    }}
+                    </td>
                 </tr>
                 <tr>
                     <td colspan="6">
@@ -56,8 +61,8 @@
                 </tr>
                 <tr>
                     <td colspan="6">
-                        <pre
-                            style="white-space: pre-wrap; margin: 0; font-family: inherit;">内容：<br>NOTAM{{formData.type==='代替现有报文'?'R 代替':formData.type==='取消现有报文'?'C 取消':' '}}{{pageData.aftnSn}}<br>{{ pageData.e_data || telegramTextWithoutFirstLine }} </pre>
+                        <pre style="white-space: pre-wrap; margin: 0; font-family: inherit;">内容：<br>{{ notamFirstlineText }}<br>{{ pageData.e_data || telegramTextWithoutFirstLine }} 
+                            <br>{{ pageData.specialNotes ==='' || pageData.specialNotes ===null ? '' : '其他需要说明的情况：\n' + pageData.specialNotes }}</pre>
                     </td>
                 </tr>
                 <tr>
@@ -92,9 +97,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, toRefs, defineProps, defineEmits, reactive, onMounted,computed } from 'vue'
+import { ref, toRefs, defineProps, defineEmits, reactive, onMounted, computed } from 'vue'
 import { TinyButton, TinyInput } from '@opentiny/vue'
-import { queryDepartmentDetail, queryUserDetail } from '@/api/fetchInterface';
+import { queryDepartmentDetail, queryUserDetail, queryMessageDetail } from '@/api/fetchInterface';
 import { useUserStore } from '@/store';
 import pagePrint from '@/utils/tools'
 import { isEmpty, formatTimeToYYMMDDHHMM, formatCustomDate } from '@/utils/string-utils';
@@ -109,6 +114,7 @@ const { formData } = toRefs(props);
 const { act } = toRefs(props);
 const preCondition = ref(false);
 const pageData = reactive({});
+const notamFirstlineText = ref('')
 const exportPDF = () => {
     let iframeBody = document.getElementById(
         "exportElementProcessOperate"
@@ -174,28 +180,28 @@ const formattedTime = ref('');
 // 为了满足空管部隐藏Q项的需求
 // 计算属性：返回去掉第一行后的文本
 const telegramTextWithoutFirstLine = computed({
-  get() {
-    if (!pageData.telegramText) return ''
-    
-    // 将文本按行分割
-    const lines = pageData.telegramText.split('\n')
-    
-    // 去掉第一行，然后重新组合
-    if (lines.length > 1) {
-      return lines.slice(1).join('\n')
+    get() {
+        if (!pageData.telegramText) return ''
+
+        // 将文本按行分割
+        const lines = pageData.telegramText.split('\n')
+
+        // 去掉第一行，然后重新组合
+        if (lines.length > 1) {
+            return lines.slice(1).join('\n')
+        }
+
+        // 如果只有一行，返回空字符串
+        return ''
+    },
+    set(value) {
+        // 获取原始的第一行
+        const originalLines = (pageData.telegramText || '').split('\n')
+        const firstLine = originalLines.length > 0 ? originalLines[0] : ''
+
+        // 使用模板字符串重新组合：第一行 + 新的内容
+        pageData.telegramText = `${firstLine}${value ? `\n${value}` : ''}`
     }
-    
-    // 如果只有一行，返回空字符串
-    return ''
-  },
-  set(value) {
-    // 获取原始的第一行
-    const originalLines = (pageData.telegramText || '').split('\n')
-    const firstLine = originalLines.length > 0 ? originalLines[0] : ''
-    
-    // 使用模板字符串重新组合：第一行 + 新的内容
-    pageData.telegramText = `${firstLine}${value ? `\n${value}` : ''}`
-  }
 })
 // 定义一个更新 formattedTime 的函数
 const updateTime = () => {
@@ -226,7 +232,7 @@ const getUserAndDepartmentInfo = async () => {
                 pageData.receiveDepName = res.data.fullName || res.data.depName
             })
         }
-        console.log(pageData.receiveUserId,'情报人员id')
+        console.log(pageData.receiveUserId, '情报人员id')
         if (!isEmpty(pageData.sendUserId)) {
             await queryUserDetail({ id: pageData.sendUserId }).then((res) => {
                 pageData.sendUserName = res.data.userName
@@ -237,6 +243,7 @@ const getUserAndDepartmentInfo = async () => {
             await queryUserDetail({ id: pageData.receiveUserId }).then((res) => {
                 pageData.receiveUserName = res.data.userName
                 pageData.receiveUserMobile = res.data.mobile
+                pageData.receiveUserFax = res.data.fax
             })
         }
         if (!isEmpty(pageData.leaderUserId)) {
@@ -251,11 +258,22 @@ const getUserAndDepartmentInfo = async () => {
 
     }
 };
+// 获取被代替获取取消的通告号,并计算填写的文本
+const setAftnText = async () => {
+    if ((pageData.type === '代替现有报文' || pageData.type === '取消现有报文') && !isEmpty(pageData.parentId)) {
+        let { data } = await queryMessageDetail({ id: pageData.parentId });
+        notamFirstlineText.value = `${pageData.aftnSn} NOTAM${pageData.type === '代替现有报文' ? 'R' : 'C'} ${data.aftnSn}`
+    }
+    else {
+        notamFirstlineText.value = `NOTAMN ${pageData.aftnSn || ''}`
+    }
+};
 // 初始化请求数据
 onMounted(async () => {
     Object.assign(pageData, formData.value);
     // 获取现在时间
     updateTime();
+    await setAftnText()
     await getUserAndDepartmentInfo()
     preCondition.value = true;
 });

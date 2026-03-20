@@ -25,6 +25,9 @@
             <tiny-form-item label="手机号" prop="mobile" :validate-icon="validateIcon">
                 <tiny-input v-model="createData.mobile" clearable></tiny-input>
             </tiny-form-item>
+            <tiny-form-item label="传真" prop="fax" :validate-icon="validateIcon">
+                <tiny-input v-model="createData.fax" clearable></tiny-input>
+            </tiny-form-item>
             <tiny-form-item label="邮箱" prop="email" :validate-icon="validateIcon">
                 <tiny-input v-model="createData.email" clearable></tiny-input>
             </tiny-form-item>
@@ -77,6 +80,7 @@ const createData = reactive({
     role: '',
     depID: '',
     mobile: "",
+    fax: "",
     email: '',
     flyflowTenantId: '',
     authUserId: '',

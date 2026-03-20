@@ -29,6 +29,7 @@ export interface MessageVM {
     parentId: number;
     startTime: string;
     endTime: string;
+    specialNotes:string;
 }
 export interface MessageWorkflowVM {
     messageId: number;

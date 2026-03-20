@@ -195,6 +195,12 @@
             </tiny-collapse-item>
           </tiny-collapse>
         </tiny-form-item>
+        <tiny-col :span="12">
+          <!--额外的正文文本-->
+          <tiny-form-item label="需要特别说明的：">
+            <tiny-input v-model="createData.specialNotes" type="textarea" :disabled="act === 'edit'"></tiny-input>
+          </tiny-form-item>
+        </tiny-col>
         <tiny-col :span="4">
           <!--影响高度范围-->
           <tiny-form-item label="影响高度范围" v-if="!isEmpty(createData.qLowerLimit)">
@@ -321,7 +327,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, defineProps, toRefs, onMounted, toRaw, watch,computed} from 'vue'
+import { ref, reactive, defineProps, toRefs, onMounted, toRaw, watch, computed } from 'vue'
 import {
   Collapse as TinyCollapse,
   CollapseItem as TinyCollapseItem,
@@ -541,7 +547,8 @@ const createData = reactive({
   notamSn: '',
   // 通告序列号
   aftnSn: '',
-
+  // 通知单特殊说明
+  specialNotes: '',
 })
 // 基准面
 const baseType = ref<any>('');
@@ -626,6 +633,7 @@ const messageData: MessageVM = {
   telegramText: "",
   startTime: "",
   endTime: "",
+  specialNotes:"",
 };
 const showNotice = ref(false);
 
@@ -840,7 +848,7 @@ function onAssemble() {
     Modal.alert('事件失效时间不能大于事件生效时间');
     return;
   }
-  if ((createData.messageValidType === 'PERM' ||  createData.messageValidType === '')  && isEmpty(createData.b_time)) {
+  if ((createData.messageValidType === 'PERM' || createData.messageValidType === '') && isEmpty(createData.b_time)) {
     Modal.alert('请填写事件生效时间');
     return;
   }
@@ -869,7 +877,7 @@ function onAssemble() {
   let qText = `Q)${createData.qAirSpace}/${createData.qCode}/${createData.qFlightType}/${createData.qTarget}/${createData.qReach}/${createData.qLowerLimit}/${createData.qUpperLimit}/${createData.qLat}${createData.qLong}${createData.qRadius}`;
   // PERM时，C项为空,C项不能够选择0000时间，只能是2359
   // C的文本
-  console.log(createData.b_time,createData.c_time);
+  console.log(createData.b_time, createData.c_time);
   let cText = "";
   if (createData.messageValidType === "PERM" && createData.messageType === "新发报文") {
     cText = "PERM";
@@ -931,6 +939,7 @@ async function onSend() {
       messageData.templateId = templateID.value;
       messageData.startTime = createData.b_time;
       messageData.endTime = createData.c_time;
+      messageData.specialNotes = createData.specialNotes;
       // 代替取消报要记录parentid
       if (messageType.value === 'replace' || messageType.value === 'cnl') {
         messageData.parentId = parentId.value;
@@ -1063,15 +1072,15 @@ function uniqueByProperty(array: any, key: any) {
 const telegramTextWithoutFirstLine = computed({
   get() {
     if (!createData.telegramText) return ''
-    
+
     // 将文本按行分割
     const lines = createData.telegramText.split('\n')
-    
+
     // 去掉第一行，然后重新组合
     if (lines.length > 1) {
       return lines.slice(1).join('\n')
     }
-    
+
     // 如果只有一行，返回空字符串
     return ''
   },
@@ -1079,7 +1088,7 @@ const telegramTextWithoutFirstLine = computed({
     // 获取原始的第一行
     const originalLines = (createData.telegramText || '').split('\n')
     const firstLine = originalLines.length > 0 ? originalLines[0] : ''
-    
+
     // 使用模板字符串重新组合：第一行 + 新的内容
     createData.telegramText = `${firstLine}${value ? `\n${value}` : ''}`
   }
