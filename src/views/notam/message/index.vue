@@ -150,9 +150,9 @@
 </template>
 
 <script setup lang="jsx">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, reactive } from 'vue'
 import {
-  Grid as TinyGrid, GridColumn as TinyGridColumn, Button as TinyButton, DialogBox as TinyDialogBox, GridToolbar as TinyGridToolbar, Input as TinyInput, Form as TinyForm, TinyTag,
+  Grid as TinyGrid, GridColumn as TinyGridColumn, Button as TinyButton, DialogBox as TinyDialogBox, GridToolbar as TinyGridToolbar, Input as TinyInput, Form as TinyForm, TinyTag, Loading,
   FormItem as TinyFormItem, Layout as TinyLayout, Row as TinyRow, Col as TinyCol, Modal, TinyDatePicker, Collapse as TinyCollapse, CollapseItem as TinyCollapseItem, Option as TinyOption, Select as TinySelect,
 } from '@opentiny/vue';
 import { queryMessageList, queryAirSpaceList, publishMessage } from '@/api/fetchInterface';
@@ -294,9 +294,31 @@ const validTypeOptions = [
   },
 ];
 const act = ref("")
+// 加载效果
+// 加载效果
+const state = reactive({
+  loading: null,
+  options: [],
+  project: '',
+});
 async function queryClick() {
-  //getData({ page: pagerConfig.value.attrs });
-  gridRef.value.handleFetch();
+  // 创建loading实例
+  state.loading = Loading.service({
+    text: 'loading...',
+    target: document.getElementById('container'),
+    background: 'rgba(0, 0, 0, 0.7)',
+  });
+
+  try {
+    // 执行查询操作
+    await gridRef.value.handleFetch();
+  } catch (error) {
+    console.error('查询失败:', error);
+    // 可以根据需要添加错误提示
+  } finally {
+    // 无论成功或失败，都关闭loading
+    state.loading.close();
+  }
 }
 
 function renderName(h, { row }) {

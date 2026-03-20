@@ -9,7 +9,7 @@
 
       <tiny-form-item prop="userPwd" size="medium">
         <tiny-input v-model="loginMail.userPwd" type="password" show-password
-          :placeholder="$t('login.form.userPwd.placeholder')">
+          :placeholder="'密码：a000000@'">
         </tiny-input>
       </tiny-form-item>
 
@@ -85,7 +85,6 @@ const rules = computed(() => {
 });
 
 const loginMail = reactive({
-    // TODO 上线要改
   userCode: '',
   userPwd: '',
   rememberPassword: true,
