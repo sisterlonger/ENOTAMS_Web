@@ -9,4 +9,5 @@ export interface WorkFlowDeptTree {
 export interface WorkFlowState {
     user: WorkFlowUserInfo;
     dept: WorkFlowDeptTree;
+    msgMaxId: number
   }

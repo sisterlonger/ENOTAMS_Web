@@ -60,11 +60,10 @@ axios.interceptors.response.use(
     if (res.code !== '0' && res.code !== 200) {
       (res.errMsg || res.msg) &&
         Modal.message({
-          message: res.errMsg + res.msg,
+          message: res.msg,
           status: 'error',
         });
-      console.log(res.errMsg);
-      return Promise.reject(new Error(res.errMsg + res.msg || 'Error'));
+      return Promise.reject(new Error(res.msg || 'Error'));
     }
     return res;
   },

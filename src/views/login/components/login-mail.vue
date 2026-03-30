@@ -8,12 +8,11 @@
       </tiny-form-item>
 
       <tiny-form-item prop="userPwd" size="medium">
-        <tiny-input v-model="loginMail.userPwd" type="password" show-password
-          :placeholder="'密码：a000000@'">
+        <tiny-input v-model="loginMail.userPwd" type="password" show-password :placeholder="'密码：a000000@'">
         </tiny-input>
       </tiny-form-item>
 
-      <div class="login-form-options" v-if = false>
+      <div class="login-form-options" v-if=false>
         <tiny-checkbox style="color:#fff">{{ $t('login.form.rememberPassword') }}</tiny-checkbox>
         <div>
           <tiny-link style="color:#fff" type="primary" class="divide-line">|</tiny-link>
@@ -112,6 +111,11 @@ const getFlyflowToken = async (mobile: string) => {
     }).then((res1: any) => {
       userWorkFlowStore.updateUserInfo({ loginId: res.data.data.loginId, tokenValue: res.data.data.tokenValue, depidId: res1.data.data.deptIdList[0] });
     })
+    workflowaxios.post('/message/queryList', { pageNum: 1, pageSize: 10 }).then((res2) => {
+      if(res2.data.data.records.length>0){
+        userWorkFlowStore.updateMsgMaxId(res2.data.data.records[0].id);
+      }
+    });
   })
 };
 
@@ -143,7 +147,7 @@ function handleSubmit() {
         component: DefaultLayout,
         children: appRoutes,
       });
-      
+
       router.addRoute({
         name: 'noauth',
         path: import.meta.env.VITE_CONTEXT,

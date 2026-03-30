@@ -47,14 +47,15 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, onMounted, computed, nextTick } from 'vue';
+import { ref, watch, onMounted, computed, nextTick,onBeforeUnmount } from 'vue';
 import {
   Container as TinyContainer,
   Layout as TinyLayout,
   Modal as tinyModal,
   Tabs,
   TabItem,
-  Modal
+  Modal,
+  Notify
 } from '@opentiny/vue';
 import TinyThemeTool from '@opentiny/vue-theme/theme-tool.js';
 import { useAppStore, useTabStore, useUserStore, useWorkFlowStore } from '@/store';
@@ -81,6 +82,84 @@ const tabsHistory = computed(() => { return tabStore.data });
 const currentTabName = ref();
 // 切换简约模式，图标按钮
 const top = ref('10px');
+// 消息轮询相关
+// 消息轮询相关
+let pollInterval: ReturnType<typeof setInterval> | null = null;
+
+// ==============================轮询查询消息===================================
+// 轮询查询消息
+const checkUnreadMessages = async () => {
+  try {
+    // 1. 从Pinia store中获取当前的最大消息ID
+    const currentMsgMaxId = userWorkFlowStore.msgMaxId || 0;
+    
+    // 2. 调用接口，传入当前的lastId
+    const response = await workflowaxios.get(`/message/unreadNum?lastId=${currentMsgMaxId}`);
+    
+    // 使用对象解构获取data
+    const { data } = response.data;
+    
+    if (data) {
+      const { maxId, title, content, num } = data;
+      
+      // 3. 判断是否有新消息（通过maxId字段是否存在且大于当前ID）
+      if (maxId && maxId > currentMsgMaxId) {
+        // 有新消息，进行弹窗提示
+        Notify({
+          title: '流程通知',
+          message: `${title || '新消息'}: ${content || '请及时处理'}`,
+          type: 'info',
+          position: 'top-right',
+          duration: 5000,
+          showClose: true
+        });
+        
+        // 4. 更新store中的msgMaxId为接口返回的最新maxId
+        userWorkFlowStore.updateMsgMaxId(maxId);
+        
+        console.log(`检测到新消息，更新msgMaxId: ${currentMsgMaxId} -> ${maxId}`);
+      } else {
+        // 无新消息，仅记录未读数量（num）
+        console.log(`当前无新消息，未读数量: ${num || 0}`);
+      }
+    }
+  } catch (error) {
+    console.error('查询未读消息失败:', error);
+    
+  }
+};
+
+// 开始轮询消息
+const startMessagePolling = () => {
+  // 清除可能存在的定时器
+  if (pollInterval) {
+    clearInterval(pollInterval);
+  }
+  
+  // 立即查询一次
+  checkUnreadMessages();
+  
+  // 每10秒查询一次
+  pollInterval = setInterval(() => {
+    checkUnreadMessages();
+  }, 10000);
+  
+  console.log('开始轮询工作流消息，间隔10秒');
+};
+
+// 停止轮询
+const stopMessagePolling = () => {
+  if (pollInterval) {
+    clearInterval(pollInterval);
+    pollInterval = null;
+  }
+};
+
+// 组件卸载时清理定时器
+onBeforeUnmount(() => {
+  stopMessagePolling();
+});
+// ==============================轮询查询消息===================================
 
 watch(
   () => tabStore.current,
@@ -200,6 +279,11 @@ onMounted(async () => {
   theme.changeTheme(DefaultTheme);
   appStore.updateSettings({ themelist: 'default' });
   //await getFlyflowToken();
+  // 页面加载完成后开始消息轮询
+  // 延迟一下，确保工作流登录已完成
+  setTimeout(() => {
+    startMessagePolling();
+  }, 2000);
 });
 </script>
 

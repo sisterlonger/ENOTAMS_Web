@@ -4,7 +4,8 @@ import { WorkFlowState, WorkFlowUserInfo, WorkFlowDeptTree } from './types';
 const useWorkFlowStore = defineStore('workflow', {
   state: (): WorkFlowState => ({
     user: {}, // 用户信息初始值
-    dept: {}  // 部门信息初始值
+    dept: {},  // 部门信息初始值
+    msgMaxId : 0  // 最大消息ID
   }),
 
   getters: {
@@ -15,6 +16,10 @@ const useWorkFlowStore = defineStore('workflow', {
     // 部门信息获取器（网页4类型安全实践）
     workflowCurrentDeptInfo(state): WorkFlowDeptTree {
       return state.dept;
+    },
+    // 获取最大消息ID
+    workflowMsgMaxId(state): number {
+      return state.msgMaxId;
     }
   },
 
@@ -29,6 +34,12 @@ const useWorkFlowStore = defineStore('workflow', {
     updateDeptInfo(partial: Partial<WorkFlowDeptTree>) {
       this.$patch({
         dept: { ...this.dept, ...partial }
+      });
+    },
+    // 更新最大消息ID
+    updateMsgMaxId(partial: number) {
+      this.$patch({
+        msgMaxId: partial
       });
     }
   },
