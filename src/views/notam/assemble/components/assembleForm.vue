@@ -634,6 +634,7 @@ const messageData: MessageVM = {
   startTime: "",
   endTime: "",
   specialNotes:"",
+  notamSn: "",
 };
 const showNotice = ref(false);
 
@@ -940,6 +941,7 @@ async function onSend() {
       messageData.startTime = createData.b_time;
       messageData.endTime = createData.c_time;
       messageData.specialNotes = createData.specialNotes;
+      messageData.notamSn = createData.notamSn;
       // 代替取消报要记录parentid
       if (messageType.value === 'replace' || messageType.value === 'cnl') {
         messageData.parentId = parentId.value;
@@ -967,7 +969,6 @@ async function onSend() {
         }
       }).catch((err: any) => {
         console.log(err);
-        Modal.message({ message: `发送失败，原因${err}`, status: 'error' })
       });
     }
   })
@@ -1023,7 +1024,6 @@ const createProcess = async () => {
     }
   }).catch((err: any) => {
     console.log(err);
-    Modal.message({ message: `发送失败，原因${err}`, status: 'error' })
   });
 };
 // 获取配置项

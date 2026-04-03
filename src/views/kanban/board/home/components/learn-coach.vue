@@ -83,8 +83,8 @@
       background: 'rgba(0, 0, 0, 0.7)',
     });
     try {
-      const { data } = await getUserData();
-      state.options = data.options;
+      //const { data } = await getUserData();
+      //state.options = data.options;
     } finally {
       state.loading.close();
     }
@@ -106,7 +106,7 @@
   watch(
     state,
     (newValue, oldValue) => {
-      fetchSelect(newValue.project);
+      //fetchSelect(newValue.project);
     },
     { immediate: true }
   );

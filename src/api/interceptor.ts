@@ -77,11 +77,11 @@ axios.interceptors.response.use(
         status: 'error',
       });
     } else {
-      (data.errMsg || data.msg) &&
-        Modal.message({
-          message: locale.t(`http.error.${data.errMsg + data.msg}`),
-          status: 'error',
-        });
+      const errorMessage = data?.msg || data?.errMsg || error.message || '请求失败';
+      Modal.message({
+        message: errorMessage, // 直接使用错误消息，不进行翻译
+        status: 'error',
+      });
     }
 
     return Promise.reject(error);

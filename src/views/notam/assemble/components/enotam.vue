@@ -254,7 +254,6 @@ async function toolbarButtonClickEvent({ code }) {
           }
         }).catch((err: any) => {
           console.log(err);
-          Modal.message({ message: `发送失败，原因${err}`, status: 'error' })
         });
       }
     })

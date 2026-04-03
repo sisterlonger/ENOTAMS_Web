@@ -62,7 +62,7 @@
                 <tr>
                     <td colspan="6">
                         <pre style="white-space: pre-wrap; margin: 0; font-family: inherit;">内容：<br>{{ notamFirstlineText }}<br>{{ pageData.e_data || telegramTextWithoutFirstLine }} 
-                            <br>{{ pageData.specialNotes ==='' || pageData.specialNotes ===null ? '' : '其他需要说明的情况：\n' + pageData.specialNotes }}</pre>
+                            <br>{{ isEmpty(pageData.specialNotes) ? '' : '其他需要说明的情况：\n' + pageData.specialNotes || '' }}</pre>
                     </td>
                 </tr>
                 <tr>

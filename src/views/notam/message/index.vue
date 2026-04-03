@@ -233,6 +233,10 @@ const workflowStatusOptions = [
     value: '未开始',
     label: '未开始'
   },
+  {
+    value: '',
+    label: '全部'
+  },
 ]
 const statusOptions = [
   {
@@ -262,6 +266,10 @@ const statusOptions = [
   {
     value: '未开始',
     label: '未开始'
+  },
+   {
+    value: '',
+    label: '全部'
   },
 ]
 const activeNames = ref(['0'])

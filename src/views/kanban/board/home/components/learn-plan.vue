@@ -72,13 +72,13 @@ const preCondition = ref(false)
 const goTask = (workflowStatus: string) => {
   console.log(workflowStatus)
   //message,exam
-  /*
+  
   router.push({
     name: 'track',
     query: {
       workflowStatus
     }
-  });*/
+  });
 }
 
 // 初始化请求数据

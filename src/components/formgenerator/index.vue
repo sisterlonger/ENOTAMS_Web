@@ -12,7 +12,7 @@
                             :maxlength="item.maxLength" @change="getOption(formData[item.prop], item)"></tiny-input>
                         <!--选择组件-->
                         <tiny-select v-if="item.type === 'select'" v-model="formData[item.prop]"
-                            :placeholder="item.placeholder" :options="item.options" clearable filterable
+                            :placeholder="item.placeholder" :options="item.options" clearable filterable allow-create default-first-optio
                             :optimization="item.options.length > 1000 ? true : false"
                             :style="`width:${item.width !== null ? item.width : '200px'}`"
                             @change="getOption(formData[item.prop], item)"></tiny-select>
