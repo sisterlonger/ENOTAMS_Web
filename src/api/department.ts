@@ -36,3 +36,6 @@ export function deleteDepartment(ids: []) {
 export function postDepartment(data: DepartmentVM) {
     return axios.post<DepartmentVM>('/department/post', data);
 }
+export function queryLeaderDepId() {
+    return axios.get('/department/getleaderdepId');
+}

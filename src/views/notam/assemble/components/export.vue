@@ -16,7 +16,7 @@
                 </tr>
                 <tr>
                     <td colspan="3">提供单位：{{ pageData.sendDepName }}</td>
-                    <td colspan="3">联系日期和时间：{{ formatCustomDate(formattedTime) }}</td>
+                    <td colspan="3">提供日期和时间：{{ formatCustomDate(formattedTime) }}</td>
                 </tr>
                 <tr>
                     <td colspan="6" class="u-blod center">2.航空情报原始资料收集人</td>
@@ -42,14 +42,14 @@
                             }" v-model="formData.notamSn" placeholder="请输入提供序列号" v-if="act !== 'detail'"></tiny-input>
                         </div>
                     </td>
-                    <td colspan="3">生效日期和时间：{{ formData.messageType === '新发报文' ||
-                        formData.type === '新发报文' ? formatCustomDate(formData.b_time) ||
-                    formatCustomDate(formData.startTime) : '立即生效'
+                    <td colspan="3">生效日期和时间：{{ pageData.messageType === '新发报文' ||
+                        pageData.type === '新发报文' ? formatCustomDate(pageData.startTime) : '立即生效'
                     }}</td>
                 </tr>
                 <tr>
                     <td colspan="3">共1页</td>
-                    <td colspan="3">失效日期和时间：{{ formatCustomDate(formData.c_time) || formatCustomDate(formData.endTime)
+                    <td colspan="3">失效日期和时间：{{ pageData.validType === 'PERM'?'PERM':   
+                    pageData.validType === 'EST'? formatCustomDate(pageData.endTime) + ' EST' : formatCustomDate(pageData.endTime)
                     }}
                     </td>
                 </tr>
@@ -87,7 +87,7 @@
                     <td colspan="6">提供序列号：{{ formData.notamSn }}
                         <br>收集单位：{{ pageData.receiveDepName }}
                         <br>收集人：{{ pageData.receiveUserName }}
-                        <br>收集时间：{{ formatCustomDate(formattedTime) }}
+                        <br>收集时间：{{ formatCustomDate(pageData.receiveTime) }}
                         <br>备注：{{ pageData.comment }}
                     </td>
                 </tr>
@@ -268,6 +268,7 @@ const setAftnText = async () => {
         notamFirstlineText.value = `NOTAMN ${pageData.aftnSn || ''}`
     }
 };
+
 // 初始化请求数据
 onMounted(async () => {
     Object.assign(pageData, formData.value);

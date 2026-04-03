@@ -59,6 +59,7 @@ import {
 } from '@opentiny/vue';
 import TinyThemeTool from '@opentiny/vue-theme/theme-tool.js';
 import { useAppStore, useTabStore, useUserStore, useWorkFlowStore } from '@/store';
+import useUser from '@/hooks/user';
 // eslint-disable-next-line import/extensions
 import Footer from '@/components/footer/index.vue';
 import NavBar from '@/components/navbar/index.vue';
@@ -71,6 +72,7 @@ import PageLayout from './page-layout.vue';
 
 // 动态切换
 const appStore = useAppStore();
+const { logout } = useUser();
 const router = useRouter();
 const userStore = useUserStore();
 const userWorkFlowStore = useWorkFlowStore();
@@ -92,7 +94,9 @@ const checkUnreadMessages = async () => {
   try {
     // 1. 从Pinia store中获取当前的最大消息ID
     const currentMsgMaxId = userWorkFlowStore.msgMaxId || 0;
-    
+    if(currentMsgMaxId === 0){
+      logout();
+    }
     // 2. 调用接口，传入当前的lastId
     const response = await workflowaxios.get(`/message/unreadNum?lastId=${currentMsgMaxId}`);
     

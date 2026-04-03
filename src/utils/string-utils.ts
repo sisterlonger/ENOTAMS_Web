@@ -63,26 +63,47 @@ export function formatTimeToYYMMDDHHMM (time:any) :string {
 
 
 /**
- * 将yyMMddhhss格式的字符串转换为yyyy年MM月dd日hh时mm分格式
- * @param {string} dateStr - 原始日期字符串，格式为yyMMddhhss（如"2509291430"）
+ * 将多种时间格式转换为yyyy年MM月dd日hh时mm分格式
+ * 支持格式：
+ * 1. yyMMddhhss (如"2509291430" -> "2025年09月29日14时30分")
+ * 2. yyyy-MM-dd HH:mm:ss.ffffff (如"2026-04-03 09:29:33.159169" -> "2026年04月03日09时29分")
+ * 3. 标准ISO格式 (如"2026-04-03T09:29:33.159Z")
+ * @param {string} dateStr - 原始日期字符串
  * @returns {string} 格式化后的日期字符串，格式为yyyy年MM月dd日hh时mm分
  */
-export function formatCustomDate(dateStr:string):string {
-    if (!dateStr || dateStr.length !== 10) {
-        console.warn('日期字符串格式应为yyMMddhhss，且长度为10位');
-        return dateStr; // 或返回空字符串等默认值
-    }
+export function formatCustomDate(dateStr: string): string {
+  if (!dateStr) {
+    return dateStr;
+  }
 
-    // 解析字符串各部分
+  // 判断格式类型
+  if (/^\d{10}$/.test(dateStr)) {
+    // 格式1: yyMMddhhss (旧格式)
     const yearPart = dateStr.substring(0, 2);
     const monthPart = dateStr.substring(2, 4);
     const dayPart = dateStr.substring(4, 6);
     const hourPart = dateStr.substring(6, 8);
     const minutePart = dateStr.substring(8, 10);
-
-    // 将两位数年份转换为四位数（假设20xx年）
     const fullYear = `20${yearPart}`;
-
-    // 返回目标格式
+    
     return `${fullYear}年${monthPart}月${dayPart}日${hourPart}时${minutePart}分`;
+  }
+  
+  // 格式2/3: 新格式，使用Date对象解析
+  const date = new Date(dateStr);
+  
+  // 检查日期是否有效，使用 Number.isNaN
+  if (Number.isNaN(date.getTime())) {
+    console.warn('日期字符串格式无效:', dateStr);
+    return dateStr;
+  }
+  
+  // 提取各组成部分
+  const year = date.getFullYear().toString().padStart(4, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, '0');
+  const hour = date.getHours().toString().padStart(2, '0');
+  const minute = date.getMinutes().toString().padStart(2, '0');
+  
+  return `${year}年${month}月${day}日${hour}时${minute}分`;
 }
