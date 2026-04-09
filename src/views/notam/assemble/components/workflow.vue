@@ -36,7 +36,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, toRefs, reactive, defineProps, onMounted,defineEmits } from 'vue'
+import { ref, toRefs, reactive, defineProps, onMounted, defineEmits } from 'vue'
 import { queryGetRelateMessage, queryGetWorkflowProgress, queryMessageDetail } from '@/api/fetchInterface';
 import { TinyTimeLine, Modal, TinyGrid, TinyGridColumn, Button as TinyButton, } from '@opentiny/vue'
 import exportMessage from '@/views/notam/assemble/components/export.vue';
@@ -177,7 +177,28 @@ const getWorkflowProgress = async () => {
 
         // 递归处理节点函数
         const processNode = (node: any) => {
-            if (node.status !== 0) {
+            // 判断是否需要跳过这个节点
+            const shouldSkipNode = (item: any) => {
+                // 如果节点状态为2但没有showTime，则跳过
+                if (item.status === 2) {
+                    // 检查节点自身是否有showTime
+                    if (!item.showTime) {
+                        // 检查userVoList中是否有用户有showTime
+                        let hasShowTime = false;
+                        if (item.userVoList && item.userVoList.length > 0) {
+                            hasShowTime = item.userVoList.some((user: any) => user.showTime);
+                        }
+                        // 如果既没有节点自身的showTime，也没有userVoList中的showTime，则跳过
+                        if (!hasShowTime) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            };
+
+            // 只处理不应该跳过的节点
+            if (node.status !== 0 && !shouldSkipNode(node)) {
                 data.push(buildNode(node));
             }
 

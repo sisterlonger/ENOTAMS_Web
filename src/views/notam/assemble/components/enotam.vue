@@ -145,7 +145,6 @@ const fetchData = async () => {
   try {
     const { data } = await queryTemplateDetail({ id: localTemplateID.value });
     templateData.value = data;
-    console.log(parentId, parentId.value);
     if (!isEmpty(parentId.value)) {
       await getParentMessage()
     }

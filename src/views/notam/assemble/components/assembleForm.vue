@@ -131,7 +131,8 @@
             <!--时间-->
             <tiny-form-item label="事件生效时间">
               <tiny-date-picker v-model="createData.startTime" type="datetime" placeholder="请选择生效时间（北京时）"
-                format="yyMMddHHmm" value-format="yyMMddHHmm" :disabled="act === 'edit'"></tiny-date-picker>
+                format="yyMMddHHmm" value-format="yyMMddHHmm" :disabled="act === 'edit'" @change="onChangeB">
+              </tiny-date-picker>
             </tiny-form-item>
           </tiny-col>
           <tiny-col :span="6" v-show="(createData.validType !== 'PERM' && createData.messageType !== '取消现有报文')">
@@ -549,6 +550,8 @@ const createData = reactive({
   aftnSn: '',
   // 通知单特殊说明
   specialNotes: '',
+  // 是否立即生效
+  isImmediate: false,
 })
 // 基准面
 const baseType = ref<any>('');
@@ -635,6 +638,7 @@ const messageData: MessageVM = {
   endTime: "",
   specialNotes: "",
   notamSn: "",
+  isImmediate: false,
 };
 const showNotice = ref(false);
 
@@ -663,6 +667,9 @@ onMounted(async () => {
     createData.messageType = "代替现有报文"
     onChangeMessageType()
   }
+  if(!isEmpty(parentId.value)){
+    createData.parentId = parentId?.value;
+  }
   // 用户只会发自己情报区的电报
   createData.qAirSpace = userStore.airSpaceCodeId || "";
 });
@@ -686,7 +693,7 @@ const handleMessage = async () => {
       createData.startTime = data.startTime;
       createData.endTime = data.endTime;
     };
-    console.log(data, createData.parentId);
+    createData.isImmediate = data.isImmediate;
     // 当已经提交后，不显示E项
     // 解析正文并赋值B、C、D、F、G项
     // 定义结果类型（严格约束键为 A-G）
@@ -945,6 +952,9 @@ async function onSend() {
       messageData.endTime = createData.endTime;
       messageData.specialNotes = createData.specialNotes;
       messageData.notamSn = createData.notamSn;
+      messageData.parentId = createData.parentId;
+      messageData.isImmediate = createData.isImmediate;
+      console.log(messageData);
       // 代替取消报要记录parentid
       if (messageType.value === 'replace' || messageType.value === 'cnl') {
         messageData.parentId = parentId.value;
@@ -1149,6 +1159,14 @@ async function onChangeA() {
       createData.qLong = "";
       staticData.value = {};
     }
+  }
+}
+function onChangeB(){
+  if(createData.startTime === getCurrentFormattedTime()){
+    createData.isImmediate = true;
+  }
+  else{
+    createData.isImmediate = false
   }
 }
 // D项点击事件

@@ -20,4 +20,8 @@ export function queryRadioNavigationConfig(params: { name: string}) {
         params,
     });
 }
-
+export function queryRadioNavigationConfigByCodeId(params: { codeId: string}) {
+    return axios.get('/radionavigation/getbycodeid', {
+        params,
+    });
+}

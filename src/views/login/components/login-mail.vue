@@ -115,6 +115,10 @@ const getFlyflowToken = async (mobile: string) => {
       if(res2.data.data.records.length>0){
         userWorkFlowStore.updateMsgMaxId(res2.data.data.records[0].id);
       }
+      else{
+        userWorkFlowStore.updateMsgMaxId(1);
+
+      }
     });
   })
 };

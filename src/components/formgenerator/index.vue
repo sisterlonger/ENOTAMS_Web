@@ -36,7 +36,7 @@
 
 <script setup>
 import { ref, reactive, onMounted, toRefs, watch, toRaw, defineExpose, defineEmits } from 'vue';
-import { queryDicType, queryRwyConfig, queryRadioNavigationConfig, getKeyWordJSON, queryRestrictedConfig, queryControlledConfig } from '@/api/fetchInterface';
+import { queryDicType, queryRwyConfig, queryRadioNavigationConfig, queryRadioNavigationConfigByCodeId,getKeyWordJSON, queryRestrictedConfig, queryControlledConfig } from '@/api/fetchInterface';
 import {
     TinyForm,
     TinyFormItem,
@@ -239,6 +239,13 @@ const getOption = async (data, field) => {
         }
         if (field.label === "VOR/DME设备名称") {
             let response = await queryRadioNavigationConfig({ name: formData[field.prop] });
+            const vorConfigKey = Object.keys(response.data);
+            vorConfigKey.forEach(key => {
+                eData.value[`vors${key}`] = String(response.data[key]);
+            });
+        }
+         if (field.label === "VOR/DME设备呼号") {
+            let response = await queryRadioNavigationConfigByCodeId({ codeId: formData[field.prop] });
             const vorConfigKey = Object.keys(response.data);
             vorConfigKey.forEach(key => {
                 eData.value[`vors${key}`] = String(response.data[key]);

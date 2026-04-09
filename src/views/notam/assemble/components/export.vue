@@ -42,8 +42,8 @@
                             }" v-model="formData.notamSn" placeholder="请输入提供序列号" v-if="act !== 'detail'"></tiny-input>
                         </div>
                     </td>
-                    <td colspan="3">生效日期和时间：{{ pageData.messageType === '新发报文' ||
-                        pageData.type === '新发报文' ? formatCustomDate(pageData.startTime) : '立即生效'
+                    <td colspan="3">生效日期和时间：{{ pageData.isImmediate === true ? '立即生效':pageData.messageType === '新发报文' ||
+                        pageData.type === '新发报文' ? formatCustomDate(pageData.startTime) : '立即生效' 
                     }}</td>
                 </tr>
                 <tr>
@@ -260,9 +260,9 @@ const getUserAndDepartmentInfo = async () => {
 };
 // 获取被代替获取取消的通告号,并计算填写的文本
 const setAftnText = async () => {
-    if ((pageData.type === '代替现有报文' || pageData.type === '取消现有报文') && !isEmpty(pageData.parentId)) {
+    if ((pageData.messageType === '代替现有报文' || pageData.messageType === '取消现有报文' || pageData.type === '代替现有报文' || pageData.type === '取消现有报文') && !isEmpty(pageData.parentId)) {
         let { data } = await queryMessageDetail({ id: pageData.parentId });
-        notamFirstlineText.value = `${pageData.aftnSn} NOTAM${pageData.type === '代替现有报文' ? 'R' : 'C'} ${data.aftnSn}`
+        notamFirstlineText.value = `${pageData.aftnSn || ''} NOTAM${pageData.type === '代替现有报文' ? 'R' : 'C'} ${data.aftnSn}`
     }
     else {
         notamFirstlineText.value = `NOTAMN ${pageData.aftnSn || ''}`
