@@ -47,7 +47,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, onMounted, computed, nextTick,onBeforeUnmount } from 'vue';
+import { ref, watch, onMounted, computed, nextTick, onBeforeUnmount } from 'vue';
 import {
   Container as TinyContainer,
   Layout as TinyLayout,
@@ -58,6 +58,7 @@ import {
   Notify
 } from '@opentiny/vue';
 import TinyThemeTool from '@opentiny/vue-theme/theme-tool.js';
+import { queryTimeoutTasks } from '@/api/fetchInterface';
 import { useAppStore, useTabStore, useUserStore, useWorkFlowStore } from '@/store';
 import useUser from '@/hooks/user';
 // eslint-disable-next-line import/extensions
@@ -94,18 +95,31 @@ const checkUnreadMessages = async () => {
   try {
     // 1. 从Pinia store中获取当前的最大消息ID
     const currentMsgMaxId = userWorkFlowStore.msgMaxId || 0;
-    if(currentMsgMaxId === 0){
+    if (currentMsgMaxId === 0) {
       logout();
     }
     // 2. 调用接口，传入当前的lastId
     const response = await workflowaxios.get(`/message/unreadNum?lastId=${currentMsgMaxId}`);
-    
+    await queryTimeoutTasks().then((res) => {
+          console.log(res);
+          if(res.code===200 && res.data.length>0){
+            Modal.message({
+            message: `请及时处理待办！超出15分钟未处理的代码有${res.data.length}条`,
+            status: 'error',
+          });
+          }
+        }).catch((err) => {
+          Modal.message({
+            message: `获取告警数据错误信息为:${err.message}`,
+            status: 'error',
+          });
+        });
     // 使用对象解构获取data
     const { data } = response.data;
-    
+
     if (data) {
       const { maxId, title, content, num } = data;
-      
+
       // 3. 判断是否有新消息（通过maxId字段是否存在且大于当前ID）
       if (maxId && maxId > currentMsgMaxId) {
         // 有新消息，进行弹窗提示
@@ -117,10 +131,9 @@ const checkUnreadMessages = async () => {
           duration: 5000,
           showClose: true
         });
-        
+
         // 4. 更新store中的msgMaxId为接口返回的最新maxId
         userWorkFlowStore.updateMsgMaxId(maxId);
-        
         console.log(`检测到新消息，更新msgMaxId: ${currentMsgMaxId} -> ${maxId}`);
       } else {
         // 无新消息，仅记录未读数量（num）
@@ -129,7 +142,7 @@ const checkUnreadMessages = async () => {
     }
   } catch (error) {
     console.error('查询未读消息失败:', error);
-    
+
   }
 };
 
@@ -139,15 +152,15 @@ const startMessagePolling = () => {
   if (pollInterval) {
     clearInterval(pollInterval);
   }
-  
+
   // 立即查询一次
   checkUnreadMessages();
-  
+
   // 每10秒查询一次
   pollInterval = setInterval(() => {
     checkUnreadMessages();
   }, 10000);
-  
+
   console.log('开始轮询工作流消息，间隔10秒');
 };
 

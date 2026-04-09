@@ -98,4 +98,9 @@ export function resetPwdUser(ids: []) {
   return axios.post('/user/resetpwd', ids);
 }
 
+export function queryTimeoutTasks() {
+    return axios.get('/user/gettimeouttasks');
+}
+
+
 
