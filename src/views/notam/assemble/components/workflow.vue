@@ -1,7 +1,8 @@
 <template>
     <div class="demo-timeline">
+        <div style="font-size:20px;font-weight: bold;color:red;margin:15px">通告工作流程记录</div>
         <tiny-time-line :data="data" :active="2" vertical shape="dot"></tiny-time-line>
-        <div>关联通告列表</div>
+        <div style="font-size:20px;font-weight: bold;color:red;margin:15px">关联通告列表</div>
         <tiny-grid v-if="preCondition" ref="basicGridRef" :data="tableData">
             <tiny-grid-column type="index" width="60"></tiny-grid-column>
             <tiny-grid-column v-if="false" type="selection" width="60"></tiny-grid-column>
@@ -30,6 +31,9 @@
         <!--先这样，用export应付，后续再用notice-->
         <tiny-dialog-box :modal="false" v-if="workflowVisibility" v-model:visible="workflowVisibility" title="详情"
             width="80%" max-height="1000px" top="5%" :close-on-click-modal="false">
+            <div v-if="sonShow" style="font-size:20px;font-weight: bold;color:red;margin:15px">关联通告工作流程记录</div>
+            <tiny-time-line v-if="sonShow" :data="sonData" :active="2" vertical shape="dot"></tiny-time-line>
+            <div style="font-size:20px;font-weight: bold;color:red;margin:15px">关联通告通知单</div>
             <exportMessage :formData="formData" :act="'detail'" />
         </tiny-dialog-box>
     </div>
@@ -42,6 +46,7 @@ import { TinyTimeLine, Modal, TinyGrid, TinyGridColumn, Button as TinyButton, } 
 import exportMessage from '@/views/notam/assemble/components/export.vue';
 import workflowaxios from '@/views/workflow/components/workflow-axios';
 import task from '@/router/routes/modules/task';
+import { isEmpty } from 'lodash';
 
 const props = defineProps({
     processInstanceId: String,
@@ -57,6 +62,8 @@ const formData = reactive({});
 
 // 使用reactive创建响应式数组
 const data = reactive<Array<{ name: string, time: string, type: string }>>([]);
+const sonData = reactive<Array<{ name: string, time: string, type: string }>>([]);
+let sonShow = ref(false)
 let tableData = reactive<any>;
 let preCondition = ref(false)
 // 定义派发事件
@@ -77,7 +84,15 @@ const fetchData = async (id: any) => {
     try {
         const { data: detailData } = await queryMessageDetail({ id });
         Object.assign(formData, detailData);
-        console.log("formData--------", formData)
+        console.log("formData--------", formData,formData.workflowId)
+        if(!isEmpty(detailData.workflowId)){
+        await getSonWorkflowProgress(detailData.workflowId);
+        sonShow.value = true
+        }
+        else{
+            sonData.value =[]
+            sonShow.value = false
+        }
     }
     catch (err) {
         console.log(err);
@@ -88,7 +103,7 @@ const getWorkflowProgress = async () => {
     await queryGetWorkflowProgress({
         processInstanceId: processInstanceId.value,
         flowId: flowId.value,
-        taskId: taskId.value,
+        //taskId: taskId.value,
         authUserId: workflowaxios.defaults.headers.common.AuthUserId,
         authorization: workflowaxios.defaults.headers.common.Authorization,
         flyflowTenantId: workflowaxios.defaults.headers.common.FlyflowTenantId || "1"
@@ -200,6 +215,146 @@ const getWorkflowProgress = async () => {
             // 只处理不应该跳过的节点
             if (node.status !== 0 && !shouldSkipNode(node)) {
                 data.push(buildNode(node));
+            }
+
+            // 递归处理分支
+            if (node.branch && node.branch.length > 0) {
+                node.branch.forEach((branch: any) => {
+                    if (branch.children && branch.children.length > 0) {
+                        branch.children.forEach((child: any) => {
+                            processNode(child);
+                        });
+                    }
+                });
+            }
+        };
+
+        // 处理所有节点
+        res.data.forEach((item: any) => {
+            processNode(item);
+        });
+
+        console.log('处理后的时间线数据:', data);
+    }).catch((err: any) => {
+        console.log(err)
+    });
+};
+const getSonWorkflowProgress = async (workflowId:string) => {
+    await queryGetWorkflowProgress({
+        processInstanceId: workflowId,
+        flowId: "",
+        //taskId: taskId.value,
+        authUserId: workflowaxios.defaults.headers.common.AuthUserId,
+        authorization: workflowaxios.defaults.headers.common.Authorization,
+        flyflowTenantId: workflowaxios.defaults.headers.common.FlyflowTenantId || "1"
+    }).then(async (res: any) => {
+        // 0未开始，1正在进行，2已完成
+        const statusMap = {
+            0: 'primary',
+            1: 'info',
+            2: 'success'
+        };
+        sonData.value = [];
+        // 构建节点信息的函数
+        const buildNode = (item: any) => {
+            // 使用 placeholder 作为节点名，如果不存在则使用 name
+            const nodeName = item.name;
+            // 获取人员名称（优先从评论的user对象中获取）
+            let safeNamesString = '';
+            if (item.approveDescList && item.approveDescList.length > 0) {
+                const firstDesc = item.approveDescList[0];
+                // 从 desc 同级的 user 对象中获取 name
+                if (firstDesc.user && firstDesc.user.name) {
+                    safeNamesString = firstDesc.user.name;
+                }
+            }
+            // 如果没有评论人，再回退到从 userVoList 获取（作为备选）
+            if (!safeNamesString && item.userVoList && item.userVoList.length > 0) {
+                safeNamesString = item.userVoList
+                    .map((user: any) => user.name || '')
+                    .filter((name: any) => name)
+                    .join(',');
+            }
+
+            // 获取评论内容
+            let comment = '';
+            if (item.approveDescList && item.approveDescList.length > 0) {
+                const firstDesc = item.approveDescList[0];
+                try {
+                    const descObj = typeof firstDesc.desc === 'string'
+                        ? JSON.parse(firstDesc.desc)
+                        : firstDesc.desc;
+                    comment = descObj.content || '';
+                } catch (e) {
+                    comment = firstDesc.desc || '';
+                }
+            }
+
+            // 获取时间 - 优先使用 showTime，如果不存在则使用 showTimeStr
+            let timeStr = '';
+            // 只有 status 为 2 的节点才显示时间
+            if (item.status === 2) {
+                if (item.showTime) {
+                    // 直接从 showTime 获取，格式为 "2026-03-13 10:02:43"
+                    timeStr = item.showTime;
+                } else if (item.userVoList && item.userVoList.length > 0) {
+                    // 如果节点没有 showTime，尝试从 userVoList 中获取第一个有 showTime 的用户的时间
+                    const userWithTime = item.userVoList.find((user: any) => user.showTime);
+                    if (userWithTime) {
+                        timeStr = userWithTime.showTime;
+                    }
+                } else if (item.showTimeStr) {
+                    timeStr = item.showTimeStr;
+                }
+            } else {
+                // status 为 1 的节点，时间设置为空字符串
+                timeStr = '';
+            }
+
+            // 构建显示名称
+            let displayName = nodeName;
+            if (safeNamesString) {
+                displayName += `【${safeNamesString}】`;
+            }
+            if (comment) {
+                displayName += ` 评论：${comment}`;
+            }
+            if (item.status === 1) {
+                console.log(nodeName);
+                emit('getCurrentNode', nodeName);
+            }
+            return {
+                name: displayName,
+                time: timeStr, // 使用获取到的时间
+                type: statusMap[item.status] || 'danger'
+            };
+        };
+
+        // 递归处理节点函数
+        const processNode = (node: any) => {
+            // 判断是否需要跳过这个节点
+            const shouldSkipNode = (item: any) => {
+                // 如果节点状态为2但没有showTime，则跳过
+                if (item.status === 2) {
+                    // 检查节点自身是否有showTime
+                    if (!item.showTime) {
+                        // 检查userVoList中是否有用户有showTime
+                        let hasShowTime = false;
+                        if (item.userVoList && item.userVoList.length > 0) {
+                            hasShowTime = item.userVoList.some((user: any) => user.showTime);
+                        }
+                        // 如果既没有节点自身的showTime，也没有userVoList中的showTime，则跳过
+                        if (!hasShowTime) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            };
+
+            // 只处理不应该跳过的节点
+            if (node.status !== 0 && !shouldSkipNode(node)) {
+                sonData.push(buildNode(node));
             }
 
             // 递归处理分支

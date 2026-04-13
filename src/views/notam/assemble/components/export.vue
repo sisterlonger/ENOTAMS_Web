@@ -205,7 +205,6 @@ const telegramTextWithoutFirstLine = computed({
 })
 // 定义一个更新 formattedTime 的函数
 const updateTime = () => {
-    console.log(pageData.createTime)
     formattedTime.value = formatTimeToYYMMDDHHMM(pageData.createTime);
 };
 // 获取用户和部门信息

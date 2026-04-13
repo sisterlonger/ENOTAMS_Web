@@ -95,7 +95,7 @@ export function formatCustomDate(dateStr: string): string {
   // 检查日期是否有效，使用 Number.isNaN
   if (Number.isNaN(date.getTime())) {
     console.warn('日期字符串格式无效:', dateStr);
-    return dateStr;
+    return "";
   }
   
   // 提取各组成部分
