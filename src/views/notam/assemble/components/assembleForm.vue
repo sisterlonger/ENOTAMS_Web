@@ -267,7 +267,9 @@
     </tiny-form>
     <tiny-dialog-box :modal="false" v-if="boxDVisibility" v-model:visible="boxDVisibility" append-to-body title="编辑分段时间"
       width="35%" :close-on-click-modal="false">
-      <schedulePicker @scheduleChange="handleScheduleChange" @close="dialogClose" />
+      <keep-alive>
+        <schedulePicker @scheduleChange="handleScheduleChange" @close="dialogClose" />
+      </keep-alive>
     </tiny-dialog-box>
     <tiny-dialog-box :modal="false" v-show="boxFVisibility" v-model:visible="boxFVisibility" append-to-body title="编辑F项"
       width="35%" :close-on-click-modal="false">

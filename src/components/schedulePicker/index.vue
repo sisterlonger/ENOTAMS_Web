@@ -47,7 +47,7 @@
         </div>
         <!-- 组装D项的文本 -->
         <tiny-row class="text-content">
-            <tiny-input v-model="formatted" placeholder="组装的D项文本" clearable></tiny-input>
+            <tiny-input v-model="formatted" placeholder="组装的D项文本" clearable @clear="onClear" ></tiny-input>
         </tiny-row>
     </div>
 </template>
@@ -123,11 +123,17 @@ const confirm = () => {
     }
 
     const currentRule = formatSchedule(rule)
-    scheduleRules.value = [...new Set(scheduleRules.value), currentRule] // 去重
+    
+    // 检查当前规则是否已经存在
+    if (scheduleRules.value.includes(currentRule)) {
+        Modal.alert('该规则已存在，请勿重复添加')
+        return
+    }
+    
+    scheduleRules.value.push(currentRule)
     formatted.value = scheduleRules.value.join(' AND ')
     emit('scheduleChange', formatted.value)
 }
-
 const formatSchedule = (rule) => {
     const timePart = formatTimeRange(rule.timeRange.start, rule.timeRange.end)
     let result = ''
@@ -139,27 +145,56 @@ const formatSchedule = (rule) => {
 
         case 'weekly':
             {
-                const sortedDays = [...rule.days].sort()
+                // 对星期进行标准化排序
+                const dayOrder = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
+                const sortedDays = [...rule.days]
+                    .sort((a, b) => dayOrder.indexOf(a) - dayOrder.indexOf(b))
                 result = `${timePart} ${sortedDays.join(',')}`
                 break
             }
 
         case 'monthly':
             if (rule.dates.length > 0) {
-                const datesStr = rule.dates.sort().map(d => d.padStart(2, '0')).join(',')
+                // 对日期进行标准化排序
+                const sortedDates = [...rule.dates]
+                    .map(d => parseInt(d, 10))
+                    .sort((a, b) => a - b)
+                    .map(d => d.toString().padStart(2, '0'))
+                const datesStr = sortedDates.join(',')
                 result = `${timePart} EVERY ${datesStr}`
             }
             break
 
         case 'custom':
-            if (rule.customDates.length > 0) {
-                const grouped = groupByMonth(rule.customDates)
-                result = Object.values(grouped)
+            if (rule.customDates && rule.customDates.length > 0) {
+                // 首先对日期进行标准化排序
+                const sortedDates = [...rule.customDates]
+                    .map(dateStr => new Date(dateStr))
+                    .filter(date => !Number.isNaN(date.getTime()))
+                    .sort((a, b) => a.getTime() - b.getTime())
+                
+                // 将日期字符串分组到月份
+                const grouped = sortedDates.reduce((acc, dateObj) => {
+                    const monthAbbr = getMonthAbbreviation(dateObj)
+                    const day = dateObj.getDate().toString().padStart(2, '0')
+                    
+                    if (!acc[monthAbbr]) acc[monthAbbr] = []
+                    acc[monthAbbr].push(day)
+                    return acc
+                }, {})
+                
+                // 定义月份的排序顺序
+                const monthOrder = ['Jan.', 'Feb.', 'Mar.', 'Apr.', 'May.', 'Jun.', 'Jul.', 'Aug.', 'Sep.', 'Oct.', 'Nov.', 'Dec.']
+                
+                // 按月份排序并生成字符串
+                const monthParts = Object.keys(grouped)
+                    .sort((a, b) => monthOrder.indexOf(a) - monthOrder.indexOf(b))
                     .map(month => {
-                        const dates = month.sort((a, b) => a.getDate() - b.getDate())
-                        return `${getMonthAbbreviation(month[0].toISOString().slice(0, 7))}.${dates.join(',')}`
+                        const datesStr = grouped[month].join(',')
+                        return `${month}${datesStr}`
                     })
-                    .join(' AND ')
+                
+                result = `${timePart} ${monthParts.join(' AND ')}`
             }
             break;
         default:
@@ -182,21 +217,17 @@ const formatTimeRange = (start, end) => {
     return timePart
 }
 
-const groupByMonth = (dates) => {
-    return dates.reduce((acc, date) => {
-        const monthKey = date.toISOString().slice(0, 7)
-        if (!acc[monthKey]) acc[monthKey] = []
-        acc[monthKey].push(date)
-        return acc
-    }, {})
-}
 
-const getMonthAbbreviation = (monthKey) => {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-    const monthIndex = parseInt(monthKey.slice(5, 7), 10) - 1
+// const getMonthAbbreviation = (monthKey) => {
+//     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+//     const monthIndex = parseInt(monthKey.slice(5, 7), 10) - 1
+//     return months[monthIndex]
+// }
+const getMonthAbbreviation = (dateObj) => {
+    const months = ['Jan.', 'Feb.', 'Mar.', 'Apr.', 'May.', 'Jun.', 'Jul.', 'Aug.', 'Sep.', 'Oct.', 'Nov.', 'Dec.']
+    const monthIndex = dateObj.getMonth()
     return months[monthIndex]
 }
-
 const chunkArray = (arr, size) => {
     return arr.reduce((acc, _, i) => {
         if (i % size === 0) acc.push(arr.slice(i, i + size))
@@ -206,6 +237,12 @@ const chunkArray = (arr, size) => {
 
 const formatTime = (time) => {
     return time.replace(/(\d{2})(\d{2})/, '$1:$2')
+}
+
+const onClear = () => {
+    scheduleRules.value = []
+    formatted.value = ''
+    emit('scheduleChange', formatted.value)
 }
 </script>
 <style scoped>
