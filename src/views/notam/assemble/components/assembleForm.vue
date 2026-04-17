@@ -92,8 +92,8 @@
                 </tiny-form-item>
               </tiny-col>
               <tiny-col :span="isNoAuth ? 4 : 2.5" style="margin:2px">
-                <tiny-form-item label-width="60px" label="半径">
-                  <tiny-input placeholder="请输入半径" v-model="createData.qRadius" :disabled="act === 'edit'">
+                <tiny-form-item label-width="150px" label="请输入事件影响半径">
+                  <tiny-input placeholder="请输入影响半径" v-model="createData.qRadius" :disabled="act === 'edit'">
                   </tiny-input>
                 </tiny-form-item>
               </tiny-col>
@@ -323,6 +323,7 @@
         <tiny-form-item>
           <tiny-button type="primary" @click="createProcess()">确定</tiny-button>
           <tiny-button type="info" @click="boxDepartmentVisibility = false">取消</tiny-button>
+          <tiny-button type="danger" style="margin-left: 300px;" @click="createProcess(false)">先送情报单位发布通告发布后审批,慎点</tiny-button>
         </tiny-form-item>
       </tiny-form>
     </tiny-dialog-box>
@@ -1025,7 +1026,12 @@ async function onNotice() {
   }
 }
 // 创建流程
-const createProcess = async () => {
+const createProcess = async (neddConsult = true) => {
+  // 判断是否需要原始资料单位领导审批
+  if(neddConsult && leaderNodeList.value.map(item => item.id).join(",").length===0){
+    Modal.alert('请填写审批单位');
+    return
+  }
   let vm = {
     messageId: messageId.value,
     templateId: messageData.templateId,

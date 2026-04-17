@@ -37,8 +37,8 @@
                   </tiny-form-item>
                 </tiny-col>
                 <tiny-col :span="4">
-                  <tiny-form-item label="当前处理人">
-                    <tiny-input v-model="formData.taskAssignShow" placeholder="请输入当前处理人" clearable></tiny-input>
+                  <tiny-form-item label="当前节点">
+                    <tiny-input v-model="formData.taskAssignShow" placeholder="请输入当前节点" clearable></tiny-input>
                   </tiny-form-item>
                 </tiny-col>
                 <tiny-col :span="4">
@@ -90,21 +90,21 @@
           </template>
           <tiny-grid-column type="index" width="60"></tiny-grid-column>
           <tiny-grid-column field="messageId" title="序号" width="60"></tiny-grid-column>
-          <tiny-grid-column field="notamSn" title="通告序列号" width="100"></tiny-grid-column>
+          <tiny-grid-column field="notamSn" title="提供序列号" width="10%"></tiny-grid-column>
           <!-- <tiny-grid-column field="qCode" title="Q码"></tiny-grid-column> -->
-          <tiny-grid-column field="airSpaceCodeId" title="发生地" width="10%"></tiny-grid-column>
-          <tiny-grid-column field="type" title="报文类型" width="10%"></tiny-grid-column>
-          <tiny-grid-column field="telegramText" title="主要内容(E项)" show-overflow></tiny-grid-column>
-          <tiny-grid-column field="createTime" title="创建时间" width="11%" :renderer="renderName"></tiny-grid-column>
-          <tiny-grid-column field="taskAssignShow" title="当前处理人" width="10%"></tiny-grid-column>
-          <tiny-grid-column field="workflowStatus" title="任务状态"></tiny-grid-column>
-          <tiny-grid-column field="status" title="流程进度" width="10%">
+          <tiny-grid-column field="airSpaceCodeId" title="发生地" width="5%"></tiny-grid-column>
+          <tiny-grid-column field="type" title="报文类型" width="5%"></tiny-grid-column>
+          <tiny-grid-column field="telegramText" title="主要内容(E项)" show-overflow width="30%"></tiny-grid-column>
+          <tiny-grid-column field="createTime" title="创建时间" width="5%" :renderer="renderName"></tiny-grid-column>
+          <tiny-grid-column field="taskAssignShow" title="当前节点" width="10%"></tiny-grid-column>
+          <!-- <tiny-grid-column field="workflowStatus" title="任务状态"></tiny-grid-column> -->
+          <tiny-grid-column field="status" title="流程进度" width="4%">
             <template #default="data">
               <tiny-tag size="mini" :type="data.row.buttonType" effect="dark">{{
                 data.row.status }}</tiny-tag>
             </template>
           </tiny-grid-column>
-          <tiny-grid-column title="操作" width="300" align="center">
+          <tiny-grid-column title="操作" width="400" align="center">
             <template #default="data">
               <!-- <tiny-button v-show="data.row.status !== '未开始'" v-track="'电报'" size="mini" type="success"
                 @click="editRowEvent(data.row, '电报')">电报</tiny-button> -->
@@ -114,9 +114,9 @@
                 @click="editRowEvent(data.row, '详情')">详情</tiny-button>
               <tiny-button v-show="data.row.workflowStatus === '待办'" v-track="'处理'" size="mini" type="warning"
                 @click="editRowEvent(data.row, '处理')">处理</tiny-button>
-              <tiny-button v-show="data.row.status === '已完成' && data.row.type !== '取消现有报文'" v-track="'代替'" size="mini"
+              <tiny-button v-show="true" v-track="'代替'" size="mini"
                 type="primary" @click="editRowEvent(data.row, '代替')">代替报</tiny-button>
-              <tiny-button v-show="data.row.status === '已完成' && data.row.type !== '取消现有报文'" v-track="'取消'" size="mini"
+              <tiny-button v-show="true" v-track="'取消'" size="mini"
                 type="primary" @click="editRowEvent(data.row, '取消')">取消报</tiny-button>
             </template>
           </tiny-grid-column>
@@ -206,7 +206,7 @@ const formData = ref({
   createTime: "",
   long: "",
   taskAssignShow: "",
-  workflowStatus: "待办",
+  workflowStatus: "",
   timeRange: [],
 })
 let workFlowList = ref([]);
@@ -225,10 +225,6 @@ const workflowStatusOptions = [
   {
     value: '抄送',
     label: '抄送'
-  },
-  {
-    value: '发起',
-    label: '发起'
   },
   {
     value: '未开始',

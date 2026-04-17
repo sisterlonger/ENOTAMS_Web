@@ -1,8 +1,9 @@
 <template>
     <div class="demo-timeline">
-        <div style="font-size:20px;font-weight: bold;color:red;margin:15px">通告工作流程记录</div>
+         <div style="font-size:20px;font-weight: bold;color:red;margin:15px">请查阅工作进展后，切换⬆️原始资料通知单页面继续处理</div>
+        <div style="font-size:20px;font-weight: bold;color:blue;margin:15px">通告工作流程记录</div>
         <tiny-time-line :data="data" :active="2" vertical shape="dot"></tiny-time-line>
-        <div style="font-size:20px;font-weight: bold;color:red;margin:15px">关联通告列表</div>
+        <div style="font-size:20px;font-weight: bold;color:blue;margin:15px">上下游通告列表</div>
         <tiny-grid v-if="preCondition" ref="basicGridRef" :data="tableData">
             <tiny-grid-column type="index" width="60"></tiny-grid-column>
             <tiny-grid-column v-if="false" type="selection" width="60"></tiny-grid-column>
@@ -31,9 +32,9 @@
         <!--先这样，用export应付，后续再用notice-->
         <tiny-dialog-box :modal="false" v-if="workflowVisibility" v-model:visible="workflowVisibility" title="详情"
             width="80%" max-height="1000px" top="5%" :close-on-click-modal="false">
-            <div v-if="sonShow" style="font-size:20px;font-weight: bold;color:red;margin:15px">关联通告工作流程记录</div>
+            <div v-if="sonShow" style="font-size:20px;font-weight: bold;color:red;margin:15px">上下游通告工作流程记录</div>
             <tiny-time-line v-if="sonShow" :data="sonData" :active="2" vertical shape="dot"></tiny-time-line>
-            <div style="font-size:20px;font-weight: bold;color:red;margin:15px">关联通告通知单</div>
+            <div style="font-size:20px;font-weight: bold;color:red;margin:15px">上下游通告通知单</div>
             <exportMessage :formData="formData" :act="'detail'" />
         </tiny-dialog-box>
     </div>

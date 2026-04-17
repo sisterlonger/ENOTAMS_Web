@@ -261,7 +261,8 @@ const getUserAndDepartmentInfo = async () => {
 const setAftnText = async () => {
     if ((pageData.messageType === '代替现有报文' || pageData.messageType === '取消现有报文' || pageData.type === '代替现有报文' || pageData.type === '取消现有报文') && !isEmpty(pageData.parentId)) {
         let { data } = await queryMessageDetail({ id: pageData.parentId });
-        notamFirstlineText.value = `${pageData.aftnSn || ''} NOTAM${pageData.type === '代替现有报文' ? 'R' : 'C'} ${data.aftnSn}`
+        console.log(pageData,"pageData")
+        notamFirstlineText.value = `${pageData.aftnSn || ''} NOTAM${pageData.type === '代替现有报文' || pageData.messageType === '代替现有报文' ? 'R' : 'C'} ${data.aftnSn}`
     }
     else {
         notamFirstlineText.value = `NOTAMN ${pageData.aftnSn || ''}`

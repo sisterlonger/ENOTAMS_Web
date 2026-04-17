@@ -1,23 +1,25 @@
 <template>
     <div>
-        <tiny-tabs v-if="preCondition" v-model="activeName" tab-style="border-card" size="small">
-            <!--PDF预览的内容-->
+        <tiny-tabs v-if="preCondition" v-model="activeName" tab-style="border-card" size="large">
+            <!--流程记录-->
             <tiny-tab-item :key="tabsList[0].name" :title="tabsList[0].title" :name="tabsList[0].name">
+                <workflow :processInstanceId="processInstanceId" :flowId="flowId" :taskId="taskId"
+                    :messageId="messageId" @getCurrentNode="getCurrentNode">
+                </workflow>
+            </tiny-tab-item>
+            <!--PDF预览的内容-->
+            <tiny-tab-item :key="tabsList[2].name" :title="tabsList[2].title" :name="tabsList[2].name">
                 <exportMessage :formData="formData" :act="'detail'" />
                 <materials :messageId="messageId" :templateID="templateID" :isNoAuth="isNoAuth" :act="materialsAct">
                 </materials>
-                <audit v-if="act === 'edit' && afterCondition" :processInstanceId="processInstanceId" :flowId="flowId" :taskId="taskId"
-                    :isInitiator="isInitiator" :isRecipient="isRecipient" :nodeName="nodeName" :messageId="messageId" @close="dialogClose" />
+                <audit v-if="act === 'edit' && afterCondition" :processInstanceId="processInstanceId" :flowId="flowId"
+                    :taskId="taskId" :isInitiator="isInitiator" :isRecipient="isRecipient" :nodeName="nodeName"
+                    :messageId="messageId" @close="dialogClose" />
             </tiny-tab-item>
             <!--附件记录-->
             <tiny-tab-item v-if="false" :key="tabsList[1].name" :title="tabsList[1].title" :name="tabsList[1].name">
                 <materials :messageId="messageId" :templateID="templateID" :isNoAuth="isNoAuth" :act="materialsAct">
                 </materials>
-            </tiny-tab-item>
-            <!--流程记录-->
-            <tiny-tab-item :key="tabsList[2].name" :title="tabsList[2].title" :name="tabsList[2].name">
-                <workflow :processInstanceId="processInstanceId" :flowId="flowId" :taskId="taskId" :messageId="messageId" @getCurrentNode="getCurrentNode">
-                </workflow>
             </tiny-tab-item>
         </tiny-tabs>
     </div>
@@ -44,19 +46,19 @@ const state = reactive<{
 }>({
     loading: null,
 });
-const activeName = ref('enotam')
+const activeName = ref('工作进展')
 const tabsList = ref([
     {
-        name: 'enotam',
-        title: '原始资料通知单',
+        name: '工作进展',
+        title: '工作进展',
     },
     {
         name: '佐证材料',
         title: '佐证材料',
     },
     {
-        name: '工作进展',
-        title: '工作进展',
+        name: 'enotam',
+        title: '原始资料通知单',
     },
 ])
 let tableData = reactive<any[]>
@@ -134,7 +136,7 @@ function dialogClose() {
     emit('close');
 }
 
-function getCurrentNode(node:any) {
+function getCurrentNode(node: any) {
     console.log(node)
     nodeName.value = node;
     afterCondition.value = true;

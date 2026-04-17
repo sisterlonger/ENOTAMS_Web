@@ -1,6 +1,7 @@
 <template>
     <div class="demo-form" v-if="preCondition">
-        <tiny-form ref="ruleFormRef" :model="createData" :rules="rules" label-width="150px" overflow-title style="margin-top: 20px;">
+        <tiny-form ref="ruleFormRef" :model="createData" :rules="rules" label-width="150px" overflow-title
+            style="margin-top: 20px;">
             <tiny-form-item v-if="addSignature" label="加批领导：">
                 <template #label>
                     <tiny-tooltip type="info" content="加批领导提供意见后方可继续" placement="top">
@@ -17,9 +18,6 @@
                         multiple: true
                     }" @change="onChangeLeaderNodeList"></tiny-cascader>
             </tiny-form-item>
-            <tiny-form-item v-if="showTwoPerson" label="紧急情况下，跳过双岗制审批请点击关闭" prop="showTwoPerson">
-                <tiny-switch v-model="createData.isTwoPerson"></tiny-switch>
-            </tiny-form-item>
             <tiny-form-item v-if="showAftnSn" label="通告号" prop="aftnSn">
                 <tiny-input v-model="createData.aftnSn" placeholder="请输入通告号"></tiny-input>
             </tiny-form-item>
@@ -27,9 +25,14 @@
                 <tiny-input v-model="createData.approveDesc" placeholder="请填写意见"></tiny-input>
             </tiny-form-item>
             <tiny-form-item>
-                <tiny-button v-if="nodeName !=='情报值班人员审批'"  type="primary" :disabled="leaderNodes.length > 0" @click="handleSubmit(true)">
-                    {{ nodeName === '原始资料经办人' || nodeName === "原始资料经办人加签处理1" || nodeName === "原始资料经办人加签处理2" ? "送情报审批" :
-                        "通过" }}
+                <tiny-button v-if="nodeName !== '情报值班人员审批'" type="primary" :disabled="leaderNodes.length > 0"
+                    @click="handleSubmit(true)">
+                    {{ nodeName === '原始资料经办人' || nodeName === "原始资料经办人加签处理1" || nodeName === "原始资料经办人加签处理2" ?
+                        "审批完成，送情报发布通告" :
+                        nodeName === '确定可发布' ? '通告已完成拟稿，值班员交叉审核' : nodeName === '双岗制审批' ? '通告已核稿，可以发布'
+                            : nodeName === '发布，输入通告号' ?
+                                '通告已发布,送原始资料提供人' : nodeName === '最终审批' ? '确认通告已发布' :
+                                    "通过" }}
                 </tiny-button>
                 <tiny-button v-if="addSignature" type="warning" :disabled="leaderNodes.length === 0"
                     @click="handleSubmit(true)">
@@ -38,12 +41,17 @@
                 <tiny-button type="info" @click="close">
                     取消
                 </tiny-button>
+                <tiny-button v-if="showTwoPerson" style="margin-left: 40%;" type="danger"
+                    @click="() => { createData.isTwoPerson = false; handleSubmit(true) }">
+                    紧急情况下，跳过情报交叉审核,慎点！
+                </tiny-button>
                 <!--当节点为情报值班人员审批时，显示，并且将通过按钮隐藏，实际上你可以理解成按钮转移到这里-->
-                <tiny-button v-if="nodeName ==='情报值班人员审批'"  style="margin-left: 40%;" type="danger" @click="handleSubmit(true)">
+                <tiny-button v-if="nodeName === '情报值班人员审批'" style="margin-left: 40%;" type="danger"
+                    @click="handleSubmit(true)">
                     特殊情况下，先发布后审批
                 </tiny-button>
-                <tiny-button v-if="isInitiator"  style="margin-left: 40%;" type="danger" @click="handleSubmit(false)">
-                    终止流程，慎用！
+                <tiny-button v-if="isInitiator && nodeName !=='最终审批'" style="margin-left: 40%;" type="danger" @click="handleSubmit(false)">
+                    终止全部流程，工作结束，慎点！
                 </tiny-button>
             </tiny-form-item>
         </tiny-form>
@@ -151,7 +159,7 @@ async function handleSubmit(approveState: boolean) {
         Modal.alert('请填写意见！');
         return;
     }
-    console.log("通告号校验",isEmpty(createData.aftnSn) ,showAftnSn.value);
+    console.log("通告号校验", isEmpty(createData.aftnSn), showAftnSn.value);
     if (isEmpty(createData.aftnSn) && showAftnSn.value) {
         Modal.alert('请填写通告号！');
         return;
