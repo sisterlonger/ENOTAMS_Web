@@ -1,12 +1,12 @@
 <template>
     <div class="demo-timeline">
-        <div style="font-size:20px;font-weight: bold;color:red;margin:15px">请查阅工作进展后，切换⬆️原始资料通知单页面继续处理</div>
         <div style="font-size:20px;font-weight: bold;color:blue;margin:15px">通告工作流程记录</div>
         <tiny-time-line :data="data" :active="2" vertical shape="dot"></tiny-time-line>
         <div style="font-size:20px;font-weight: bold;color:blue;margin:15px">上下游通告列表</div>
         <tiny-grid v-if="preCondition" ref="basicGridRef" :data="tableData">
             <tiny-grid-column type="index" width="60"></tiny-grid-column>
             <tiny-grid-column v-if="false" type="selection" width="60"></tiny-grid-column>
+            <tiny-grid-column field="messageId" title="序号" width="60"></tiny-grid-column>
             <tiny-grid-column field="qCode" title="Q码" width="120"></tiny-grid-column>
             <tiny-grid-column field="telegramText" title="内容"></tiny-grid-column>
             <tiny-grid-column field="status" title="与当前通知单关系" width="200"></tiny-grid-column>
@@ -53,10 +53,11 @@ const props = defineProps({
     processInstanceId: String,
     flowId: String,
     taskId: String,
-    messageId: Number
+    messageId: Number,
+    parentId: Number,
 });
 
-const { processInstanceId, flowId, messageId, taskId } = toRefs(props);
+const { processInstanceId, flowId, messageId, taskId, parentId } = toRefs(props);
 const workflowVisibility = ref(false)
 const act = ref("")
 const formData = reactive({});
@@ -85,13 +86,13 @@ const fetchData = async (id: any) => {
     try {
         const { data: detailData } = await queryMessageDetail({ id });
         Object.assign(formData, detailData);
-        console.log("formData--------", formData,formData.workflowId)
-        if(!isEmpty(detailData.workflowId)){
-        await getSonWorkflowProgress(detailData.workflowId);
-        sonShow.value = true
+        console.log("formData--------", formData, formData.workflowId)
+        if (!isEmpty(detailData.workflowId)) {
+            await getSonWorkflowProgress(detailData.workflowId);
+            sonShow.value = true
         }
-        else{
-            sonData.value =[]
+        else {
+            sonData.value = []
             sonShow.value = false
         }
     }
@@ -240,7 +241,7 @@ const getWorkflowProgress = async () => {
         console.log(err)
     });
 };
-const getSonWorkflowProgress = async (workflowId:string) => {
+const getSonWorkflowProgress = async (workflowId: string) => {
     await queryGetWorkflowProgress({
         processInstanceId: workflowId,
         flowId: "",
@@ -383,6 +384,7 @@ const getSonWorkflowProgress = async (workflowId:string) => {
 const getRelateMessage = async () => {
     await queryGetRelateMessage({
         messageId: messageId.value,
+        parentMessageId: parentId.value,
         authUserId: workflowaxios.defaults.headers.common.AuthUserId,
         authorization: workflowaxios.defaults.headers.common.Authorization,
         flyflowTenantId: workflowaxios.defaults.headers.common.FlyflowTenantId || "1"
@@ -403,8 +405,15 @@ const getRelateMessage = async () => {
 };
 // 初始化请求数据
 onMounted(async () => {
-    await getWorkflowProgress();
-    await getRelateMessage();
+    console.log(processInstanceId.value, "processInstanceId.value", parentId.value);
+    // 有流程实例ID则获取流程进度
+    if (processInstanceId.value !== "0") {
+        await getWorkflowProgress();
+    }
+    // 有messageId或者parentId则获取关联消息
+    if (!isEmpty(messageId.value) || !isEmpty(parentId.value) ) {
+        await getRelateMessage();
+    }
     preCondition.value = true;
     // await workflowaxios.post('/process-instance/queryTaskListInProgress/43a0c03d-061e-11f1-b74e-0242ac110005', {
 

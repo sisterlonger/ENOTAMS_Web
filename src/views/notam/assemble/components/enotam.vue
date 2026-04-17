@@ -1,10 +1,19 @@
 <template>
   <div>
     <tiny-tabs v-if="preCondition" v-model="activeName" tab-style="border-card" size="large">
-      <!--报文记录-->
+      <!--流程记录-->
       <tiny-tab-item :key="tabsList[0].name" :title="tabsList[0].title" :name="tabsList[0].name">
-        <div v-if="!isEmpty(parentId) && (messageType === 'cnl' || messageType === 'replace')">本单{{messageType === 'cnl'?'取消':'代替'}}了【{{
-          parentMessageFormData.notamSn }}】的原始资料通知单，及发布的【{{ parentMessageFormData.aftnSn }}】</div>
+        <div style="font-size:20px;font-weight: bold;color:red;margin:15px">请查阅工作进展后，切换⬆️原始资料通知单页面继续处理</div>
+        <workflow :processInstanceId="processInstanceId || '0'" :flowId="flowId || '0'" :messageId="localMessageID"
+          :parentId="parentId">
+        </workflow>
+      </tiny-tab-item>
+      <!--报文记录-->
+      <tiny-tab-item :key="tabsList[1].name" :title="tabsList[1].title" :name="tabsList[1].name">
+        <div style="font-size:20px;font-weight: bold;color:red;margin:15px">请查阅工作进展后，切换⬆️原始资料通知单页面继续处理</div>
+        <div v-if="!isEmpty(parentId) && (messageType === 'cnl' || messageType === 'replace')">本单{{ messageType ===
+          'cnl' ? '取消' : '代替' }}了【{{
+            parentMessageFormData.notamSn }}】的原始资料通知单，及发布的【{{ parentMessageFormData.aftnSn }}】</div>
         <assembleForm :messageId="localMessageID" :parentId="parentId" :messageType="messageType"
           :templateID="localTemplateID" :templateData="templateData" :isNoAuth="isNoAuth" :act="act"
           :processInstanceId="processInstanceId || '0'" :flowId="flowId || '0'" @close="dialogClose"
@@ -14,11 +23,6 @@
       <tiny-tab-item v-if="false" :key="tabsList[1].name" :title="tabsList[1].title" :name="tabsList[1].name">
         <materials :messageId="localMessageID" :templateID="localTemplateID" :isNoAuth="isNoAuth" :act="act">
         </materials>
-      </tiny-tab-item>
-      <!--流程记录-->
-      <tiny-tab-item :key="tabsList[2].name" :title="tabsList[2].title" :name="tabsList[2].name">
-        <workflow :processInstanceId="processInstanceId || '0'" :flowId="flowId || '0'" :messageId="localMessageID">
-        </workflow>
       </tiny-tab-item>
     </tiny-tabs>
     <tiny-dialog-box :modal="false" v-if="boxVisibility" v-model:visible="boxVisibility" title="请选择需要发送的关联通告"
@@ -75,8 +79,12 @@ const state = reactive<{
 }>({
   loading: null,
 });
-const activeName = ref('enotam')
+const activeName = ref('工作进展')
 const tabsList = ref([
+  {
+    name: '工作进展',
+    title: '工作进展',
+  },
   {
     name: 'enotam',
     title: '原始资料通知单',
@@ -84,10 +92,6 @@ const tabsList = ref([
   {
     name: '佐证材料',
     title: '佐证材料',
-  },
-  {
-    name: '工作进展',
-    title: '工作进展',
   },
 ])
 const toolbarButtons = ref([
@@ -326,8 +330,11 @@ onMounted(async () => {
     isNoAuth.value = true;
   }
   localTemplateID.value = Number(queryParams.templateID as string) || templateID.value;
-  console.log(localTemplateID.value,templateID.value,"localTemplateID");
+  console.log(localTemplateID.value, templateID.value, "localTemplateID");
   localMessageID.value = Number(queryParams.messageId as string) || messageId.value;
+  if (isEmpty(localMessageID.value)) {
+    activeName.value = "enotam"
+  }
   if (localTemplateID.value) {
     await fetchData();
     preCondition.value = true;

@@ -3,12 +3,14 @@
         <tiny-tabs v-if="preCondition" v-model="activeName" tab-style="border-card" size="large">
             <!--流程记录-->
             <tiny-tab-item :key="tabsList[0].name" :title="tabsList[0].title" :name="tabsList[0].name">
+                <div style="font-size:20px;font-weight: bold;color:red;margin:15px">请查阅工作进展后，切换⬆️原始资料通知单页面继续处理</div>
                 <workflow :processInstanceId="processInstanceId" :flowId="flowId" :taskId="taskId"
                     :messageId="messageId" @getCurrentNode="getCurrentNode">
                 </workflow>
             </tiny-tab-item>
             <!--PDF预览的内容-->
             <tiny-tab-item :key="tabsList[2].name" :title="tabsList[2].title" :name="tabsList[2].name">
+                <div style="font-size:20px;font-weight: bold;color:red;margin:15px">请查阅工作进展后，切换⬆️原始资料通知单页面继续处理</div>
                 <exportMessage :formData="formData" :act="'detail'" />
                 <materials :messageId="messageId" :templateID="templateID" :isNoAuth="isNoAuth" :act="materialsAct">
                 </materials>

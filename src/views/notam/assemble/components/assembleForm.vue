@@ -514,7 +514,7 @@ const createData = reactive({
   messageId: '',
   parentId: 0,
   // 报文生效类型
-  validType: '',
+  validType: 'NEITHER',
   // F/G项的基准面
   baseType: "",
   // Q项
