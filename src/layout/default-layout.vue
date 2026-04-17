@@ -68,6 +68,8 @@ import Theme from '@/components/theme/index.vue';
 import Menu from '@/components/menu/index.vue';
 import { useRouter } from 'vue-router';
 import { DefaultTheme } from '@/components/theme/type';
+// 导入音频工具
+import audioAlert from '@/utils/audio';
 import workflowaxios from '@/views/workflow/components/workflow-axios';
 import PageLayout from './page-layout.vue';
 
@@ -88,6 +90,66 @@ const top = ref('10px');
 // 消息轮询相关
 // 消息轮询相关
 let pollInterval: ReturnType<typeof setInterval> | null = null;
+let timeoutTaskInterval: ReturnType<typeof setInterval> | null = null;
+
+// ==============================轮询查询超时任务===================================
+
+
+// 在组件中修改checkTimeoutTasks函数
+const checkTimeoutTasks = async () => {
+  try {
+    const response = await queryTimeoutTasks();
+    console.log(response);
+    if (response.code === 200 && response.data.length > 0) {
+      // 播放告警声音
+      audioAlert.play('error').catch(error => {
+        console.warn('告警声音播放失败:', error);
+      });
+      
+      // 显示Modal提示
+      Modal.message({
+        message: `请及时处理待办！超出15分钟未处理的代码有${response.data.length}条`,
+        status: 'error',
+      });
+      
+      // 可以添加震动效果（如果支持）
+      if ('vibrate' in navigator) {
+        navigator.vibrate([200, 100, 200]); // 震动模式
+      }
+    }
+  } catch (err) {
+    Modal.message({
+      message: `获取告警数据错误信息为:${err.message}`,
+      status: 'error',
+    });
+  }
+};
+
+// 开始轮询超时任务（2分钟一次）
+const startTimeoutTaskPolling = () => {
+  // 清除可能存在的定时器
+  if (timeoutTaskInterval) {
+    clearInterval(timeoutTaskInterval);
+  }
+
+  // 立即查询一次
+  checkTimeoutTasks();
+  // 每2分钟（120000毫秒）查询一次
+  timeoutTaskInterval = setInterval(() => {
+    checkTimeoutTasks();
+  }, 120000);
+
+  console.log('开始轮询超时任务，间隔2分钟');
+};
+
+// 停止轮询超时任务
+const stopTimeoutTaskPolling = () => {
+  if (timeoutTaskInterval) {
+    clearInterval(timeoutTaskInterval);
+    timeoutTaskInterval = null;
+  }
+};
+// ==============================轮询查询超时任务===================================
 
 // ==============================轮询查询消息===================================
 // 轮询查询消息
@@ -100,20 +162,7 @@ const checkUnreadMessages = async () => {
     }
     // 2. 调用接口，传入当前的lastId
     const response = await workflowaxios.get(`/message/unreadNum?lastId=${currentMsgMaxId}`);
-    await queryTimeoutTasks().then((res) => {
-          console.log(res);
-          if(res.code===200 && res.data.length>0){
-            Modal.message({
-            message: `请及时处理待办！超出15分钟未处理的代码有${res.data.length}条`,
-            status: 'error',
-          });
-          }
-        }).catch((err) => {
-          Modal.message({
-            message: `获取告警数据错误信息为:${err.message}`,
-            status: 'error',
-          });
-        });
+
     // 使用对象解构获取data
     const { data } = response.data;
 
@@ -125,7 +174,7 @@ const checkUnreadMessages = async () => {
         // 有新消息，进行弹窗提示
         Notify({
           title: '流程通知',
-          message: `${title || '新消息'}: ${content || '请及时处理'}`,
+          message: `${title || '新消息'}: ${content || '请尽快审核'}`,
           type: 'info',
           position: 'top-right',
           duration: 5000,
@@ -142,7 +191,6 @@ const checkUnreadMessages = async () => {
     }
   } catch (error) {
     console.error('查询未读消息失败:', error);
-
   }
 };
 
@@ -175,6 +223,7 @@ const stopMessagePolling = () => {
 // 组件卸载时清理定时器
 onBeforeUnmount(() => {
   stopMessagePolling();
+  stopTimeoutTaskPolling();
 });
 // ==============================轮询查询消息===================================
 
@@ -300,6 +349,10 @@ onMounted(async () => {
   // 延迟一下，确保工作流登录已完成
   setTimeout(() => {
     startMessagePolling();
+    startTimeoutTaskPolling();
+    if (userStore.userInfo.fullName?.includes('飞行服务')) {
+      startTimeoutTaskPolling();
+    }
   }, 2000);
 });
 </script>

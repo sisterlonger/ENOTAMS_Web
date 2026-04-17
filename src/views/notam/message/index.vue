@@ -97,7 +97,7 @@
           <tiny-grid-column field="telegramText" title="主要内容(E项)" show-overflow width="30%"></tiny-grid-column>
           <tiny-grid-column field="createTime" title="创建时间" width="5%" :renderer="renderName"></tiny-grid-column>
           <tiny-grid-column field="taskAssignShow" title="当前节点" width="10%"></tiny-grid-column>
-          <!-- <tiny-grid-column field="workflowStatus" title="任务状态"></tiny-grid-column> -->
+          <tiny-grid-column field="workflowStatus" title="任务状态"></tiny-grid-column>
           <tiny-grid-column field="status" title="流程进度" width="4%">
             <template #default="data">
               <tiny-tag size="mini" :type="data.row.buttonType" effect="dark">{{
@@ -114,9 +114,9 @@
                 @click="editRowEvent(data.row, '详情')">详情</tiny-button>
               <tiny-button v-show="data.row.workflowStatus === '待办'" v-track="'处理'" size="mini" type="warning"
                 @click="editRowEvent(data.row, '处理')">处理</tiny-button>
-              <tiny-button v-show="true" v-track="'代替'" size="mini"
+              <tiny-button v-show="data.row.status === '已完成' && data.row.type !== '取消现有报文'" v-track="'代替'" size="mini"
                 type="primary" @click="editRowEvent(data.row, '代替')">代替报</tiny-button>
-              <tiny-button v-show="true" v-track="'取消'" size="mini"
+              <tiny-button v-show="data.row.status === '已完成' && data.row.type !== '取消现有报文'" v-track="'取消'" size="mini"
                 type="primary" @click="editRowEvent(data.row, '取消')">取消报</tiny-button>
             </template>
           </tiny-grid-column>

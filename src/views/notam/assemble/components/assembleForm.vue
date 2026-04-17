@@ -23,7 +23,7 @@
             <tiny-form-item label="通告类型">
               <!--单选框-->
               <tiny-radio-group v-model="createData.messageType"
-                :disabled="act === 'edit' || messageType != 'cnl' || messageType != 'replace'"
+                :disabled="act === 'edit' || messageType != 'cnl'"
                 @change="onChangeMessageType">
                 <tiny-radio-button v-for="(item, index) in messageTypeOption" :label="item" :value="item"
                   :key="index"></tiny-radio-button>
@@ -118,7 +118,7 @@
               </tiny-select>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="7" v-show="messageType !== 'cnl' && messageType !== 'replace'">
+          <tiny-col :span="7" v-show="messageType !== 'cnl'">
             <!--生效时间-->
             <tiny-form-item label="事件是否有明确的生效时间">
               <tiny-radio-group v-model="createData.validType" size="mini" :disabled="act === 'edit'">
@@ -127,7 +127,7 @@
               </tiny-radio-group>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="6" v-show="messageType !== 'cnl' && messageType !== 'replace'">
+          <tiny-col :span="6" v-show="messageType !== 'cnl'">
             <!--时间-->
             <tiny-form-item label="事件生效时间">
               <tiny-date-picker v-model="createData.startTime" type="datetime" placeholder="请选择生效时间（北京时）"

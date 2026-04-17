@@ -1,6 +1,6 @@
 <template>
     <div class="demo-timeline">
-         <div style="font-size:20px;font-weight: bold;color:red;margin:15px">请查阅工作进展后，切换⬆️原始资料通知单页面继续处理</div>
+        <div style="font-size:20px;font-weight: bold;color:red;margin:15px">请查阅工作进展后，切换⬆️原始资料通知单页面继续处理</div>
         <div style="font-size:20px;font-weight: bold;color:blue;margin:15px">通告工作流程记录</div>
         <tiny-time-line :data="data" :active="2" vertical shape="dot"></tiny-time-line>
         <div style="font-size:20px;font-weight: bold;color:blue;margin:15px">上下游通告列表</div>

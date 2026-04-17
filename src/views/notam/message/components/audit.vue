@@ -46,7 +46,7 @@
                     紧急情况下，跳过情报交叉审核,慎点！
                 </tiny-button>
                 <!--当节点为情报值班人员审批时，显示，并且将通过按钮隐藏，实际上你可以理解成按钮转移到这里-->
-                <tiny-button v-if="nodeName === '情报值班人员审批'" style="margin-left: 40%;" type="danger"
+                <tiny-button v-if="nodeName === '情报值班人员审批'" style="margin-left: 40%;" type="danger" :disabled="leaderNodes.length !== 0"
                     @click="handleSubmit(true)">
                     特殊情况下，先发布后审批
                 </tiny-button>

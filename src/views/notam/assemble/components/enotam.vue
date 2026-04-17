@@ -1,6 +1,6 @@
 <template>
   <div>
-    <tiny-tabs v-if="preCondition" v-model="activeName" tab-style="border-card" size="small">
+    <tiny-tabs v-if="preCondition" v-model="activeName" tab-style="border-card" size="large">
       <!--报文记录-->
       <tiny-tab-item :key="tabsList[0].name" :title="tabsList[0].title" :name="tabsList[0].name">
         <div v-if="!isEmpty(parentId) && (messageType === 'cnl' || messageType === 'replace')">本单{{messageType === 'cnl'?'取消':'代替'}}了【{{
@@ -16,7 +16,7 @@
         </materials>
       </tiny-tab-item>
       <!--流程记录-->
-      <tiny-tab-item v-if="act === 'edit'" :key="tabsList[2].name" :title="tabsList[2].title" :name="tabsList[2].name">
+      <tiny-tab-item :key="tabsList[2].name" :title="tabsList[2].title" :name="tabsList[2].name">
         <workflow :processInstanceId="processInstanceId || '0'" :flowId="flowId || '0'" :messageId="localMessageID">
         </workflow>
       </tiny-tab-item>
