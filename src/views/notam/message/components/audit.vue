@@ -41,16 +41,16 @@
                 <tiny-button type="info" @click="close">
                     取消
                 </tiny-button>
-                <tiny-button v-if="showTwoPerson" style="margin-left: 40%;" type="danger"
+                <tiny-button v-if="showTwoPerson" style="margin-left: 30%;" type="danger"
                     @click="() => { createData.isTwoPerson = false; handleSubmit(true) }">
                     紧急情况下，跳过情报交叉审核,慎点！
                 </tiny-button>
                 <!--当节点为情报值班人员审批时，显示，并且将通过按钮隐藏，实际上你可以理解成按钮转移到这里-->
-                <tiny-button v-if="nodeName === '情报值班人员审批'" style="margin-left: 40%;" type="danger" :disabled="leaderNodes.length !== 0"
+                <tiny-button v-if="nodeName === '情报值班人员审批'" style="margin-left: 30%;" type="danger" :disabled="leaderNodes.length !== 0"
                     @click="handleSubmit(true)">
                     特殊情况下，先发布后审批
                 </tiny-button>
-                <tiny-button v-if="isInitiator && nodeName !=='最终审批'" style="margin-left: 40%;" type="danger" @click="handleSubmit(false)">
+                <tiny-button v-if="isInitiator && nodeName !=='最终审批'" style="margin-left: 30%;" type="danger" @click="handleSubmit(false)">
                     终止全部流程，工作结束，慎点！
                 </tiny-button>
             </tiny-form-item>

@@ -2,6 +2,9 @@
     <div class="demo-timeline">
         <div style="font-size:20px;font-weight: bold;color:blue;margin:15px">通告工作流程记录</div>
         <tiny-time-line :data="data" :active="2" vertical shape="dot"></tiny-time-line>
+        <div style="font-size:20px;font-weight: bold;color:blue;margin:15px">上下游通告关系图</div>
+        <tiny-mind-map class="demo-mind-map-export-date" ref="mindmap" @create="onCreate" v-model="mapData"  :key="mapData.nodeData.id" 
+        :options="{toolBar:true,overflowHidden:true}" />
         <div style="font-size:20px;font-weight: bold;color:blue;margin:15px">上下游通告列表</div>
         <tiny-grid v-if="preCondition" ref="basicGridRef" :data="tableData">
             <tiny-grid-column type="index" width="60"></tiny-grid-column>
@@ -9,8 +12,7 @@
             <tiny-grid-column field="messageId" title="序号" width="60"></tiny-grid-column>
             <tiny-grid-column field="qCode" title="Q码" width="120"></tiny-grid-column>
             <tiny-grid-column field="telegramText" title="内容"></tiny-grid-column>
-            <tiny-grid-column field="status" title="与当前通知单关系" width="200"></tiny-grid-column>
-            <tiny-grid-column field="taskAssignShow" title="当前处理人" width="200"></tiny-grid-column>
+            <tiny-grid-column field="relation" title="与当前通知单关系" width="200"></tiny-grid-column>
             <tiny-grid-column title="操作" width="100" align="center">
                 <template #default="data">
                     <tiny-button size="mini" type="primary" @click="queryRowEvent(data.row, '详情')">详情</tiny-button>
@@ -41,13 +43,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, toRefs, reactive, defineProps, onMounted, defineEmits } from 'vue'
+import { ref, toRefs, reactive, defineProps, onMounted, defineEmits, watch } from 'vue'
 import { queryGetRelateMessage, queryGetWorkflowProgress, queryMessageDetail } from '@/api/fetchInterface';
-import { TinyTimeLine, Modal, TinyGrid, TinyGridColumn, Button as TinyButton, } from '@opentiny/vue'
+import { TinyTimeLine, Modal, TinyGrid, TinyGridColumn, Button as TinyButton, TinyMindMap } from '@opentiny/vue'
+import { isEmpty } from '@/utils/string-utils';
 import exportMessage from '@/views/notam/assemble/components/export.vue';
 import workflowaxios from '@/views/workflow/components/workflow-axios';
-import task from '@/router/routes/modules/task';
-import { isEmpty } from 'lodash';
 
 const props = defineProps({
     processInstanceId: String,
@@ -66,7 +67,8 @@ const formData = reactive({});
 const data = reactive<Array<{ name: string, time: string, type: string }>>([]);
 const sonData = reactive<Array<{ name: string, time: string, type: string }>>([]);
 let sonShow = ref(false)
-let tableData = reactive<any>;
+let tableData = ref<any[]>([]);
+let mapResData = ref<any[]>([]);
 let preCondition = ref(false)
 // 定义派发事件
 const emit = defineEmits(['getCurrentNode']);
@@ -86,7 +88,6 @@ const fetchData = async (id: any) => {
     try {
         const { data: detailData } = await queryMessageDetail({ id });
         Object.assign(formData, detailData);
-        console.log("formData--------", formData, formData.workflowId)
         if (!isEmpty(detailData.workflowId)) {
             await getSonWorkflowProgress(detailData.workflowId);
             sonShow.value = true
@@ -389,20 +390,139 @@ const getRelateMessage = async () => {
         authorization: workflowaxios.defaults.headers.common.Authorization,
         flyflowTenantId: workflowaxios.defaults.headers.common.FlyflowTenantId || "1"
     }).then(async (res: any) => {
-        tableData = res.data;
-        tableData.forEach((item: any) => {
-            if (item.parentId === messageId.value) {
-                item.status = "此条记录为下游"
-            }
-            else {
-                item.status = "此条记录为上游"
-            }
-        });
+        tableData.value = res.data.filter((item: any) => item.messageId !== messageId.value);
+        //tableData.value = res.data;
+        mapResData.value = res.data;
+        // tableData.value.forEach((item: any) => {
+        //     if (item.parentId === messageId.value) {
+        //         item.status = "此条记录为下游"
+        //     }
+        //     else {
+        //         item.status = "此条记录为上游"
+        //     }
+        // });
+        // 更新思维导图数据
+        updateMapData();
         console.log(tableData)
     }).catch((err: any) => {
         console.log(err)
     });
 };
+
+// 监听tableData变化，自动更新思维导图
+watch(mapResData, () => {
+    updateMapData();
+});
+
+// 更新思维导图数据
+// 安全的树形结构构建
+const updateMapData = () => {
+  if (!mapResData.value || mapResData.value.length === 0) {
+    mapData.value = {
+      nodeData: {
+        id: 'empty',
+        topic: '暂无数据',
+        root: true
+      }
+    };
+    return;
+  }
+
+  try {
+    // 使用JSON序列化/反序列化打破可能的循环引用
+    const cleanData = JSON.parse(JSON.stringify(mapResData.value));
+    
+    // 构建节点映射
+    const nodeMap = new Map();
+    cleanData.forEach(item => {
+      nodeMap.set(item.messageId, {
+        id: String(item.messageId),
+        topic: `${item.qCode}`,
+        children: [],
+        isCurrent: item.messageId === messageId.value
+      });
+    });
+
+    // 找出根节点（没有父节点或父节点不在列表中的节点）
+    const rootNodes = [];
+    const usedAsChild = new Set();
+
+    // 建立父子关系
+    cleanData.forEach(item => {
+      const node = nodeMap.get(item.messageId);
+      if (item.parentId && nodeMap.has(item.parentId)) {
+        const parentNode = nodeMap.get(item.parentId);
+        parentNode.children.push(node);
+        usedAsChild.add(item.messageId);
+      }
+    });
+
+    // 根节点是那些没有被用作子节点的节点
+    cleanData.forEach(item => {
+      if (!usedAsChild.has(item.messageId)) {
+        rootNodes.push(nodeMap.get(item.messageId));
+      }
+    });
+
+    // 构建最终树
+    let finalTree;
+    if (rootNodes.length === 1) {
+      // 使用数组解构替代 rootNodes[0]
+      [finalTree] = rootNodes;
+      finalTree.root = true;
+    } else {
+      finalTree = {
+        id: 'root',
+        topic: '关联通告树',
+        root: true,
+        children: rootNodes
+      };
+    }
+
+    // 高亮当前节点
+    const highlightNode = (node) => {
+      if (node.isCurrent) {
+        node.topic = `🔥 ${node.topic}`;
+        node.style = { 
+          background: '#fff2e8', 
+          color: '#fa8c16',
+          fontWeight: 'bold'
+        };
+      }
+      if (node.children) {
+        node.children.forEach(child => highlightNode(child));
+      }
+    };
+    
+    highlightNode(finalTree);
+
+    mapData.value = {
+      nodeData: finalTree
+    };
+  } catch (error) {
+    console.error('构建思维导图数据失败:', error);
+    mapData.value = {
+      nodeData: {
+        id: 'error',
+        topic: '数据解析失败',
+        root: true
+      }
+    };
+  }
+};
+const render = ref(null)
+// 初始化为空数据
+const mapData = ref({
+    nodeData: {
+        id: 'loading',
+        topic: '加载中...',
+        root: true
+    }
+})
+const onCreate = (instance) => {
+    render.value = instance
+}
+
 // 初始化请求数据
 onMounted(async () => {
     console.log(processInstanceId.value, "processInstanceId.value", parentId.value);
@@ -410,17 +530,13 @@ onMounted(async () => {
     if (processInstanceId.value !== "0") {
         await getWorkflowProgress();
     }
-    // 有messageId或者parentId则获取关联消息
-    if (!isEmpty(messageId.value) || !isEmpty(parentId.value) ) {
+    if (!isEmpty(messageId.value) || !isEmpty(parentId.value)) {
         await getRelateMessage();
     }
     preCondition.value = true;
-    // await workflowaxios.post('/process-instance/queryTaskListInProgress/43a0c03d-061e-11f1-b74e-0242ac110005', {
-
-    // }).then(async (res1: any) => {
-    //     console.log("res1-----------------------", res1);
-    // })
 });
+
+
 </script>
 
 <style scoped>
@@ -434,5 +550,16 @@ code {
 
 .demo-line {
     line-height: 24px;
+}
+
+.demo-mind-map-export-date {
+    width: 100%;
+    height: 400px;
+
+    :deep(.map-container) {
+        .map-canvas {
+            background-color: var(--tv-color-bg);
+        }
+    }
 }
 </style>

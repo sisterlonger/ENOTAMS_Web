@@ -448,6 +448,7 @@ const initOption = (fieldList) => {
             }
         }
         // selectChildren 和 children
+        console.log(field.type,"field.type",field);
         if (field.type.includes("hildren") && field.children) {
             initOption(field.children);
         }

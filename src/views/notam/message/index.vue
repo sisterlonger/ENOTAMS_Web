@@ -156,7 +156,7 @@ import {
   Grid as TinyGrid, GridColumn as TinyGridColumn, Button as TinyButton, DialogBox as TinyDialogBox, GridToolbar as TinyGridToolbar, Input as TinyInput, Form as TinyForm, TinyTag, Loading,
   FormItem as TinyFormItem, Layout as TinyLayout, Row as TinyRow, Col as TinyCol, Modal, TinyDatePicker, Collapse as TinyCollapse, CollapseItem as TinyCollapseItem, Option as TinyOption, Select as TinySelect,
 } from '@opentiny/vue';
-import { queryMessageList, queryAirSpaceList, publishMessage } from '@/api/fetchInterface';
+import { queryMessageList, queryAirSpaceList, publishMessage, queryGetRelateMessage } from '@/api/fetchInterface';
 import { isEmpty } from '@/utils/string-utils';
 import { useRoute } from 'vue-router'
 import router from '@/router';
@@ -264,7 +264,7 @@ const statusOptions = [
     value: '未开始',
     label: '未开始'
   },
-   {
+  {
     value: '',
     label: '全部'
   },
@@ -399,24 +399,80 @@ const editRowEvent = async (row, type) => {
 
   }
   else if (type === "取消") {
+    const res = await queryGetRelateMessage({
+      messageId: messageId.value,
+      authUserId: workflowaxios.defaults.headers.common.AuthUserId,
+      authorization: workflowaxios.defaults.headers.common.Authorization,
+      flyflowTenantId: workflowaxios.defaults.headers.common.FlyflowTenantId || "1"
+    });
+
+    if (res.code !== 200) {
+      return; // 查询失败，直接返回
+    }
+
+    const todoRelateMessage = res.data.filter(item =>
+      item.parentId === messageId.value && item.status !== "已完成" && item.type === '取消现有报文'
+    );
+
+    // 如果有正在进行的取消报，需要用户确认
+    if (todoRelateMessage.length > 0) {
+      const userConfirmed = await Modal.confirm('当前通告已经有正在进行的取消报，您确定要继续吗？').then((comfirm) => {
+        if (comfirm === 'confirm') {
+          // 执行取消操作
+          act.value = "add";
+          messageType.value = "cnl";
+          templateId.value = 751;
+          addVisibility.value = true;
+          parentId.value = messageId.value;
+          messageId.value = null;
+        }
+      });
+      if (!userConfirmed) {
+        return; // 用户取消操作
+      }
+    }
+
+    // 执行取消操作
     act.value = "add";
-    messageType.value = "cnl"
+    messageType.value = "cnl";
     templateId.value = 751;
     addVisibility.value = true;
     parentId.value = messageId.value;
     messageId.value = null;
   }
   else if (type === "代替") {
-    // await publishMessage(publishData).then(async (res) => {
-    //   console.log("res", res);
-    //   if (res.code === 200) {
-    //     act.value = "add";
-    //     addVisibility.value = true;
-    //     messageId.value = res.data;
-    //     //Modal.alert({ message: '代替成功', status: 'success' })
-    //   }
-    // })
-    // await queryClick();
+    const res = await queryGetRelateMessage({
+      messageId: messageId.value,
+      authUserId: workflowaxios.defaults.headers.common.AuthUserId,
+      authorization: workflowaxios.defaults.headers.common.Authorization,
+      flyflowTenantId: workflowaxios.defaults.headers.common.FlyflowTenantId || "1"
+    });
+
+    if (res.code !== 200) {
+      return; // 查询失败，直接返回
+    }
+
+    const todoRelateMessage = res.data.filter(item =>
+      item.parentId === messageId.value && item.status !== "已完成" && item.type === '代替现有报文'
+    );
+
+    // 如果有正在进行的代替报，需要用户确认
+    if (todoRelateMessage.length > 0) {
+      const userConfirmed = await Modal.confirm('当前通告已经有正在进行的代替报，您确定要继续吗？').then((comfirm) => {
+        if (comfirm === 'confirm') {
+          // 执行代替操作
+          act.value = "add";
+          messageType.value = "replace"
+          addVisibility.value = true;
+          parentId.value = messageId.value;
+          messageId.value = null;
+        }
+      });
+      if (!userConfirmed) {
+        return; // 用户代替操作
+      }
+    }
+
     act.value = "add";
     messageType.value = "replace"
     addVisibility.value = true;

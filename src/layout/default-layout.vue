@@ -349,7 +349,7 @@ onMounted(async () => {
   // 延迟一下，确保工作流登录已完成
   setTimeout(() => {
     startMessagePolling();
-    startTimeoutTaskPolling();
+    //startTimeoutTaskPolling();
     if (userStore.userInfo.fullName?.includes('飞行服务')) {
       startTimeoutTaskPolling();
     }
