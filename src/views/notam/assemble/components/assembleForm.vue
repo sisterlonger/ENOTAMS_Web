@@ -872,7 +872,8 @@ async function onAssemble() {
     Modal.alert('请填写事件生效时间和事件失效时间');
     return;
   }
-  // 校验E项中的必填项是否都填完
+  // 校验E项中的必填项是否都填完,由于有一些必填项自带了文本，因此需要进一步判断--todo
+  console.log(eFormData.requiredList);
   if (eFormData.requiredList.length > 0 && eFormData.requiredList.every((item: string) => typeof item === 'undefined' || item.includes("undefined") || item.includes('null'))) {
     Modal.alert('请填写必填项');
     return;

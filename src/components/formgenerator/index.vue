@@ -1,9 +1,53 @@
 <template>
     <div>
         <tiny-row v-if="preCondition">
-            <tiny-form ref="ruleFormRef" :model="formData" :rules="formRules" :label-width="formStyle.width || '200px'" overflow-title>
+            <tiny-form ref="ruleFormRef" :model="formData" :rules="formRules" :label-width="formStyle.width || '200px'"
+                overflow-title>
                 <div v-for="(item, index) in formFields" :key="'field' + index">
-                    <tiny-form-item v-if="!item.hidden" :label="keyWordLabel[index]" :prop="item.prop">
+                    <!-- 可重复字段组 -->
+                    <div v-if="item.repeatable" class="repeatable-field-group">
+                        <!-- 渲染所有实例 -->
+                        <div v-for="(instance, instanceIndex) in getFieldInstances(item.prop)"
+                            :key="`${item.prop}_${instanceIndex}`">
+                            <tiny-form-item v-if="!item.hidden" :label="instanceIndex === 0 ? keyWordLabel[index] : ''"
+                                :prop="getFieldProp(item.prop, instanceIndex)">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <!-- 输入组件 -->
+                                    <tiny-input v-if="item.type.includes('input')"
+                                        v-model="formData[item.prop][instanceIndex]" :placeholder="item.placeholder"
+                                        clearable :style="`width:${item.width !== null ? item.width : '200px'}`"
+                                        :type="item.type === 'inputtextarea' ? 'textarea' : 'text'" autosize
+                                        :maxlength="item.maxLength"
+                                        @change="getOption(formData[item.prop][instanceIndex], item)">
+                                    </tiny-input>
+
+                                    <!-- 选择组件 -->
+                                    <tiny-select v-if="item.type === 'select'"
+                                        v-model="formData[item.prop][instanceIndex]" :placeholder="item.placeholder"
+                                        :options="item.options" clearable filterable allow-create default-first-option
+                                        :optimization="item.options.length > 1000"
+                                        :style="`width:${item.width !== null ? item.width : '200px'}`"
+                                        @change="getOption(formData[item.prop][instanceIndex], item)">
+                                    </tiny-select>
+
+                                    <!-- 删除按钮（第一个不显示） -->
+                                    <tiny-button v-if="instanceIndex > 0"
+                                        @click="removeFieldInstance(item.prop, instanceIndex)" :icon="IconDeleteL" type="danger" circle> 
+                                    </tiny-button>
+                                </div>
+                            </tiny-form-item>
+                        </div>
+
+                        <!-- 添加按钮 -->
+                        <div style="margin-left: 200px; margin-top: 8px;">
+                            <tiny-button @click="addFieldInstance(item)" :icon="IconPlus" type="success">
+                                添加{{ item.label || '更多' }}
+                            </tiny-button>
+                        </div>
+                    </div>
+
+                    <!-- 原有逻辑保持不变 -->
+                    <tiny-form-item v-else-if="!item.hidden" :label="keyWordLabel[index]" :prop="item.prop">
                         <!--输入组件-->
                         <tiny-input v-if="item.type.includes('input')" v-model="formData[item.prop]"
                             :placeholder="item.placeholder" clearable
@@ -12,11 +56,11 @@
                             :maxlength="item.maxLength" @change="getOption(formData[item.prop], item)"></tiny-input>
                         <!--选择组件-->
                         <tiny-select v-if="item.type === 'select'" v-model="formData[item.prop]"
-                            :placeholder="item.placeholder" :options="item.options" clearable filterable allow-create default-first-optio
-                            :optimization="item.options.length > 1000 ? true : false"
+                            :placeholder="item.placeholder" :options="item.options" clearable filterable allow-create
+                            default-first-option :optimization="item.options.length > 1000"
                             :style="`width:${item.width !== null ? item.width : '200px'}`"
                             @change="getOption(formData[item.prop], item)"></tiny-select>
-                        <!--chilren组件-->
+                        <!--children组件-->
                         <div v-if="item.type === 'children'">
                             <children :item="item" :formData="formData" :formFields="formFields"
                                 @update:formData="val => parentFormData = val"
@@ -35,8 +79,8 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, toRefs, watch, toRaw, defineExpose, defineEmits } from 'vue';
-import { queryDicType, queryRwyConfig, queryRadioNavigationConfig, queryRadioNavigationConfigByCodeId,getKeyWordJSON, queryRestrictedConfig, queryControlledConfig } from '@/api/fetchInterface';
+import { ref, reactive, onMounted, toRefs, watch, toRaw, defineExpose, defineEmits, computed } from 'vue';
+import { queryDicType, queryRwyConfig, queryRadioNavigationConfig, queryRadioNavigationConfigByCodeId, getKeyWordJSON, queryRestrictedConfig, queryControlledConfig } from '@/api/fetchInterface';
 import {
     TinyForm,
     TinyFormItem,
@@ -45,21 +89,13 @@ import {
     TinyButton,
     TinyRow,
     TinyCol,
-    Select as TinySelect,
+    Select as TinySelect
 } from '@opentiny/vue';
-
-/*
-defineProps({
-  formFields: {
-    type: Array,
-    default() {
-      return [];
-    },
-  },
-});*/
-//const emit = defineEmits(['onChangeE']);
+import { iconDeleteL,iconPlus } from '@opentiny/vue-icon'
 import children from './components/children.vue';
 
+const IconPlus = iconPlus()
+const IconDeleteL = iconDeleteL()
 const props = defineProps({
     keyWord: String,
     keyWordLabel: Object,
@@ -76,9 +112,54 @@ const submitFormData = reactive({});
 const keyList = reactive({});
 const formStyle = reactive({ width: '200px', span: 6 });
 const preCondition = ref(false);
-const eData = ref({
+const eData = ref({});
+const parentFormData = ref({});
 
-});
+// 新增的简单函数
+
+// 生成字段属性名
+const getFieldProp = (prop, index) => {
+    return `${prop}_${index}`;
+};
+
+// 添加字段实例
+const addFieldInstance = (item) => {
+    if (!formData[item.prop]) {
+        formData[item.prop] = [''];
+    }
+    formData[item.prop].push('');
+
+    // 如果有验证规则，为新实例添加规则
+    if (item.rules && item.rules.length > 0) {
+        const index = formData[item.prop].length - 1;
+        formRules[getFieldProp(item.prop, index)] = item.rules.map(rule => ({
+            validator: validate,
+            trigger: rule.trigger,
+            required: rule.required,
+            validatortext: rule.validatortext,
+            validators: rule.validators
+        }));
+    }
+};
+
+// 移除字段实例
+const removeFieldInstance = (prop, index) => {
+    if (formData[prop] && formData[prop].length > 1) {
+        formData[prop].splice(index, 1);
+
+        // 移除验证规则
+        delete formRules[`${prop}_${index}`];
+
+        // 重新索引验证规则
+        Object.keys(formRules).forEach(key => {
+            if (key.startsWith(`${prop}_`) && parseInt(key.split('_')[1], 10) > index) {
+                const newKey = `${prop}_${parseInt(key.split('_')[1], 10) - 1}`;
+                formRules[newKey] = formRules[key];
+                delete formRules[key];
+            }
+        });
+    }
+};
 
 // 1vn,静态数据发生变化时触发的函数，函数将会动态调整对应的关键字里选择器中的选项值
 const updateOptions = async (newValue, fieldList) => {
@@ -168,11 +249,10 @@ watch(
         updateValue(newValue, formFields.value);
 
     },
-    { immediate:true,deep: true, }
+    { immediate: true, deep: true, }
 );
 // 通用的校验函数
-const validate = (rule, value, callback, data, options) => {
-    // 报错原因，未能获取到rule（因为子没有暴露出来）
+const validate = (rule, value, callback) => {
     const regex = new RegExp(rule.validators);
     if (!regex.test(value)) {
         callback(new Error(rule.validatortext));
@@ -197,6 +277,18 @@ function uniqueByProperty(array, key) {
         return true;
     });
 };
+// 用户输入字符串-替代-template中占位符$符号
+function replaceDollarSequentially(str, replacements) {
+    let regex = /\$/g; // 匹配所有的$
+    let matchCount = 0; // 记录已经替换的$的数量
+    return str.replace(regex, () => {
+        if (matchCount < replacements.length) {
+            matchCount += 1;
+            return replacements[matchCount - 1]; // 返回对应的替换字符，并递增
+        }
+        return '$'; // 如果替换数组耗尽，保留原始$
+    });
+}
 // E-E，某选项变化时，触发naip或者上下游选择器获取option,data是该选项的值，field是该选项的配置
 const getOption = async (data, field) => {
     // 非初始化
@@ -244,7 +336,7 @@ const getOption = async (data, field) => {
                 eData.value[`vors${key}`] = String(response.data[key]);
             });
         }
-         if (field.label === "VOR/DME设备呼号") {
+        if (field.label === "VOR/DME设备呼号") {
             let response = await queryRadioNavigationConfigByCodeId({ codeId: formData[field.prop] });
             const vorConfigKey = Object.keys(response.data);
             vorConfigKey.forEach(key => {
@@ -354,66 +446,146 @@ const getOption = async (data, field) => {
         }
     }
 };
-// 用户输入字符串-替代-template中占位符$符号
-function replaceDollarSequentially(str, replacements) {
-    let regex = /\$/g; // 匹配所有的$
-    let matchCount = 0; // 记录已经替换的$的数量
-    return str.replace(regex, () => {
-        if (matchCount < replacements.length) {
-            matchCount += 1;
-            return replacements[matchCount - 1]; // 返回对应的替换字符，并递增
-        }
-        return '$'; // 如果替换数组耗尽，保留原始$
-    });
-}
+// 获取字段实例数组
+const getFieldInstances = (prop) => {
+    if (!formData[prop]) {
+        formData[prop] = [''];
+    }
+    // 确保返回的是数组
+    if (!Array.isArray(formData[prop])) {
+        formData[prop] = [formData[prop]];
+    }
+    return formData[prop];
+};
+
+// 从children对象中提取值的辅助函数
+const getChildrenValues = (childList, data) => {
+    const result = [];
+    if (childList && childList.length > 0) {
+        childList.forEach(child => {
+            if (child.type === "children" || child.type === "selectChildren") {
+                // 递归处理嵌套的children
+                if (data && data[child.prop]) {
+                    result.push(getChildrenValues(child.children, data[child.prop]));
+                } else {
+                    result.push('');
+                }
+            } else {
+                // 获取普通字段的值
+                result.push(data && data[child.prop] ? data[child.prop] : '');
+            }
+        });
+    }
+    return result;
+};
+
+// 修改后的handleFormData函数
 // 按formFields中，children组件的所有变量顺序组装合成变成children组件变量值
 const handleFormData = (formFieldList) => {
     let result = [];
-    // 如果是children就不行,得根据template
     if (!formFieldList || formFieldList === null || formFieldList.length === 0) {
         return result;
     }
+
     formFieldList.forEach((field) => {
-        // 如果是子组件则递归，递归返回多个
-        if (field.type === "children") {
-            // template算法
-            let template = "";
-            if (field.template) {
-                template = replaceDollarSequentially(field.template, handleFormData(field.children));
-            }
-            else {
-                template = handleFormData(field.children).join("");
-            }
-            result.push(`${template}`);
-            // 必须是一级变量才可以加入到提交数据中
-            if (field.prop.split("-").length === 2) {
-                submitFormData[field.prop] = template;
-            }
+        const fieldValue = formData[field.prop];
+
+        // 处理可重复字段
+        if (field.repeatable && fieldValue) {
+            handleRepeatableField(field, fieldValue, result);
         }
-        // 单个
+        // 处理children组件
+        else if (field.type === "children") {
+            handleChildrenField(field, result);
+        }
+        // 处理selectChildren组件
         else if (field.type === "selectChildren") {
-            let childrenIndex = 0;
-            field.children.forEach((child, index) => {
-                if (child.prop.includes(formData[field.prop])) {
-                    childrenIndex = index;
-                }
-            })
-            // 必须是一级变量才可以加入到提交数据中
-            if (field.prop.split("-").length === 2) {
-                submitFormData[field.prop] = `${field.prefix || ''}${handleFormData([field.children[childrenIndex]], field.prop)}${field.suffix || ''}`;
-            }
+            handleSelectChildrenField(field, result);
         }
-        // 返回多个
+        // 处理普通字段
         else {
-            result.push(`${formData[field.prop]}`);
-            // 必须是一级变量才可以加入到提交数据中
+            handleNormalField(field, result);
+        }
+    });
+
+    return result;
+};
+
+// 处理可重复字段
+const handleRepeatableField = (field, fieldValue, result) => {
+    // 确保fieldValue是一个数组
+    if (Array.isArray(fieldValue)) {
+        const instanceStrings = [];
+        fieldValue.forEach((instanceData) => {
+            if (field.type === "children" || field.type === "selectChildren") {
+                // 处理children类型的数据
+                if (instanceData && typeof instanceData === 'object') {
+                    const childValues = getChildrenValues(field.children, instanceData);
+                    if (field.template) {
+                        const templateResult = replaceDollarSequentially(field.template, childValues);
+                        instanceStrings.push(templateResult);
+                    } else {
+                        instanceStrings.push(childValues.join(""));
+                    }
+                }
+            } else if (instanceData && typeof instanceData === 'string' && instanceData.trim() !== '') {
+                // 处理普通字段（字符串）
+                instanceStrings.push(instanceData);
+            }
+        });
+
+        if (instanceStrings.length > 0) {
+            const combinedValue = instanceStrings.join(', ');
+            result.push(combinedValue);
             if (field.prop.split("-").length === 2) {
-                submitFormData[field.prop] = formData[field.prop];
+                submitFormData[field.prop] = combinedValue;
             }
         }
-    })
-    return result;
-}
+    } else if (fieldValue && typeof fieldValue === 'string' && fieldValue.trim() !== '') {
+        // 如果不是数组，但数据存在且是有效字符串，则直接使用
+        result.push(fieldValue);
+        if (field.prop.split("-").length === 2) {
+            submitFormData[field.prop] = fieldValue;
+        }
+    }
+};
+
+// 处理children组件
+const handleChildrenField = (field, result) => {
+    let template = "";
+    if (field.template) {
+        template = replaceDollarSequentially(field.template, handleFormData(field.children));
+    } else {
+        template = handleFormData(field.children).join("");
+    }
+    result.push(`${template}`);
+    if (field.prop.split("-").length === 2) {
+        submitFormData[field.prop] = template;
+    }
+};
+
+// 处理selectChildren组件
+const handleSelectChildrenField = (field, result) => {
+    let childrenIndex = 0;
+    field.children.forEach((child, index) => {
+        if (child.prop.includes(formData[field.prop])) {
+            childrenIndex = index;
+        }
+    });
+
+    if (field.prop.split("-").length === 2) {
+        const childData = handleFormData([field.children[childrenIndex]]);
+        submitFormData[field.prop] = `${field.prefix || ''}${childData}${field.suffix || ''}`;
+    }
+};
+
+// 处理普通字段
+const handleNormalField = (field, result) => {
+    result.push(`${formData[field.prop]}`);
+    if (field.prop.split("-").length === 2) {
+        submitFormData[field.prop] = formData[field.prop];
+    }
+};
 // 组装关键字中的字符串
 const assembleStr = () => {
     // 组装函数
@@ -425,15 +597,18 @@ defineExpose({ assembleStr });
 const initOption = (fieldList) => {
     fieldList.forEach((field) => {
         if (field.rules && field.rules.length > 0) {
-            field.rules.forEach((rule) => {
-                // 空的话就创建数组
-                if (!formRules[field.prop]) {
-                    formRules[field.prop] = [];
-                }
-                formRules[field.prop].push({ validator: validate, trigger: rule.trigger, required: rule.required, validatortext: rule.validatortext, validators: rule.validators });
-                field.maxLength = rule.maxLength;
+            // 空的话就创建数组
+            if (!formRules[field.prop]) {
+                formRules[field.prop] = [];
+            }
+            formRules[field.prop].push({
+                validator: validate,
+                trigger: field.rules[0].trigger,
+                required: field.rules[0].required,
+                validatortext: field.rules[0].validatortext,
+                validators: field.rules[0].validators
             });
-
+            field.maxLength = field.rules[0].maxLength;
         }
         // 模板拼接字符
         if (field.template) {
@@ -443,17 +618,21 @@ const initOption = (fieldList) => {
                 field.suffix = templateList[1] + (field.suffix || "");
             }
             else {
-                field.children.forEach((child, index) => { child.prefix = templateList[index] + (child.prefix || "") });
+                field.children.forEach((child, index) => {
+                    child.prefix = templateList[index] + (child.prefix || "");
+                });
                 field.suffix = templateList[templateList.length - 1];
             }
         }
+        // 新增：初始化可重复字段
+        if (field.repeatable && !formData[field.prop]) {
+            formData[field.prop] = [''];
+        }
         // selectChildren 和 children
-        console.log(field.type,"field.type",field);
         if (field.type.includes("hildren") && field.children) {
             initOption(field.children);
         }
     })
-
 }
 onMounted(async () => {
     // 获取关键字配置
@@ -472,4 +651,10 @@ onMounted(async () => {
 .tiny-form-item {
     margin-bottom: 10px;
 }
+
+/* 新增样式 */
+.repeatable-field-group {
+    margin-bottom: 15px;
+}
+
 </style>
