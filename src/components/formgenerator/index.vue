@@ -91,6 +91,7 @@ import {
     TinyCol,
     Select as TinySelect
 } from '@opentiny/vue';
+import { isEmpty } from '@/utils/string-utils';
 import { iconDeleteL,iconPlus } from '@opentiny/vue-icon'
 import children from './components/children.vue';
 
@@ -636,7 +637,10 @@ const initOption = (fieldList) => {
 }
 onMounted(async () => {
     // 获取关键字配置
-    let result = await getKeyWordJSON({ model: keyWord.value });
+    let result = '';
+    if(!isEmpty(keyWord.value )){
+        result = await getKeyWordJSON({ model: keyWord.value });
+    }
     formFields.value = result.data;
     //console.log(formFields.value);
     // 初始化所有组件

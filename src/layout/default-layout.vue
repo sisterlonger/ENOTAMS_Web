@@ -152,6 +152,23 @@ const stopTimeoutTaskPolling = () => {
 // ==============================轮询查询超时任务===================================
 
 // ==============================轮询查询消息===================================
+// 解析content并生成新格式
+function formatMessage(content:string) {
+  // 使用正则表达式匹配两个[]中的内容
+  const regex = /\[(.*?)\].*?\[(.*?)\]/;
+  const matches = content.match(regex);
+  
+  if (matches && matches.length >= 3) {
+    const department = matches[1];  // 第一个[]中的内容
+    const processName = matches[2];  // 第二个[]中的内容
+    
+    // 返回新格式
+    return `[${department}]向您提交了一份[${processName}]原始资料通知单，请尽快审核。`;
+  }
+  
+  // 如果格式不匹配，返回原始内容
+  return content;
+}
 // 轮询查询消息
 const checkUnreadMessages = async () => {
   try {
@@ -171,10 +188,12 @@ const checkUnreadMessages = async () => {
 
       // 3. 判断是否有新消息（通过maxId字段是否存在且大于当前ID）
       if (maxId && maxId > currentMsgMaxId) {
+         // 格式化content
+        const formattedContent = formatMessage(content);
         // 有新消息，进行弹窗提示
         Notify({
           title: '流程通知',
-          message: `${title || '新消息'}: ${content || '请尽快审核'}`,
+          message: `${title || '新消息'}: ${formattedContent || '请尽快审核'}`,
           type: 'info',
           position: 'top-right',
           duration: 5000,
