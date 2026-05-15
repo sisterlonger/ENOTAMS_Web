@@ -37,8 +37,8 @@
                   </tiny-form-item>
                 </tiny-col>
                 <tiny-col :span="4">
-                  <tiny-form-item label="当前节点">
-                    <tiny-input v-model="formData.taskAssignShow" placeholder="请输入当前节点" clearable></tiny-input>
+                  <tiny-form-item label="当前处理人">
+                    <tiny-input v-model="formData.taskAssignShow" placeholder="请输入当前处理人" clearable></tiny-input>
                   </tiny-form-item>
                 </tiny-col>
                 <tiny-col :span="4">

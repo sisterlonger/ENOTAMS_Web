@@ -29,7 +29,7 @@
                     @click="handleSubmit(true)">
                     {{ nodeName === '原始资料经办人' || nodeName === "原始资料经办人加签处理1" || nodeName === "原始资料经办人加签处理2" ?
                         "审批完成，送情报发布通告" :
-                        nodeName === '确定可发布' ? '通告已完成拟稿，值班员交叉审核' : nodeName === '双岗制审批' ? '通告已核稿，可以发布'
+                        nodeName === '确定可发布' ||  nodeName === '情报值班人员加签处理1' || nodeName==='情报值班人员审批' ? '通告已完成拟稿，值班员交叉审核' : nodeName === '双岗制审批' ? '通告已核稿，可以发布'
                             : nodeName === '发布，输入通告号' ?
                                 '通告已发布,送原始资料提供人' : nodeName === '最终审批' ? '确认通告已发布' :
                                     "通过" }}
@@ -100,8 +100,10 @@ const createData = reactive({
     approveDesc: "",
     // 是否双岗
     isTwoPerson: true,
+    isSkipAck:false,
     // 通告序列号
     aftnSn: '',
+    
 })
 // 双岗显示标识
 const showTwoPerson = ref(false);
@@ -128,10 +130,11 @@ onMounted(async () => {
     const { data } = await queryUserTreeList();
     console.log(data, props.nodeName);
     departmentTreeData.value = data.children;
+    // 这些步骤可以加签
     if ((props.isInitiator || props.isRecipient) && nodeNameList.value.includes(props.nodeName)) {
         addSignature.value = true;
     }
-    if (props.isRecipient && props.nodeName === "确定可发布") {
+    if (props.isRecipient && (props.nodeName === "确定可发布" || props.nodeName === "情报值班人员加签处理1")) {
         showTwoPerson.value = true;
     }
     console.log(props.isRecipient, props.nodeName);
@@ -164,6 +167,10 @@ async function handleSubmit(approveState: boolean) {
         Modal.alert('请填写通告号！');
         return;
     }
+    if(props.nodeName === "情报值班人员加签处理1" && leaderNodeList.value.length === 0){
+        createData.isSkipAck = true;
+        createData.isTwoPerson = true;
+    }
     // 处理加批数据！！！关键是识别步骤点目前在哪
 
     // 构建请求参数
@@ -181,6 +188,7 @@ async function handleSubmit(approveState: boolean) {
         leaderParentNodes: [...new Set(leaderNodeList.value.map(item => item.parentId))].map(id => id / 10000).join(','),
         nodeName: props.nodeName,
         isTwoPerson: createData.isTwoPerson,
+        isSkipAck: createData.isSkipAck ,
         aftnSn: createData.aftnSn
     }
 

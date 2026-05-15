@@ -137,7 +137,7 @@
           <tiny-col :span="6" v-show="(createData.validType !== 'PERM' && createData.messageType !== '取消现有报文')">
             <!--时间-->
             <tiny-form-item label="事件失效时间">
-              <tiny-date-picker v-model="createData.endTime" type="datetime" placeholder="请选择失效时间（北京时）"
+              <tiny-date-picker v-model="createData.endTime" type="datetime" 	default-time="00:01:00" placeholder="请选择失效时间（北京时）"
                 format="yyMMddHHmm" value-format="yyMMddHHmm" :disabled="act === 'edit'"></tiny-date-picker>
             </tiny-form-item>
           </tiny-col>
@@ -329,9 +329,9 @@
             }" @change="onChangeConsultationNodeList"></tiny-cascader>
         </tiny-form-item>
         <tiny-form-item>
-          <tiny-button type="primary" @click="createProcess()">确定</tiny-button>
+          <tiny-button type="primary" :disabled="leaderNodes.length === 0" @click="createProcess()">确定</tiny-button>
           <tiny-button type="info" @click="boxDepartmentVisibility = false">取消</tiny-button>
-          <tiny-button type="danger" style="margin-left: 300px;"
+          <tiny-button type="danger" style="margin-left: 300px;" :disabled="leaderNodes.length !== 0"
             @click="createProcess(false)">先送情报单位发布通告发布后审批,慎点</tiny-button>
         </tiny-form-item>
       </tiny-form>

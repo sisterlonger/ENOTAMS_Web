@@ -141,7 +141,7 @@ const fetchConfig = async () => {
         background: 'rgba(0, 0, 0, 0.7)',
     });
     try {
-        let airportList = await queryAirPortList();
+        let airportList = await queryAirPortList({PageSize:10000});
         airportOptions.value = airportList.data;
         let airspaceList = await queryAirSpaceList();
         airspaceOptions.value = airspaceList.data;

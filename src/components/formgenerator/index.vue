@@ -298,7 +298,7 @@ const getOption = async (data, field) => {
         // TODO,目前只有跑道，以后要多点其他。要灵活。是NAIP相关的,预留位置，关联其他选项来触发其他选项的可选项
         // 跑道、机场、情报区等等
         if (field.label === "跑道") {
-            let response = await queryRwyConfig({ name: formData[field.prop] });
+            let response = await queryRwyConfig({ name: ensureString(formData[field.prop])  });
             // 注意String化，可以分两批，第一批是机场参数(staticData)，第二批是跑道参数，跑道参数在这里初始化
             // 将count=1的全部放出来，=n的就保持如下并去重。
             // 1v多的就不回填，更新选项即可(去重)
@@ -324,28 +324,29 @@ const getOption = async (data, field) => {
             });
         }
         if (field.label === "NDB设备名称") {
-            let response = await queryRadioNavigationConfig({ name: formData[field.prop] });
+            let response = await queryRadioNavigationConfig({ name: ensureString(formData[field.prop])  });
             const ndbConfigKey = Object.keys(response.data);
             ndbConfigKey.forEach(key => {
                 eData.value[`ndbs${key}`] = String(response.data[key]);
             });
         }
         if (field.label === "VOR/DME设备名称") {
-            let response = await queryRadioNavigationConfig({ name: formData[field.prop] });
+
+            let response = await queryRadioNavigationConfig({ name: ensureString(formData[field.prop])  });
             const vorConfigKey = Object.keys(response.data);
             vorConfigKey.forEach(key => {
                 eData.value[`vors${key}`] = String(response.data[key]);
             });
         }
         if (field.label === "VOR/DME设备呼号") {
-            let response = await queryRadioNavigationConfigByCodeId({ codeId: formData[field.prop] });
+            let response = await queryRadioNavigationConfigByCodeId({ codeId: ensureString(formData[field.prop])  });
             const vorConfigKey = Object.keys(response.data);
             vorConfigKey.forEach(key => {
                 eData.value[`vors${key}`] = String(response.data[key]);
             });
         }
         if (field.label === "限制区名称") {
-            let response = await queryRestrictedConfig({ name: formData[field.prop] });
+            let response = await queryRestrictedConfig({ name: ensureString(formData[field.prop])  });
             const restrictedConfigKey = Object.keys(response.data);
             restrictedConfigKey.forEach(key => {
                 eData.value[`restricteds${key}`] = String(response.data[key]);
@@ -635,6 +636,18 @@ const initOption = (fieldList) => {
         }
     })
 }
+// 定义一个通用的转换函数
+const ensureString = (value) => {
+    if (value === null || value === undefined) return '';
+    if (Array.isArray(value)) {
+        // 根据你的业务需求选择：
+        // 1. 取第一个元素
+        return value.length > 0 ? String(value[0]) : '';
+        // 2. 拼接所有元素
+        // return value.map(v => String(v)).join(',');
+    }
+    return String(value);
+};
 onMounted(async () => {
     // 获取关键字配置
     let result = '';

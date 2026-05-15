@@ -3,7 +3,7 @@
         <div style="font-size:20px;font-weight: bold;color:blue;margin:15px">通告工作流程记录</div>
         <tiny-time-line :data="data" :active="2" vertical shape="dot"></tiny-time-line>
         <div style="font-size:20px;font-weight: bold;color:blue;margin:15px">上下游通告关系图</div>
-        <tiny-mind-map class="demo-mind-map-export-date" ref="mindmap" @create="onCreate" v-model="mapData"  :key="mapData.nodeData.id" 
+        <tiny-mind-map class="demo-mind-map-export-date" ref="mindmap" @create="onCreate" v-model="mapData"  :key="mapData.nodeData.id" @select-nodes="onSelectNodes"
         :options="{toolBar:true,overflowHidden:true}" />
         <div style="font-size:20px;font-weight: bold;color:blue;margin:15px">上下游通告列表</div>
         <tiny-grid v-if="preCondition" ref="basicGridRef" :data="tableData">
@@ -45,7 +45,7 @@
 <script setup lang="ts">
 import { ref, toRefs, reactive, defineProps, onMounted, defineEmits, watch } from 'vue'
 import { queryGetRelateMessage, queryGetWorkflowProgress, queryMessageDetail } from '@/api/fetchInterface';
-import { TinyTimeLine, Modal, TinyGrid, TinyGridColumn, Button as TinyButton, TinyMindMap } from '@opentiny/vue'
+import { TinyTimeLine, Modal, TinyGrid, TinyGridColumn, Button as TinyButton, TinyMindMap,TinyModal } from '@opentiny/vue'
 import { isEmpty } from '@/utils/string-utils';
 import exportMessage from '@/views/notam/assemble/components/export.vue';
 import workflowaxios from '@/views/workflow/components/workflow-axios';
@@ -437,7 +437,8 @@ const updateMapData = () => {
     cleanData.forEach(item => {
       nodeMap.set(item.messageId, {
         id: String(item.messageId),
-        topic: `${item.qCode}`,
+        topic: `${item.notamSn}`,
+        tooltip: '设备编号：VOR-001\n频率：112.30MHz',
         children: [],
         isCurrent: item.messageId === messageId.value
       });
@@ -519,6 +520,9 @@ const mapData = ref({
         root: true
     }
 })
+const onSelectNodes = () => {
+  TinyModal.message({ message: 'selectNodes 事件触发了', status: 'info' })
+}
 const onCreate = (instance) => {
     render.value = instance
 }
