@@ -62,11 +62,9 @@ watch(
     { immediate: true, deep: true }
 );*/
 function handleSubmit() {
-    console.log(baseType.value, limit);
     emit('close');
 }
 function onChange(data: any) {
-    console.log(data);
     if (baseType != null && data.value !== "") {
         let result = '';
         if (baseType.value === "XXX M AMSL") {

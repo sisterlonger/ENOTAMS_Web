@@ -55,13 +55,6 @@ const useUserStore = defineStore('user', {
     },
   },
   actions: {
-    /*
-    switchRoles() {
-      return new Promise((resolve) => {
-        this.roleName = this.roleName === 'user' ? 'user' : 'admin';
-        resolve(this.roleName);
-      });
-    },*/
     // Set user's information
     setInfo(partial: Partial<UserState>) {
       this.$patch(partial);
@@ -84,7 +77,6 @@ const useUserStore = defineStore('user', {
     async info() {
       const res = await getUserInfo();
       const userInfo = res.data;
-      console.log("userInfo",userInfo);
       //获取按钮权限
       const rolePerMissions = await queryRolePermission();
       userInfo.menuPermissions = rolePerMissions.data;

@@ -17,26 +17,45 @@
     </div>
 </template>
 
-<script setup>
-import { ref, reactive, defineProps,defineEmits, toRefs, onMounted, watch } from 'vue'
+<script setup lang="ts">
+import { ref, reactive, toRefs, onMounted, watch } from 'vue'
 import { TinyFileUpload, Modal, TinySelect, TinyModal } from '@opentiny/vue'
 import { downloadFile, queryMessageDetail, queryTemplateDetail, deleteFile, updateFile, uploadFile } from '@/api/fetchInterface';
 import { saveAs } from 'file-saver';
 import { getToken } from '@/utils/auth';
 import { isEmpty } from '@/utils/string-utils';
 
-const emit = defineEmits(['changeFiles']);
-const props = defineProps({
-    templateID: Number,
-    messageId: Number,
-    act: String,
-});
-const { templateID } = toRefs(props);
-const templateData = reactive({});
-const { messageId } = toRefs(props);
-const { act } = toRefs(props);
+interface MaterialFile {
+  name: string;
+  url: string;
+  id: number;
+}
+
+interface MaterialItem {
+  title: string;
+  fileList: MaterialFile[];
+  action?: string;
+}
+
+interface TemplateData {
+  materials?: string;
+}
+
+const emit = defineEmits<{
+  changeFiles: [files: MaterialItem[]];
+}>();
+
+const props = defineProps<{
+  templateID?: number;
+  messageId?: number;
+  act?: string;
+  isNoAuth?: boolean;
+}>();
+
+const { templateID, messageId, act } = toRefs(props);
+const templateData = reactive<TemplateData>({});
 // 素材类型
-const materials = ref([]);
+const materials = ref<MaterialItem[]>([]);
 const preCondition = ref(false);
 // 上传接口的参数
 const requestData = ref({
@@ -80,15 +99,12 @@ watch(
         // 调用关联接口
 
         if (!isEmpty(newValue) && act.value === "add") {
-            //console.log(newValue);
-            //console.log(materials);
             let updateFileVM = [];
             materials.value.forEach(item => {
                 if (item.fileList.length > 0) {
                     updateFileVM.push({ fileId: item.fileList[0].id, messageId: newValue })
                 }
             })
-            //console.log(updateFileVM);
             if (updateFileVM.length > 0) {
                 await updateFile(updateFileVM).then((res1) => {
                     if (res1.code !== 200) {
@@ -102,19 +118,15 @@ watch(
 );
 // 成功上传事件
 const onSuccess = async (res, file) => {
-    //console.log(res, file);
     Modal.message({ message: '文件上传成功!', status: 'success' });
 }
 const onError = async (res, file) => {
-    //console.log(res, file);
     Modal.message({ message: '文件上传失败!', status: 'error' });
 }
 // 下载事件
 const handleDownloadFile = async (file) => {
     let requestFileName = "";
     requestFileName = file.url
-    console.log(file);
-    console.log(requestFileName);
     try {
         // 该文件名附带日期
         const response = await downloadFile({ objectName: requestFileName });
@@ -144,9 +156,6 @@ const handleDownloadFile = async (file) => {
 // 移除前事件
 // 修改 beforeRemove 函数
 function beforeRemove(file, fileList) {
-    console.log('文件:', file)
-    console.log('文件列表:', fileList)
-    console.log('materials:', materials.value)
     return new Promise((resolve, reject) => {
         TinyModal.confirm(`确定移除 ${file.name}？`).then((res) => {
             //res === 'confirm' ? resolve() : reject(new Error('取消移除'))
@@ -160,7 +169,6 @@ function beforeRemove(file, fileList) {
                         })
                     }
                 })
-                console.log('materials.value:', materials.value)
                 Modal.message({ message: '删除成功', status: 'success' })
                 emit('changeFiles',materials.value);
             }
@@ -172,7 +180,6 @@ function beforeRemove(file, fileList) {
 // 上传接口相关函数
 const httpRequest = reactive((params, item) => {
     const { file } = params;
-    console.log(item)
     return new Promise((resolve, reject) => {
         // 移除 await，直接使用 Promise 链
         uploadFile(file)
@@ -180,17 +187,14 @@ const httpRequest = reactive((params, item) => {
                 if (res1.code === 200) {
                     Modal.message({ message: '上传成功', status: 'success' })
                     item.fileList.push({ name: res1.data.fileName, url: res1.data.folderPath + res1.data.fileName, id: res1.data.fileId })
-                    console.log("materials.value",materials.value)
                     emit('changeFiles',materials.value);
                     resolve()
                 } else {
                     Modal.message({ message: '上传失败', status: 'error' })
-                    console.log(res1, materials)
                     resolve()
                 }
             })
             .catch((error) => {
-                console.log(error)
                 reject(new Error(`上传失败！原因:${error}`))
             })
     })
@@ -216,7 +220,6 @@ const fetchData = async () => {
     // 是有通告号的，编辑
     if (messageId.value) {
         const { data } = await queryMessageDetail({ id: messageId.value });
-        console.log(data.files);
         // 有文件
         if (data.files.length > 0) {
             files = data.files;

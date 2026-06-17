@@ -215,8 +215,6 @@ const getNodeDataSync = async () => {
 onMounted(async () => {
     departmentOptions.value = await getNodeDataSync();
     const apiUrl = import.meta.env;
-    console.log("apiUrl", apiUrl);
-    console.log(router.currentRoute.value.meta.locale);
 });
 
 </script>

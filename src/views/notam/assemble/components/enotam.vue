@@ -154,7 +154,6 @@ const fetchData = async () => {
     }
   }
   catch (err) {
-    console.log(err);
     Modal.alert('获取数据错误');
     emit('close');
   }
@@ -166,13 +165,11 @@ const fetchData = async () => {
 async function dialogClose(status: boolean) {
   // status代表成功发送通告
   // 如果status为true且配置了关联通告，需要关联通告
-  console.log(status, templateData.value.templateID);
   if (status && !isEmpty(templateData.value.templateID)) {
     preCondition.value = false;
     // 有关联通告才需要填写
     await queryByTemplateIdTemplateDetail({ templateId: templateData.value.templateID }).then((res: any) => {
       if (res.code === 200) {
-        console.log("tableData", tableData);
         tableData = res.data;
         if (tableData.length > 0) {
           tableData.forEach((item: any) => {
@@ -204,8 +201,6 @@ async function toolbarButtonClickEvent({ code }) {
   let data = basicGridRef.value.getSelectRecords(true)
   //let data1 = basicGridRef.value.getData();
   // ----------------------处理成列表
-  console.log(data);
-  //console.log(data1);
   if (code === "relate") {
     // 1. 检查是否勾选了数据
     if (!data || data.length === 0) {
@@ -248,7 +243,6 @@ async function toolbarButtonClickEvent({ code }) {
           messageData.consultDepId = item.sendDepId.join(",");
           return messageData;
         });
-        //console.log("messageList--------------------", messageList)
         // 调用批量接口
         await postBatchMessage(messageList).then((res1: any) => {
           if (res1.code === 200) {
@@ -256,7 +250,6 @@ async function toolbarButtonClickEvent({ code }) {
             emit('close')
           }
         }).catch((err: any) => {
-          console.log(err);
         });
       }
     })
@@ -269,9 +262,6 @@ async function toolbarButtonClickEvent({ code }) {
 
 // 处理选择的部门
 function formatMulti(value) {
-  //console.log(value);
-  //console.log("cellValue", value.cellValue);
-  //console.log("options",value.column.editor.attrs.options);
 
   // 使用对象解构
   const { cellValue: depIds } = value;
@@ -312,8 +302,6 @@ function formatMulti(value) {
     .map(depId => depIdToFullNameMap[depId]) // 转换为fullName
     .filter(fullName => fullName !== undefined && fullName !== null && fullName !== ''); // 过滤掉无效值
 
-  console.log("映射表:", depIdToFullNameMap);
-  console.log("找到的fullNames:", fullNames);
 
   // 用逗号分隔并返回
   return fullNames.join(',');
@@ -330,7 +318,6 @@ onMounted(async () => {
     isNoAuth.value = true;
   }
   localTemplateID.value = Number(queryParams.templateID as string) || templateID.value;
-  console.log(localTemplateID.value, templateID.value, "localTemplateID");
   localMessageID.value = Number(queryParams.messageId as string) || messageId.value;
   if (isEmpty(localMessageID.value)) {
     activeName.value = "enotam"

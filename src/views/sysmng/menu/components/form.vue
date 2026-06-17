@@ -103,7 +103,6 @@ const state = reactive<{
     loading: null,
 });
 const valueChange = async (value: any) => {
-    console.log("value", value);
 }
 // 请求权限列表
 const fetPermissions = async () => {

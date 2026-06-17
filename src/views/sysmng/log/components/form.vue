@@ -105,7 +105,6 @@ const fetchData = async () => {
 
 // 初始化请求数据
 onMounted(async () => {
-    console.log('id', id.value);
     if (id.value) {
         fetchData();
     }

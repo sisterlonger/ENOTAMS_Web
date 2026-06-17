@@ -32,15 +32,9 @@ axios.interceptors.request.use(
         config.headers = {};
       }
       config.headers.Authorization = `Bearer ${token}`;
-      console.log("token",token)
     }
 
     config.headers = { ...config.headers };
-    /*
-    if (config.responseType === 'blob') {
-      config.adapter = axios.defaults.adapter; // 强制使用默认适配器
-    }
-    console.log(config);*/
     return config;
   },
   (error) => {
@@ -58,17 +52,29 @@ axios.interceptors.response.use(
     }
     const res = response.data;
     if (res.code !== '0' && res.code !== 200) {
-      (res.errMsg || res.msg) &&
+      const errorMessage = res.errMsg || res.msg;
+      if (errorMessage) {
         Modal.message({
-          message: res.msg,
+          message: errorMessage,
           status: 'error',
         });
-      return Promise.reject(new Error(res.msg || 'Error'));
+      }
+      return Promise.reject(new Error(errorMessage || 'Error'));
     }
     return res;
   },
   (error) => {
-    const { status, data } = error.response;
+    const status = error.response?.status;
+    const data = error.response?.data;
+
+    if (!error.response) {
+      Modal.message({
+        message: error.message || '网络请求失败',
+        status: 'error',
+      });
+      return Promise.reject(error);
+    }
+
     if (status === 401) {
       clearToken();
       router.replace({ name: 'login' });

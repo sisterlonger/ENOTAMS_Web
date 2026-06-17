@@ -98,7 +98,6 @@ const fetchData = async (id: any) => {
         }
     }
     catch (err) {
-        console.log(err);
         Modal.alert('获取数据错误');
     }
 }
@@ -183,7 +182,6 @@ const getWorkflowProgress = async () => {
                 displayName += ` 评论：${comment}`;
             }
             if (item.status === 1) {
-                console.log(nodeName);
                 emit('getCurrentNode', nodeName);
             }
             return {
@@ -237,9 +235,7 @@ const getWorkflowProgress = async () => {
             processNode(item);
         });
 
-        console.log('处理后的时间线数据:', data);
     }).catch((err: any) => {
-        console.log(err)
     });
 };
 const getSonWorkflowProgress = async (workflowId: string) => {
@@ -323,7 +319,6 @@ const getSonWorkflowProgress = async (workflowId: string) => {
                 displayName += ` 评论：${comment}`;
             }
             if (item.status === 1) {
-                console.log(nodeName);
                 emit('getCurrentNode', nodeName);
             }
             return {
@@ -377,9 +372,7 @@ const getSonWorkflowProgress = async (workflowId: string) => {
             processNode(item);
         });
 
-        console.log('处理后的时间线数据:', data);
     }).catch((err: any) => {
-        console.log(err)
     });
 };
 const getRelateMessage = async () => {
@@ -403,9 +396,7 @@ const getRelateMessage = async () => {
         // });
         // 更新思维导图数据
         updateMapData();
-        console.log(tableData)
     }).catch((err: any) => {
-        console.log(err)
     });
 };
 
@@ -529,7 +520,6 @@ const onCreate = (instance) => {
 
 // 初始化请求数据
 onMounted(async () => {
-    console.log(processInstanceId.value, "processInstanceId.value", parentId.value);
     // 有流程实例ID则获取流程进度
     if (processInstanceId.value !== "0") {
         await getWorkflowProgress();

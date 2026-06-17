@@ -11,14 +11,11 @@ export default function useUser() {
   const userWorkFlowStore = useWorkFlowStore();
   // 退出工作流
   const logoutFlyflow = async () => {
-    await workflowaxios.post('/login/logout', {}).then((res: any) => {
-      console.log(res);
-    })
+    await workflowaxios.post('/login/logout', {});
   };
-  const logout = async (logoutTo?: string) => {
+  const logout = async () => {
     await userStore.logout();
     await logoutFlyflow();
-    const currentRoute = router.currentRoute.value;
     Modal.message({
       message: t('setting.loginout'),
       status: 'success',
@@ -26,14 +23,6 @@ export default function useUser() {
     router.push({
       name: 'login',
     });
-    // 原本的退出机制，会带着现在的路由重定向
-    // router.push({
-    //   name: logoutTo && typeof logoutTo === 'string' ? logoutTo : 'login',
-    //   query: {
-    //     ...router.currentRoute.value.query,
-    //     redirect: currentRoute.name as string,
-    //   },
-    // });
   };
   return {
     logout,

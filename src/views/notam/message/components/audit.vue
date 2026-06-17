@@ -128,7 +128,6 @@ const state = reactive<{
 // 初始化请求数据
 onMounted(async () => {
     const { data } = await queryUserTreeList();
-    console.log(data, props.nodeName);
     departmentTreeData.value = data.children;
     // 这些步骤可以加签
     if ((props.isInitiator || props.isRecipient) && nodeNameList.value.includes(props.nodeName)) {
@@ -137,7 +136,6 @@ onMounted(async () => {
     if (props.isRecipient && (props.nodeName === "确定可发布" || props.nodeName === "情报值班人员加签处理1")) {
         showTwoPerson.value = true;
     }
-    console.log(props.isRecipient, props.nodeName);
     if (props.isRecipient && props.nodeName === "发布，输入通告号") {
         showAftnSn.value = true;
     }
@@ -152,9 +150,7 @@ const emit = defineEmits(['close']);
 
 const onChangeLeaderNodeList = () => {
     let checkVal = cascaderLeaderRef.value.getCheckedNodes(true);
-    console.log(checkVal);
     leaderNodeList.value = checkVal.map((item: any) => { return { id: item.value, type: "user", name: item.label, parentId: item.parent.value, } })
-    console.log(leaderNodeList.value, leaderNodeList.value.map(item => item.id).join(","))
 }
 
 async function handleSubmit(approveState: boolean) {
@@ -162,7 +158,6 @@ async function handleSubmit(approveState: boolean) {
         Modal.alert('请填写意见！');
         return;
     }
-    console.log("通告号校验", isEmpty(createData.aftnSn), showAftnSn.value);
     if (isEmpty(createData.aftnSn) && showAftnSn.value) {
         Modal.alert('请填写通告号！');
         return;
@@ -200,10 +195,8 @@ async function handleSubmit(approveState: boolean) {
             else {
                 Modal.alert('操作失败！');
             }
-            console.log(res)
             emit('close');
         }).catch((err: any) => {
-            console.log(err)
             Modal.alert(`操作失败！报错${err}`);
         });
     } catch (error) {

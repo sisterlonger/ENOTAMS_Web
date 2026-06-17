@@ -8,11 +8,11 @@
       </tiny-form-item>
 
       <tiny-form-item prop="userPwd" size="medium">
-        <tiny-input v-model="loginMail.userPwd" type="password" show-password :placeholder="'密码：a000000@'">
+        <tiny-input v-model="loginMail.userPwd" type="password" show-password :placeholder="'请输入密码'">
         </tiny-input>
       </tiny-form-item>
 
-      <div class="login-form-options" v-if=false>
+      <div class="login-form-options" v-if="false">
         <tiny-checkbox style="color:#fff">{{ $t('login.form.rememberPassword') }}</tiny-checkbox>
         <div>
           <tiny-link style="color:#fff" type="primary" class="divide-line">|</tiny-link>
@@ -46,16 +46,9 @@ import {
 import { useI18n } from 'vue-i18n';
 import { useUserStore, useWorkFlowStore } from '@/store';
 import useLoading from '@/hooks/loading';
-import { sm2, sm3, sm4 } from 'sm-crypto';
+import { sm3 } from 'sm-crypto';
 import workflowaxios from '@/views/workflow/components/workflow-axios';
-import appRoutes from '@/router/routes/index';
-import noauthRoutes from '@/router/routes/noauth';
-import DefaultLayout from '@/layout/default-layout.vue';
-import GeneralLayout from '@/layout/general-layout.vue';
-
-
-import { RouteRecordRaw } from 'vue-router';
-
+import { registerAppRoutes } from '@/router/register-app-routes';
 
 const router = useRouter();
 const { t } = useI18n();
@@ -106,7 +99,6 @@ const getFlyflowToken = async (mobile: string) => {
       'AuthUserId': res.data.data.loginId,
       "Authorization": res.data.data.tokenValue,
     }
-    console.log("rest", res);
     workflowaxios.get('/user/getCurrentUserDetail', {
     }).then((res1: any) => {
       userWorkFlowStore.updateUserInfo({ loginId: res.data.data.loginId, tokenValue: res.data.data.tokenValue, depidId: res1.data.data.deptIdList[0] });
@@ -143,20 +135,8 @@ function handleSubmit() {
       const { redirect, ...othersQuery } = router.currentRoute.value.query;
       // 部署时需要解除注释
       await getFlyflowToken(userStore.userInfo.mobile);
-      //console.log(redirect);
       // 获取动态路由
-      router.addRoute({
-        name: 'root',
-        path: import.meta.env.VITE_CONTEXT,
-        component: DefaultLayout,
-        children: appRoutes,
-      });
-
-      router.addRoute({
-        name: 'noauth',
-        path: import.meta.env.VITE_CONTEXT,
-        children: noauthRoutes,
-      });
+      registerAppRoutes(router);
       router.push({
         name: (redirect as string) || 'home',
         query: {
@@ -164,7 +144,6 @@ function handleSubmit() {
         },
       });
     } catch (err) {
-      console.log("err", err);
       Notify({
         type: 'error',
         title: t('login.tip.right'),

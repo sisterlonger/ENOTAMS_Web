@@ -156,7 +156,6 @@ onMounted(async () => {
     }
     departmentOptions.value = await getNodeDataSync();
     preCondition.value = true;
-    console.log(userWorkFlowStore.user.loginId);
 });
 
 

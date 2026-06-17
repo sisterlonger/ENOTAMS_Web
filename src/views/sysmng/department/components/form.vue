@@ -149,7 +149,6 @@ const fetchConfig = async () => {
 
     }
     catch (err) {
-        console.log(err);
         Modal.alert(`获取数据错误${err}`);
         emit('close');
     }
@@ -179,7 +178,6 @@ const fetchData = async () => {
             createData.manageDepID.split(',').filter(Boolean).map(item => Number(item));;
     }
     catch (err) {
-        console.log(err);
         Modal.alert(`获取数据错误${err}`);
         emit('close');
     }

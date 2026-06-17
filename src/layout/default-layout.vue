@@ -70,6 +70,7 @@ import { useRouter } from 'vue-router';
 import { DefaultTheme } from '@/components/theme/type';
 // 导入音频工具
 import audioAlert from '@/utils/audio';
+import BaseUtils from '@/utils/base-utils';
 import workflowaxios from '@/views/workflow/components/workflow-axios';
 import PageLayout from './page-layout.vue';
 
@@ -88,7 +89,6 @@ const currentTabName = ref();
 // 切换简约模式，图标按钮
 const top = ref('10px');
 // 消息轮询相关
-// 消息轮询相关
 let pollInterval: ReturnType<typeof setInterval> | null = null;
 let timeoutTaskInterval: ReturnType<typeof setInterval> | null = null;
 
@@ -99,7 +99,6 @@ let timeoutTaskInterval: ReturnType<typeof setInterval> | null = null;
 const checkTimeoutTasks = async () => {
   try {
     const response = await queryTimeoutTasks();
-    console.log(response);
     if (response.code === 200 && response.data.length > 0) {
       // 播放告警声音
       audioAlert.play('error').catch(error => {
@@ -119,7 +118,7 @@ const checkTimeoutTasks = async () => {
     }
   } catch (err) {
     Modal.message({
-      message: `获取告警数据错误信息为:${err.message}`,
+      message: `获取告警数据错误信息为:${BaseUtils.getErrorMessage(err)}`,
       status: 'error',
     });
   }
@@ -138,8 +137,6 @@ const startTimeoutTaskPolling = () => {
   timeoutTaskInterval = setInterval(() => {
     checkTimeoutTasks();
   }, 120000);
-
-  console.log('开始轮询超时任务，间隔2分钟');
 };
 
 // 停止轮询超时任务
@@ -184,7 +181,7 @@ const checkUnreadMessages = async () => {
     const { data } = response.data;
 
     if (data) {
-      const { maxId, title, content, num } = data;
+      const { maxId, title, content } = data;
 
       // 3. 判断是否有新消息（通过maxId字段是否存在且大于当前ID）
       if (maxId && maxId > currentMsgMaxId) {
@@ -202,10 +199,6 @@ const checkUnreadMessages = async () => {
 
         // 4. 更新store中的msgMaxId为接口返回的最新maxId
         userWorkFlowStore.updateMsgMaxId(maxId);
-        console.log(`检测到新消息，更新msgMaxId: ${currentMsgMaxId} -> ${maxId}`);
-      } else {
-        // 无新消息，仅记录未读数量（num）
-        console.log(`当前无新消息，未读数量: ${num || 0}`);
       }
     }
   } catch (error) {
@@ -227,8 +220,6 @@ const startMessagePolling = () => {
   pollInterval = setInterval(() => {
     checkUnreadMessages();
   }, 10000);
-
-  console.log('开始轮询工作流消息，间隔10秒');
 };
 
 // 停止轮询
@@ -256,8 +247,6 @@ watch(
 const tabsRefreshKey = ref('');
 const onClick = (tab: { name: string; link: string }) => {
   const routePaths = router.getRoutes().map((routeItem) => routeItem.path);
-  console.log(routePaths);
-  console.log(tab);
   if (!routePaths.includes(tab.name)) {
     Modal.message({
       message: '错误页面',

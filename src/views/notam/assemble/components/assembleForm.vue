@@ -8,28 +8,34 @@
           <iframe src="/pdf/白云机场机场图.pdf" width="100%" :style="pdfSize" type="application/pdf" />
         </ul>
       </tiny-floatbar>
-      <tiny-button type="primary" @click="stepStart" :modal-overlay-opening-padding="100"
-        :modal-overlay-opening-radius="100">开始引导</tiny-button>
-      <tiny-button type="danger" @click="onChangeView" :modal-overlay-opening-padding="100"
-        :modal-overlay-opening-radius="100">切换视角</tiny-button>
-      <tiny-button v-if="!isEmpty(createData.parentId) && createData.parentId !== 0" type="success" @click="onRead"
-        :modal-overlay-opening-padding="100" :modal-overlay-opening-radius="100">查看关联的源通告</tiny-button>
+      <tiny-button
+type="primary" :modal-overlay-opening-padding="100" :modal-overlay-opening-radius="100"
+        @click="stepStart">开始引导</tiny-button>
+      <tiny-button
+type="danger" :modal-overlay-opening-padding="100" :modal-overlay-opening-radius="100"
+        @click="onChangeView">切换视角</tiny-button>
+      <tiny-button
+v-if="!isEmpty(createData.parentId) && createData.parentId !== 0" type="success" :modal-overlay-opening-padding="100"
+        :modal-overlay-opening-radius="100" @click="onRead">查看关联的源通告</tiny-button>
       <tiny-guide :show-step="showStep" :dom-data="domData"></tiny-guide>
       <tiny-row class="guide-box1">
-        <tiny-divider content-position="left" offset="5%" font-size="20px" content-background-color="#1476ff"
+        <tiny-divider
+content-position="left" offset="5%" font-size="20px" content-background-color="#1476ff"
           content-color="#ffffff">请选择需要发布的通告类型</tiny-divider>
         <tiny-row>
           <tiny-col :span="8">
             <tiny-form-item label="通告类型">
               <!--单选框-->
-              <tiny-radio-group v-model="createData.messageType" :disabled="act === 'edit' || messageType != 'cnl'"
+              <tiny-radio-group
+v-model="createData.messageType" :disabled="act === 'edit' || messageType != 'cnl'"
                 @change="onChangeMessageType">
-                <tiny-radio-button v-for="(item, index) in messageTypeOption" :label="item" :value="item"
-                  :key="index"></tiny-radio-button>
+                <tiny-radio-button
+v-for="(item, index) in messageTypeOption" :key="index" :label="item"
+                  :value="item"></tiny-radio-button>
               </tiny-radio-group>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="4" v-if="false" v-show="createData.messageType !== '新发报文'">
+          <tiny-col v-if="false" v-show="createData.messageType !== '新发报文'" :span="4">
             <tiny-form-item label="通告序列号">
               <tiny-input v-model="createData.aftnSn" :disabled="act === 'edit'"> </tiny-input>
             </tiny-form-item>
@@ -43,56 +49,56 @@
                   <div>Q项<tiny-icon-help-solid class="IconHelpSolid"></tiny-icon-help-solid></div>
                 </tiny-tooltip>
               </template>
-              <tiny-col :span="isNoAuth ? 4 : 2.5" style="margin:2px" v-show="view">
+              <tiny-col v-show="view" :span="isNoAuth ? 4 : 2.5" style="margin:2px">
                 <tiny-form-item label-width="60px" label="情报区">
                   <tiny-input v-model="createData.qAirSpace" :disabled="act === 'edit'"> </tiny-input>
                 </tiny-form-item>
               </tiny-col>
-              <tiny-col :span="isNoAuth ? 4 : 2.5" style="margin:2px" v-show="view">
+              <tiny-col v-show="view" :span="isNoAuth ? 4 : 2.5" style="margin:2px">
                 <tiny-form-item label-width="60px" label="代码">
                   <tiny-input v-model="createData.qCode" :disabled="act === 'edit'"> </tiny-input>
                 </tiny-form-item>
               </tiny-col>
-              <tiny-col :span="isNoAuth ? 4 : 2.5" style="margin:2px" v-show="view">
+              <tiny-col v-show="view" :span="isNoAuth ? 4 : 2.5" style="margin:2px">
                 <tiny-form-item label-width="60px" label="类型">
                   <tiny-input v-model="createData.qFlightType" :disabled="act === 'edit'"> </tiny-input>
                 </tiny-form-item>
               </tiny-col>
-              <tiny-col :span="isNoAuth ? 4 : 2.5" style="margin:2px" v-show="view">
+              <tiny-col v-show="view" :span="isNoAuth ? 4 : 2.5" style="margin:2px">
                 <tiny-form-item label-width="60px" label="目的">
                   <tiny-input v-model="createData.qTarget" :disabled="act === 'edit'"> </tiny-input>
                 </tiny-form-item>
               </tiny-col>
-              <tiny-col :span="isNoAuth ? 4 : 2.5" style="margin:2px" v-show="view">
+              <tiny-col v-show="view" :span="isNoAuth ? 4 : 2.5" style="margin:2px">
                 <tiny-form-item label-width="60px" label="范围">
                   <tiny-input v-model="createData.qReach" :disabled="act === 'edit'"> </tiny-input>
                 </tiny-form-item>
               </tiny-col>
-              <tiny-col :span="isNoAuth ? 4 : 2.5" style="margin:2px" v-show="view">
+              <tiny-col v-show="view" :span="isNoAuth ? 4 : 2.5" style="margin:2px">
                 <tiny-form-item label-width="60px" label="下限">
                   <tiny-input v-model="createData.qLowerLimit" :disabled="act === 'edit'"></tiny-input>
                 </tiny-form-item>
               </tiny-col>
-              <tiny-col :span="isNoAuth ? 4 : 2.5" style="margin:2px" v-show="view">
+              <tiny-col v-show="view" :span="isNoAuth ? 4 : 2.5" style="margin:2px">
                 <tiny-form-item label-width="60px" label="上限">
                   <tiny-input v-model="createData.qUpperLimit" :disabled="act === 'edit'"></tiny-input>
                 </tiny-form-item>
               </tiny-col>
               <tiny-col v-show="false" :span="isNoAuth ? 4 : 2.5" style="margin:2px">
                 <tiny-form-item label-width="60px" label="纬度">
-                  <tiny-input placeholder="请输入纬度" v-model="createData.qLat" :disabled="act === 'edit'">
+                  <tiny-input v-model="createData.qLat" placeholder="请输入纬度" :disabled="act === 'edit'">
                   </tiny-input>
                 </tiny-form-item>
               </tiny-col>
               <tiny-col v-show="false" :span="isNoAuth ? 4 : 2.5" style="margin:2px">
                 <tiny-form-item label-width="60px" label="经度">
-                  <tiny-input placeholder="请输入经度" v-model="createData.qLong" :disabled="act === 'edit'">
+                  <tiny-input v-model="createData.qLong" placeholder="请输入经度" :disabled="act === 'edit'">
                   </tiny-input>
                 </tiny-form-item>
               </tiny-col>
               <tiny-col :span="isNoAuth ? 4 : 2.5" style="margin:2px">
                 <tiny-form-item label-width="150px" label="请输入事件影响半径">
-                  <tiny-input placeholder="请输入影响半径" v-model="createData.qRadius" :disabled="act === 'edit'">
+                  <tiny-input v-model="createData.qRadius" placeholder="请输入影响半径" :disabled="act === 'edit'">
                   </tiny-input>
                 </tiny-form-item>
               </tiny-col>
@@ -102,50 +108,57 @@
       </tiny-row>
       <!-- <tiny-row class="guide-box2" v-show="messageType !== 'cnl' && messageType !== 'replace'"> -->
       <tiny-row class="guide-box2">
-        <tiny-divider content-position="left" offset="5%" font-size="20px" content-background-color="#1476ff"
+        <tiny-divider
+content-position="left" offset="5%" font-size="20px" content-background-color="#1476ff"
           content-color="#ffffff">发生地与生效期</tiny-divider>
         <tiny-row>
-          <tiny-col :span="4" v-show="view">
+          <tiny-col v-show="view" :span="4">
             <!--情报区或者机场两大类选择器-->
             <tiny-form-item label="A项(发生地)">
-              <tiny-select v-model="createData.a_airSpace" filterable placeholder="请选择情报区/机场" value-field="codeId"
+              <tiny-select
+v-model="createData.a_airSpace" filterable placeholder="请选择情报区/机场" value-field="codeId"
                 text-field="txtName" disabled clearable @change="onChangeA">
                 <tiny-option-group v-for="group in aOptions" :key="group.label" :label="group.label">
-                  <tiny-option v-for="item in group.options" :key="item.value" :label="item.label"
+                  <tiny-option
+v-for="item in group.options" :key="item.value" :label="item.label"
                     :value="item.value"></tiny-option>
                 </tiny-option-group>
               </tiny-select>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="7" v-show="messageType !== 'cnl'">
+          <tiny-col v-show="messageType !== 'cnl'" :span="7">
             <!--生效时间-->
             <tiny-form-item label="事件是否有明确的生效时间">
               <tiny-radio-group v-model="createData.validType" size="mini" :disabled="act === 'edit'">
-                <tiny-radio-button v-for="(item, index) in messageValidTypeOption" :label="item.label" :text="item.text"
-                  :key="index"></tiny-radio-button>
+                <tiny-radio-button
+v-for="(item, index) in messageValidTypeOption" :key="index" :label="item.label"
+                  :text="item.text"></tiny-radio-button>
               </tiny-radio-group>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="6" v-show="messageType !== 'cnl'">
+          <tiny-col v-show="messageType !== 'cnl'" :span="6">
             <!--时间-->
             <tiny-form-item label="事件生效时间">
-              <tiny-date-picker v-model="createData.startTime" type="datetime" placeholder="请选择生效时间（北京时）"
+              <tiny-date-picker
+v-model="createData.startTime" type="datetime" placeholder="请选择生效时间（北京时）"
                 format="yyMMddHHmm" value-format="yyMMddHHmm" :disabled="act === 'edit'" @change="onChangeB">
               </tiny-date-picker>
             </tiny-form-item>
           </tiny-col>
-          <tiny-col :span="6" v-show="(createData.validType !== 'PERM' && createData.messageType !== '取消现有报文')">
+          <tiny-col v-show="(createData.validType !== 'PERM' && createData.messageType !== '取消现有报文')" :span="6">
             <!--时间-->
             <tiny-form-item label="事件失效时间">
-              <tiny-date-picker v-model="createData.endTime" type="datetime" 	default-time="00:01:00" placeholder="请选择失效时间（北京时）"
+              <tiny-date-picker
+v-model="createData.endTime" type="datetime" 	default-time="00:01:00" placeholder="请选择失效时间（北京时）"
                 format="yyMMddHHmm" value-format="yyMMddHHmm" :disabled="act === 'edit'"></tiny-date-picker>
             </tiny-form-item>
           </tiny-col>
           <tiny-row>
-            <tiny-col :span="12" v-if="createData.messageType !== '代替现有报文' && createData.messageType !== '取消现有报文'">
+            <tiny-col v-if="createData.messageType !== '代替现有报文' && createData.messageType !== '取消现有报文'" :span="12">
               <!--分段时间-->
               <tiny-form-item label="分段时间">
-                <tiny-input v-model="createData.d_time" placeholder="如分时间段进行，请选择自定义时间（北京时）" :disabled="act === 'edit'"
+                <tiny-input
+v-model="createData.d_time" placeholder="如分时间段进行，请选择自定义时间（北京时）" :disabled="act === 'edit'"
                   @focus="onFocus"> </tiny-input>
               </tiny-form-item>
             </tiny-col>
@@ -154,7 +167,8 @@
 
       </tiny-row>
       <tiny-row class="guide-box3">
-        <tiny-divider content-position="left" offset="5%" font-size="20px" content-background-color="#1476ff"
+        <tiny-divider
+content-position="left" offset="5%" font-size="20px" content-background-color="#1476ff"
           content-color="#ffffff">请选择或输入原始资料内容的必填项目和选填项目</tiny-divider>
         <!--E项-->
         <div style="margin: 1%;">事件场景:{{ createData.circumstances }}</div>
@@ -162,7 +176,8 @@
           <tiny-row v-if="false">
             <tiny-col :span="6">
               <tiny-form-item label="naip数据源">
-                <tiny-select v-model="naipDataPeriod" :options="naipDataPeriodOptions" placeholder="请选择naip数据期数"
+                <tiny-select
+v-model="naipDataPeriod" :options="naipDataPeriodOptions" placeholder="请选择naip数据期数"
                   clearable filterable></tiny-select>
               </tiny-form-item>
             </tiny-col>
@@ -171,11 +186,12 @@
           <tiny-collapse v-model="activeNames" class="demo-collapse-wrap">
             <tiny-collapse-item title="必填项" name="必填项">
               <tiny-col>
-                <formgenerator v-if="preCondition" ref="childRef" :keyWord="keyWord" :keyWordLabel="keyWordLabel"
-                  :staticData="staticData" />
+                <formgenerator
+v-if="preCondition" ref="childRef" :key-word="keyWord" :key-word-label="keyWordLabel"
+                  :static-data="staticData" />
               </tiny-col>
             </tiny-collapse-item>
-            <tiny-collapse-item title="选填项" name="选填项" v-if="matches.matchesOptionalLabel.length > 0">
+            <tiny-collapse-item v-if="matches.matchesOptionalLabel.length > 0" title="选填项" name="选填项">
               <tiny-col v-for="(item, index) in matches.matchesOptionalLabel" :key="'optional' + index" :span="6">
                 <tiny-form-item :label="item">
                   <tiny-input v-model="eFormData.optionalList[index]" placeholder="请输入" clearable></tiny-input>
@@ -212,44 +228,50 @@
         </tiny-col>
         <tiny-col :span="4">
           <!--影响高度范围-->
-          <tiny-form-item label="影响高度范围" v-if="!isEmpty(createData.qLowerLimit)">
-            <tiny-select v-model="createData.baseType" value-field="fg" text-field="fg" :grid-op="baseTypeOption"
-              render-type="grid" :disabled="act === 'edit'" @change="onChangeBaseType()" placeholder="请选择影响到的高度">
+          <tiny-form-item v-if="!isEmpty(createData.qLowerLimit)" label="影响高度范围">
+            <tiny-select
+v-model="createData.baseType" value-field="fg" text-field="fg" :grid-op="baseTypeOption"
+              render-type="grid" :disabled="act === 'edit'" placeholder="请选择影响到的高度" @change="onChangeBaseType()">
             </tiny-select>
           </tiny-form-item>
         </tiny-col>
         <tiny-col :span="4">
           <!--下限-->
-          <tiny-form-item label="下限" v-if="!isEmpty(createData.qLowerLimit)">
-            <tiny-input v-model="createData.f_lowerLimit" placeholder="输入高度下限数值"
+          <tiny-form-item v-if="!isEmpty(createData.qLowerLimit)" label="下限">
+            <tiny-input
+v-model="createData.f_lowerLimit" placeholder="输入高度下限数值"
               :disabled="createData.baseType.split('-')[0] == 'SFC' || createData.baseType.split('-')[0] == 'GND' || act === 'edit'"
               @click="onFocusFG('F')"></tiny-input>
           </tiny-form-item>
         </tiny-col>
         <tiny-col :span="4">
           <!--上限-->
-          <tiny-form-item label="上限" v-if="!isEmpty(createData.qLowerLimit)">
-            <tiny-input v-model="createData.g_upperLimit" placeholder="输入高度上限数值"
+          <tiny-form-item v-if="!isEmpty(createData.qLowerLimit)" label="上限">
+            <tiny-input
+v-model="createData.g_upperLimit" placeholder="输入高度上限数值"
               :disabled="createData.baseType.split('-')[1] === 'UNL' || act === 'edit'"
               @click="onFocusFG('G')"></tiny-input>
           </tiny-form-item>
         </tiny-col>
       </tiny-row>
       <tiny-row class="guide-box2">
-        <tiny-divider content-position="left" offset="5%" font-size="20px" content-background-color="#1476ff"
+        <tiny-divider
+content-position="left" offset="5%" font-size="20px" content-background-color="#1476ff"
           content-color="#ffffff">佐证材料</tiny-divider>
-        <materials :messageId="messageId" :templateID="templateID" :isNoAuth="isNoAuth" :act="act"
-          @changeFiles="changeFiles">
+        <materials
+:message-id="messageId" :template-i-d="templateID" :is-no-auth="isNoAuth" :act="act"
+          @change-files="changeFiles">
         </materials>
       </tiny-row>
       <tiny-row class="guide-box4">
-        <tiny-divider content-position="left" offset="5%" font-size="20px" content-background-color="#1476ff"
+        <tiny-divider
+content-position="left" offset="5%" font-size="20px" content-background-color="#1476ff"
           content-color="#ffffff">原始资料通知单以及预览</tiny-divider>
         <!--预览--->
         <tiny-col :span="12">
           <!--预览通知单-->
           <tiny-row><tiny-col :span="12">
-              <exportMessage v-if="showNotice" :formData="createData" :act="'edit'" :key="exportMessageKey" />
+              <exportMessage v-if="showNotice" :key="exportMessageKey" :form-data="createData" :act="'edit'" />
             </tiny-col></tiny-row>
           <!--序列号-->
           <tiny-form-item label="提供序列号">
@@ -267,33 +289,39 @@
         </tiny-col>
       </tiny-row>
       <tiny-form-item v-show="!isNoAuth">
-        <tiny-button type="primary" v-show="act == 'add'" @click="onAssemble()">预览</tiny-button>
-        <tiny-button type="primary" v-show="!isEmpty(createData.telegramText) && act == 'add'"
+        <tiny-button v-show="act == 'add'" type="primary" @click="onAssemble()">预览</tiny-button>
+        <tiny-button
+v-show="!isEmpty(createData.telegramText) && act == 'add'" type="primary"
           @click="onSend()">确认并开始上报流程</tiny-button>
         <tiny-button v-if="act === 'edit'" type="primary" @click="copyToClipboard()"> 将通告发布至通告系统 </tiny-button>
       </tiny-form-item>
     </tiny-form>
-    <tiny-dialog-box :modal="false" v-if="boxDVisibility" v-model:visible="boxDVisibility" append-to-body title="编辑分段时间"
+    <tiny-dialog-box
+v-if="boxDVisibility" v-model:visible="boxDVisibility" :modal="false" append-to-body title="编辑分段时间"
       width="35%" :close-on-click-modal="false">
       <keep-alive>
-        <schedulePicker @scheduleChange="handleScheduleChange" @close="dialogClose" />
+        <schedulePicker @schedule-change="handleScheduleChange" @close="dialogClose" />
       </keep-alive>
     </tiny-dialog-box>
-    <tiny-dialog-box :modal="false" v-show="boxFVisibility" v-model:visible="boxFVisibility" append-to-body title="编辑F项"
+    <tiny-dialog-box
+v-show="boxFVisibility" v-model:visible="boxFVisibility" :modal="false" append-to-body title="编辑F项"
       width="35%" :close-on-click-modal="false">
-      <fgInput :baseType='baseType' :fgType='fgType' @fgChange="changeFG" @close="dialogClose" />
+      <fgInput :base-type='baseType' :fg-type='fgType' @fg-change="changeFG" @close="dialogClose" />
     </tiny-dialog-box>
-    <tiny-dialog-box :modal="false" v-show="boxGVisibility" v-model:visible="boxGVisibility" append-to-body title="编辑G项"
+    <tiny-dialog-box
+v-show="boxGVisibility" v-model:visible="boxGVisibility" :modal="false" append-to-body title="编辑G项"
       width="35%" :close-on-click-modal="false">
-      <fgInput :baseType='baseType' :fgType='fgType' @fgChange="changeFG" @close="dialogClose" />
+      <fgInput :base-type='baseType' :fg-type='fgType' @fg-change="changeFG" @close="dialogClose" />
     </tiny-dialog-box>
     <!--查看关联的源通告-->
-    <tiny-dialog-box :modal="false" v-if="workflowVisibility" v-model:visible="workflowVisibility" title="源通告"
+    <tiny-dialog-box
+v-if="workflowVisibility" v-model:visible="workflowVisibility" :modal="false" title="源通告"
       width="80%" max-height="1000px" top="5%" :close-on-click-modal="false">
-      <exportMessage :formData="messageFormData" :act="'detail'" />
+      <exportMessage :form-data="messageFormData" :act="'detail'" />
     </tiny-dialog-box>
     <!--审批流程选择-->
-    <tiny-dialog-box :modal="false" v-if="boxDepartmentVisibility" v-model:visible="boxDepartmentVisibility"
+    <tiny-dialog-box
+v-if="boxDepartmentVisibility" v-model:visible="boxDepartmentVisibility" :modal="false"
       append-to-body title="原始资料上报流程" width="60%" :close-on-click-modal="false">
       <tiny-form label-width="150px">
         <tiny-form-item label="审批单位或领导：">
@@ -302,7 +330,8 @@
               <div>审批单位或领导：<tiny-icon-help-solid class="IconHelpSolid"></tiny-icon-help-solid></div>
             </tiny-tooltip>
           </template>
-          <tiny-cascader ref="cascaderLeaderRef" v-model="leaderNodes" :options="departmentTreeData"
+          <tiny-cascader
+ref="cascaderLeaderRef" v-model="leaderNodes" :options="departmentTreeData"
             placeholder="请选择需要审批该通告的单位或领导，可多选" filterable clearable :props="{
               children: 'children',
               value: 'userID',
@@ -312,13 +341,14 @@
               multiple: true
             }" @change="onChangeLeaderNodeList"></tiny-cascader>
         </tiny-form-item>
-        <tiny-form-item label="抄送单位或领导：" v-if="createData.needConsult == true">
+        <tiny-form-item v-if="createData.needConsult == true" label="抄送单位或领导：">
           <template #label>
             <tiny-tooltip type="info" content="仅通知该单位或个人，无需其同意可继续进行流程" placement="top">
               <div>抄送单位或领导：<tiny-icon-help-solid class="IconHelpSolid"></tiny-icon-help-solid></div>
             </tiny-tooltip>
           </template>
-          <tiny-cascader ref="cascaderConsultationRef" v-model="consultationNodes" :options="departmentTreeData"
+          <tiny-cascader
+ref="cascaderConsultationRef" v-model="consultationNodes" :options="departmentTreeData"
             placeholder="请选择需要知晓该通告的单位或领导，无需其审批" filterable clearable :props="{
               children: 'children',
               value: 'userID',
@@ -331,7 +361,8 @@
         <tiny-form-item>
           <tiny-button type="primary" :disabled="leaderNodes.length === 0" @click="createProcess()">确定</tiny-button>
           <tiny-button type="info" @click="boxDepartmentVisibility = false">取消</tiny-button>
-          <tiny-button type="danger" style="margin-left: 300px;" :disabled="leaderNodes.length !== 0"
+          <tiny-button
+type="danger" style="margin-left: 300px;" :disabled="leaderNodes.length !== 0"
             @click="createProcess(false)">先送情报单位发布通告发布后审批,慎点</tiny-button>
         </tiny-form-item>
       </tiny-form>
@@ -340,25 +371,19 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, defineProps, toRefs, onMounted, toRaw, watch, computed } from 'vue'
+import { ref, reactive, toRefs, onMounted, watch, computed, h, withDefaults } from 'vue'
 import {
   Collapse as TinyCollapse,
   CollapseItem as TinyCollapseItem,
-  Layout as TinyLayout,
   Form as TinyForm,
   FormItem as TinyFormItem,
   Row as TinyRow,
   Col as TinyCol,
   Input as TinyInput,
-  Numeric as TinyNumeric,
-  IpAddress as TinyIpAddress,
   Select as TinySelect,
   Option as TinyOption,
-  Grid as TinyGrid,
-  GridColumn as TinyGridColumn,
   Button as TinyButton,
   Modal,
-  Image as TinyImage,
   Loading,
   Notify,
   TinyRadioGroup, TinyRadioButton,
@@ -371,62 +396,264 @@ import {
   TinyCascader,
   TinyTooltip,
 } from '@opentiny/vue'
-import { h } from 'vue'
-import { queryAirPortAndAirSpace, queryAirPortConfig, queryAirSpaceConfig, queryMessageDetail, postMessage, MessageVM, queryDepartmentTreeList, queryUserTreeList, createWorkflow, fetchAutoGeneratedNotamSn, queryLeaderDepId, queryNaipSettings } from '@/api/fetchInterface';
+import { queryAirPortAndAirSpace, queryAirPortConfig, queryAirSpaceConfig, queryMessageDetail, postMessage, queryUserTreeList, createWorkflow, fetchAutoGeneratedNotamSn, queryNaipSettings, type MessageVM } from '@/api/fetchInterface';
 import formgenerator from '@/components/formgenerator/index.vue';
 import schedulePicker from '@/components/schedulePicker/index.vue';
 import fgInput from '@/components/fginput/index.vue';
 import workflowaxios from '@/views/workflow/components/workflow-axios';
 import { iconHelpSolid } from '@opentiny/vue-icon'
 
-import { useUserStore, useWorkFlowStore } from '@/store';
+import { useUserStore } from '@/store';
 import { isEmpty } from '@/utils/string-utils';
 import exportMessage from './export.vue';
 import materials from './materials.vue';
 
+interface TemplateMatches {
+  matchesOptionalLabel: string[];
+  matchesRequiredLabel: string[];
+  matchesOptionalKeyWord: string[];
+  matchesRequiredKeyWord: string[];
+}
 
+interface WorkflowNode {
+  id: number | string;
+  type: string;
+  name: string;
+  parentId: number;
+}
 
+interface CascaderCheckedNode {
+  value: number | string;
+  label: string;
+  parent: { value: number };
+}
+
+interface MaterialItem {
+  title: string;
+  fileList: Array<{ id: number }>;
+}
+
+interface AOptionGroup {
+  label: string;
+  options: Array<{ label: string; value: string }>;
+}
+
+interface ValidTypeOption {
+  text: string;
+  label: string;
+}
+
+interface CreateDataForm {
+  templateID: number | null;
+  template: string;
+  example: string;
+  picturePath: string;
+  state: string;
+  remark: string;
+  needConsult: boolean;
+  messageType: string;
+  messageId: string;
+  parentId: number;
+  validType: string;
+  baseType: string;
+  qAirSpace: string;
+  qCode: string;
+  qFlightType: string;
+  qTarget: string;
+  qReach: string;
+  qLowerLimit: string;
+  qUpperLimit: string;
+  qLat: string;
+  qLong: string;
+  qRadius: string;
+  circumstances: string;
+  /* NOTAM 报文字段名，与后端保持一致 */
+  /* eslint-disable camelcase */
+  a_airSpace: string;
+  d_time: string;
+  e_data: string;
+  f_lowerLimit: string;
+  g_upperLimit: string;
+  h_coordinate: string;
+  /* eslint-enable camelcase */
+  startTime: string;
+  endTime: string;
+  telegramText: string;
+  notamSn: string;
+  aftnSn: string;
+  specialNotes: string;
+  isImmediate: boolean;
+}
+
+interface EFormData {
+  requiredList: string[];
+  optionalList: string[];
+  result: string;
+}
+
+interface AssembleFormProps {
+  templateID?: number;
+  templateData?: Partial<CreateDataForm> | Record<string, unknown>;
+  messageId?: number;
+  parentId?: number;
+  isNoAuth?: boolean;
+  act?: string;
+  messageType?: string;
+}
+
+interface AssembleMessagePayload {
+  qCode: string;
+  airSpaceCodeId: string;
+  type: string;
+  validType: string;
+  lat: string;
+  long: string;
+  radius: string;
+  telegramText: string;
+  startTime: string;
+  endTime: string;
+  specialNotes: string;
+  notamSn: string;
+  isImmediate: boolean;
+  templateId?: number;
+  workflowId?: number;
+  parentId?: number;
+  messageId?: number;
+  materials?: Array<{ fileId: number; materialType: string }>;
+}
+
+interface FormGeneratorExpose {
+  assembleStr: () => Record<string, string>;
+}
+
+interface CascaderExpose {
+  getCheckedNodes: (leafOnly: boolean) => CascaderCheckedNode[];
+}
+
+function createEmptyTemplateMatches(): TemplateMatches {
+  return {
+    matchesOptionalLabel: [],
+    matchesRequiredLabel: [],
+    matchesOptionalKeyWord: [],
+    matchesRequiredKeyWord: [],
+  };
+}
+
+const TELEGRAM_ITEM_REGEX = /[A-G]\)(.*?)(?=[A-G]\)|[\r\n]|$)/gm;
+const AIRSPACE_CONFIG_TYPES = [
+  { key: 'ndbs', prefix: 'ndbs' },
+  { key: 'restricteds', prefix: 'restricteds' },
+  { key: 'vors', prefix: 'vors' },
+  { key: 'controlleds', prefix: 'controlleds' },
+];
+const AIRPORT_CONFIG_TYPES = [
+  { key: 'rwys', prefix: 'rwys' },
+  { key: 'rwyDirections', prefix: 'rwyDirections' },
+];
+
+type TelegramItemKey = 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G';
+type TelegramItems = Record<TelegramItemKey, string>;
+
+function parseTelegramItems(telegramText: string): TelegramItems {
+  const result = {} as TelegramItems;
+  const matches = Array.from(telegramText.matchAll(TELEGRAM_ITEM_REGEX));
+  matches.forEach((match) => {
+    const letter = match[0].split(')')[0];
+    if (letter.length === 1 && letter >= 'A' && letter <= 'G') {
+      result[letter as TelegramItemKey] = (match[1] || '').trim();
+    }
+  });
+  return result;
+}
+
+function buildCText(validType: string, messageType: string, endTime: string): string {
+  if (validType === 'PERM' && messageType === '新发报文') {
+    return 'PERM';
+  }
+  if (validType === 'PERM' && messageType !== '新发报文') {
+    return '';
+  }
+  if (validType === 'EST') {
+    return `${endTime || ''} EST`;
+  }
+  return `${endTime || ''}`;
+}
+
+function mapCascaderNodes(checkVal: CascaderCheckedNode[]): WorkflowNode[] {
+  return checkVal.map((item) => ({
+    id: item.value,
+    type: 'user',
+    name: item.label,
+    parentId: item.parent.value,
+  }));
+}
+
+function uniqueByProperty<T extends Record<string, unknown>>(array: T[], key: keyof T & string) {
+  const seen = new Set();
+  return array.filter((item) => {
+    const value = item[key];
+    if (seen.has(value)) return false;
+    seen.add(value);
+    return true;
+  });
+}
+
+function createConfigItem<T extends Record<string, unknown>>(data: T[], key: keyof T & string): { value: string; label: string }[] {
+  return uniqueByProperty(data, key).map((item) => ({
+    value: String(item[key]),
+    label: String(item[key]),
+  }));
+}
+
+function processConfig(dataArray: Record<string, unknown>[], prefix: string) {
+  const config: Record<string, unknown> = {};
+  const configKeys = [...new Set(dataArray.flatMap(Object.keys))];
+  configKeys.forEach((key) => {
+    const configKey = `${prefix}${key}`;
+    const items = createConfigItem(dataArray, key);
+    config[configKey] = items.length === 1 ? items[0]?.value : items;
+  });
+  return config;
+}
+
+function mergeEntityConfig(
+  data: Record<string, unknown>,
+  configTypes: { key: string; prefix: string }[],
+  target: Record<string, unknown>,
+) {
+  const mergedConfig = configTypes.reduce<Record<string, unknown>>((acc, { key, prefix }) => {
+    const sectionData = data[key];
+    if (Array.isArray(sectionData)) {
+      return Object.assign(acc, processConfig(sectionData as Record<string, unknown>[], prefix));
+    }
+    return acc;
+  }, {});
+  Object.assign(target, mergedConfig);
+  Object.keys(data).forEach((key) => {
+    if (typeof data[key] !== 'object') {
+      target[key] = String(data[key]);
+    }
+  });
+}
 
 const TinyIconHelpSolid = iconHelpSolid()
 
-const handleScheduleChange = (rule: any) => {
-  //console.log('生成的规则：', rule);
-  createData.d_time = rule;
-  // 示例输出：
-  // {
-  //   type: 'weekly',
-  //   time: '1430',
-  //   days: ['MON', 'WED', 'FRI']
-  // }
-}
-const userWorkFlowStore = useWorkFlowStore();
 const userStore = useUserStore();
-const childRef = ref<any>();
+const childRef = ref<FormGeneratorExpose>();
 const preCondition = ref(false);
-const props = defineProps({
-  templateID: Number,
-  templateData: Object,
-  messageId: Number,
-  parentId: Number,
-  isNoAuth: Boolean,
-  act: String,
-  messageType: String
+const props = withDefaults(defineProps<AssembleFormProps>(), {
+  isNoAuth: false,
 });
-const { templateID } = toRefs(props);
-const { templateData } = toRefs(props);
-const { parentId } = toRefs(props);
-const { messageId } = toRefs(props);
-const { act } = toRefs(props);
-const { messageType } = toRefs(props);
+const { templateID, templateData, parentId, messageId, act, messageType } = toRefs(props);
 // 会商部门/审批部门
-const cascaderLeaderRef = ref();
-const cascaderConsultationRef = ref()
-const departmentTreeData = ref([]);
-const leaderNodes = ref([]);
-const consultationNodes = ref([]);
-const consultationNodeList = ref([]);
-const leaderNodeList = ref([]);
-const materialList = ref([]);
+const cascaderLeaderRef = ref<CascaderExpose>();
+const cascaderConsultationRef = ref<CascaderExpose>();
+const departmentTreeData = ref<Record<string, unknown>[]>([]);
+const leaderNodes = ref<Array<number | string>>([]);
+const consultationNodes = ref<Array<number | string>>([]);
+const consultationNodeList = ref<WorkflowNode[]>([]);
+const leaderNodeList = ref<WorkflowNode[]>([]);
+const materialList = ref<MaterialItem[]>([]);
 const materialCount = ref(0);
 
 
@@ -506,10 +733,8 @@ const floatSize = ref("width:20%;height:450px;top:10%");
 let pdfSize = ref("width:100%;height:400px;top:10%");
 const pdfState = ref("放大");
 // 机场、情报区数据
-const staticData = ref({
-});
-// TODO，如果有id，则输入值，否则直接默认NEITHER
-const createData = reactive({
+const staticData = ref<Record<string, unknown>>({});
+const createData = reactive<CreateDataForm>({
   templateID: null,
   template: '',
   example: '',
@@ -564,27 +789,32 @@ const createData = reactive({
   specialNotes: '',
   // 是否立即生效
   isImmediate: false,
-})
+});
+
+const handleScheduleChange = (rule: string) => {
+  createData.d_time = rule;
+};
+
 // 基准面
-const baseType = ref<any>('');
+const baseType = ref<string>('');
 // 弹窗的f/g的类型
-const fgType = ref<any>('');
+const fgType = ref<string>('');
 // 折叠变量
 const activeNames = ref(['示例', '必填项', '选填项'])
 // 情报区四字码
 const airSpaceCodes = ref(["ZGZU", "ZHWH", "ZJSA",]);
 // e项的组装数据
-const eFormData = reactive({
+const eFormData = reactive<EFormData>({
   requiredList: [],
   optionalList: [],
-  result: "",
-})
+  result: '',
+});
 // 整个弹窗的规则
 const rules = ref({
   radio: [{ required: true, message: '必填', trigger: 'change' }],
 })
 // A项选项
-const aOptions = ref([{
+const aOptions = ref<AOptionGroup[]>([{
   label: '飞行情报区',
   options: [{ label: "", value: "", }]
 },
@@ -601,12 +831,16 @@ const boxDepartmentVisibility = ref(false);
 
 // 关联通告弹窗显示变量
 const workflowVisibility = ref(false);
-const messageFormData = reactive({});
+const messageFormData = reactive<Record<string, unknown>>({});
 
 // 通告类型
-const messageTypeOption = ref(['新发报文', '代替现有报文', '取消现有报文']);
+const messageTypeOption = ref<string[]>(['新发报文', '代替现有报文', '取消现有报文']);
 // 报文有效期类型
-const messageValidTypeOption = ref([{ text: '有确切的结束时间', label: 'NEITHER' }, { text: '永久有效', label: 'PERM' }, { text: '无法准确设定，只能预计', label: 'EST' }]);
+const messageValidTypeOption = ref<ValidTypeOption[]>([
+  { text: '有确切的结束时间', label: 'NEITHER' },
+  { text: '永久有效', label: 'PERM' },
+  { text: '无法准确设定，只能预计', label: 'EST' },
+]);
 // 基准面类型
 const baseTypeOption = ref({
   height: 400,
@@ -626,18 +860,18 @@ const baseTypeOption = ref({
     //{ field: 'fg', title: '', hidden: true },
   ]
 });
-const keyWord = ref();
-const keyWordLabel = ref();
+const keyWord = ref<string>('');
+const keyWordLabel = ref<string[]>([]);
 // 定义派发事件
 const emit = defineEmits(['close', 'createMessage']);
 // 加载效果
 const state = reactive<{
-  loading: any,
+  loading: ReturnType<typeof Loading.service> | null;
 }>({
   loading: null,
 });
 
-const messageData: MessageVM = {
+const messageData = reactive<AssembleMessagePayload>({
   qCode: '',
   airSpaceCodeId: '',
   type: '',
@@ -651,11 +885,11 @@ const messageData: MessageVM = {
   specialNotes: "",
   notamSn: "",
   isImmediate: false,
-};
+});
 const showNotice = ref(false);
 
-const naipDataPeriodOptions = ref([])
-const naipDataPeriod = ref("")
+const naipDataPeriodOptions = ref<unknown[]>([]);
+const naipDataPeriod = ref('');
 
 watch(
   () => createData.a_airSpace,
@@ -684,7 +918,7 @@ onMounted(async () => {
     onChangeMessageType()
   }
   if (!isEmpty(parentId.value)) {
-    createData.parentId = parentId?.value;
+    createData.parentId = parentId.value ?? 0;
   }
   if (act.value === "add") {
     // 获取自动生成的提供序列号，并且填写到提供序列号中
@@ -695,58 +929,32 @@ onMounted(async () => {
 });
 
 const handleMessage = async () => {
-  // 如果有messageId，则请求message接口,并且解析数据
-  if (messageId?.value !== null) {
-    let { data } = await queryMessageDetail({ id: messageId?.value });
-    console.log("messagedata", data);
-    // 当已经提交后，锁死E项
-    createData.a_airSpace = data.airSpaceCodeId;
-    createData.messageType = data.type;
-    createData.validType = data.validType;
-    createData.qLat = data.lat;
-    createData.qLong = data.long;
-    createData.qRadius = data.radius;
-    createData.telegramText = data.telegramText;
-    createData.templateID = data.templateId;
-    createData.parentId = data.parentId;
-    if (!isEmpty(data.startTime)) {
-      createData.startTime = data.startTime;
-      createData.endTime = data.endTime;
-    };
-    createData.isImmediate = data.isImmediate;
-    // 当已经提交后，不显示E项
-    // 解析正文并赋值B、C、D、F、G项
-    // 定义结果类型（严格约束键为 A-G）
-    type ResultType = Record<'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G', string>;
-    // 修正后的正则表达式：精确匹配每个 A-G 项（非贪婪 + 断言）
-    // [A-G]\) 匹配 "字母)"
-    // (.*?) 非贪婪捕获括号内的内容（尽可能少匹配）
-    // (?=[A-G]\)|$) 正向断言：遇到下一个 "字母)" 或文本结束则停止
-    const regex = /[A-G]\)(.*?)(?=[A-G]\)|[\r\n]|$)/gm;
-    // 获取所有匹配结果（转换为数组）
-    const matches = Array.from(data.telegramText.matchAll(regex));
-    // 初始化结果对象
-    const result: ResultType = {} as ResultType;
-    // 遍历匹配结果（使用 forEach 规避 for...of 限制）
-    matches.forEach((match) => {
-      // 完整匹配项（如 "A)ZGGG"、"B)2506150000" 等）
-      const fullMatch = match[0];
-      // 提取字母（如 "A" 来自 "A)ZGGG"）
-      const letter = fullMatch.split(')')[0];
-      // 捕获组内容（括号内的值，可能为空）
-      const value = match[1] || '';
-      // 类型安全校验（确保字母在 A-G 范围内）
-      if (letter.length === 1 && letter >= 'A' && letter <= 'G') {
-        result[letter as keyof ResultType] = value.trim(); // 可选：去除首尾空格
-      }
-    });
-    createData.startTime = result.B;
-    createData.endTime = result.C;
-    createData.d_time = result.D;
-    createData.e_data = result.E;
-    createData.f_lowerLimit = result.F;
-    createData.g_upperLimit = result.G;
+  if (messageId?.value === null) {
+    return;
   }
+  const { data } = await queryMessageDetail({ id: messageId?.value });
+  createData.a_airSpace = data.airSpaceCodeId;
+  createData.messageType = data.type;
+  createData.validType = data.validType;
+  createData.qLat = data.lat;
+  createData.qLong = data.long;
+  createData.qRadius = data.radius;
+  createData.telegramText = data.telegramText;
+  createData.templateID = data.templateId;
+  createData.parentId = data.parentId;
+  if (!isEmpty(data.startTime)) {
+    createData.startTime = data.startTime;
+    createData.endTime = data.endTime;
+  }
+  createData.isImmediate = data.isImmediate;
+
+  const result = parseTelegramItems(data.telegramText);
+  createData.startTime = result.B;
+  createData.endTime = result.C;
+  createData.d_time = result.D;
+  createData.e_data = result.E;
+  createData.f_lowerLimit = result.F;
+  createData.g_upperLimit = result.G;
 }
 // A项（情报区/机场）的静态数据获取
 const fetchAirPortAndAirSpace = async () => {
@@ -757,7 +965,7 @@ const fetchAirPortAndAirSpace = async () => {
   });
   try {
     const { data } = await queryAirPortAndAirSpace({ qReach: createData.qReach });
-    aOptions.value = data;
+    aOptions.value = data as AOptionGroup[];
     if (createData.qReach === 'E' || createData.qReach === 'W') {
       createData.a_airSpace = userStore.airSpaceCodeId || '';
     }
@@ -766,18 +974,16 @@ const fetchAirPortAndAirSpace = async () => {
     }
   }
   catch (err) {
-    console.log(err);
     Modal.alert('获取数据错误');
     emit('close', false);
   }
   finally {
-    state.loading.close();
+    state.loading?.close();
   }
 }
 // 请求数据接口方法
 const fetchData = async () => {
-  Object.assign(createData, templateData.value);
-  console.log(templateData?.value, "-----------------");
+  Object.assign(createData, templateData.value ?? {});
   handleKeyWord();
   if (act.value === 'add') {
     // 加了handleMessage，不知道有没有影响，如果不加，那么parentId等数据不能导入
@@ -796,53 +1002,46 @@ function successClick() {
     position: 'top-right'
   })
 }
-function errorClick(err) {
+function errorClick(err: unknown) {
   Notify({
     type: 'error',
-    message: err,
+    message: err instanceof Error ? err.message : String(err),
     position: 'top-right'
   })
 }
 // 核心算法，提取关键字
-function extractContent(input: string): object {
-  // 正则表达式匹配$之间的内容
-  // 获取必填和选填的表单名
+function extractContent(input: string): TemplateMatches {
   const regexOptionalLabel = /\$([^$]+)\$\{/g;
   const regexRequiredLabel = /\$([^$]+)\$\【/g;
-  // 获取关键字
   const regexOptionalKeyWord = /\$\{([^}]+)\}/g;
   const regexRequiredKeyWord = /\$\【([^】]+)\】/g;
-  // 用于存储匹配结果的数组
-  const matchesOptionalLabel = [];
-  const matchesRequiredLabel = [];
-  const matchesOptionalKeyWord = [];
-  const matchesRequiredKeyWord = [];
-  // 执行匹配并获取所有结果
-  let match;
+  const matchesOptionalLabel: string[] = [];
+  const matchesRequiredLabel: string[] = [];
+  const matchesOptionalKeyWord: string[] = [];
+  const matchesRequiredKeyWord: string[] = [];
+  let match: RegExpExecArray | null;
   while ((match = regexOptionalLabel.exec(input))) {
-    matchesOptionalLabel.push(match[1]); // 添加每次匹配的结果到数组中，不包括$
+    matchesOptionalLabel.push(match[1]);
   }
   while ((match = regexRequiredLabel.exec(input))) {
-    matchesRequiredLabel.push(match[1]); // 添加每次匹配的结果到数组中，不包括$
+    matchesRequiredLabel.push(match[1]);
   }
   while ((match = regexOptionalKeyWord.exec(input))) {
-    matchesOptionalKeyWord.push(match[1]); // 添加每次匹配的结果到数组中，不包括$
+    matchesOptionalKeyWord.push(match[1]);
   }
   while ((match = regexRequiredKeyWord.exec(input))) {
-    matchesRequiredKeyWord.push(match[1]); // 添加每次匹配的结果到数组中，不包括$
+    matchesRequiredKeyWord.push(match[1]);
   }
-  // 不能用校验
-  eFormData.requiredList = Array.from({ length: matchesRequiredLabel.length }).map((item, index) => "");
-  eFormData.optionalList = Array.from({ length: matchesOptionalLabel.length }).map((item, index) => matchesOptionalKeyWord[index]);
-  console.log('eFormData', eFormData);
-  keyWord.value = matchesRequiredKeyWord.join(",");
+  eFormData.requiredList = Array.from({ length: matchesRequiredLabel.length }, () => '');
+  eFormData.optionalList = matchesOptionalLabel.map((_, index) => matchesOptionalKeyWord[index] ?? '');
+  keyWord.value = matchesRequiredKeyWord.join(',');
   keyWordLabel.value = matchesRequiredLabel;
   return { matchesOptionalLabel, matchesRequiredLabel, matchesOptionalKeyWord, matchesRequiredKeyWord };
 }
-let matches = reactive({});
+const matches = reactive<TemplateMatches>(createEmptyTemplateMatches());
 // 提取关键字事件
 const handleKeyWord = () => {
-  matches = extractContent(createData.template);
+  Object.assign(matches, extractContent(createData.template));
 }
 // 复制到粘贴板
 async function copyToClipboard() {
@@ -856,7 +1055,10 @@ async function copyToClipboard() {
 // 组装事件
 async function onAssemble() {
   showNotice.value = false;
-  let test = childRef.value.assembleStr();
+  const test = childRef.value?.assembleStr();
+  if (!test) {
+    return;
+  }
   eFormData.requiredList = Object.values(test);
   // 校验其他项---后续要做在formitem中
   // 新发报文代替现有报文必须要有b、c项
@@ -886,7 +1088,6 @@ async function onAssemble() {
     return;
   }
   // 校验E项中的必填项是否都填完,由于有一些必填项自带了文本，因此需要进一步判断--todo
-  console.log(eFormData.requiredList);
   if (eFormData.requiredList.length > 0 && eFormData.requiredList.every((item: string) => typeof item === 'undefined' || item.includes("undefined") || item.includes('null'))) {
     Modal.alert('请填写必填项');
     return;
@@ -904,22 +1105,9 @@ async function onAssemble() {
   // E项组装的文本
   eFormData.result = assembleText;
   let qText = `Q)${createData.qAirSpace}/${createData.qCode}/${createData.qFlightType}/${createData.qTarget}/${createData.qReach}/${createData.qLowerLimit}/${createData.qUpperLimit}/${createData.qLat}${createData.qLong}${createData.qRadius}`;
-  // PERM时，C项为空,C项不能够选择0000时间，只能是2359
-  // C的文本
-  console.log(createData.startTime, createData.endTime);
-  let cText = "";
+  let cText = buildCText(createData.validType, createData.messageType, createData.endTime);
   if (createData.validType === "PERM" && createData.messageType === "新发报文") {
-    cText = "PERM";
     createData.endTime = "PERM";
-  }
-  else if (createData.validType === "PERM" && createData.messageType !== "新发报文") {
-    cText = "";
-  }
-  else if (createData.validType === "EST") {
-    cText = `${createData.endTime || ''} EST`;
-  }
-  else {
-    cText = `${createData.endTime || ''}`;
   }
   let abcText = `A)${createData.a_airSpace} B)${createData.startTime || ''} ${isEmpty(cText) ? '' : `C)${cText}`}`;
   //let abcText = `A)${createData.a_airSpace} B)${createData.startTime || ''} C)${createData.validType === "NEITHER" ? createData.validType : createData.endTime || ''}`;
@@ -939,7 +1127,6 @@ async function onAssemble() {
   // 更新 key 强制组件重新渲染
   exportMessageKey.value += 1;
   showNotice.value = true;
-  console.log("showNotice.value", createData, showNotice.value);
 }
 
 
@@ -979,7 +1166,6 @@ async function onSend() {
       messageData.notamSn = createData.notamSn;
       messageData.parentId = createData.parentId;
       messageData.isImmediate = createData.isImmediate;
-      console.log(messageData);
       // 代替取消报要记录parentid
       if (messageType.value === 'replace' || messageType.value === 'cnl') {
         messageData.parentId = parentId.value;
@@ -991,35 +1177,32 @@ async function onSend() {
         messageData.messageId = messageId.value;
       }
       ////messageData.materials = [{ fileId: 87, materialType: "测试1" }];
-      console.log("messageData", messageData, materialList.value);
       messageData.materials = [];
-      materialList.value.forEach(item => {
-        if (item.fileList.length > 0) {
-          messageData.materials.push({ fileId: item.fileList[0].id, materialType: item.title })
+      materialList.value.forEach((item) => {
+        if (item.fileList?.length > 0) {
+          messageData.materials?.push({ fileId: item.fileList[0].id, materialType: item.title });
         }
       });
-      await postMessage(messageData).then((res1: any) => {
+      await postMessage(messageData as unknown as MessageVM).then((res1: { code: number; data: number }) => {
         if (res1.code === 200) {
           Modal.message({ message: '发送成功', status: 'success' })
           messageId.value = res1.data;
           emit('createMessage', res1.data, messageData);
           onNotice();
         }
-      }).catch((err: any) => {
-        console.log(err);
+      }).catch(() => {
+        // postMessage 错误由 axios 拦截器统一处理
       });
     }
   })
 }
 const onChangeLeaderNodeList = () => {
-  let checkVal = cascaderLeaderRef.value.getCheckedNodes(true);
-  console.log(checkVal);
-  leaderNodeList.value = checkVal.map((item: any) => { return { id: item.value, type: "user", name: item.label, parentId: item.parent.value, } })
+  const checkVal = cascaderLeaderRef.value?.getCheckedNodes(true) ?? [];
+  leaderNodeList.value = mapCascaderNodes(checkVal);
 }
 const onChangeConsultationNodeList = () => {
-  let checkVal = cascaderConsultationRef.value.getCheckedNodes(true);
-  console.log(checkVal);
-  consultationNodeList.value = checkVal.map((item: any) => { return { id: item.value, type: "user", name: item.label, parentId: item.parent.value } })
+  const checkVal = cascaderConsultationRef.value?.getCheckedNodes(true) ?? [];
+  consultationNodeList.value = mapCascaderNodes(checkVal);
 }
 
 // 生成通知单事件
@@ -1027,12 +1210,7 @@ async function onNotice() {
   // 获取所有通知单列表
   // 弹出选择框（选择对应的部门）
   const { data } = await queryUserTreeList();
-  //await getLeaderDepId();
-  console.log(data);
-  //departmentTreeData.value = { data: data.children };
   departmentTreeData.value = data.children;
-  // 有会商需求，才显示弹窗
-  console.log("needConsult", createData.needConsult);
   if (createData.needConsult) {
     boxDepartmentVisibility.value = true;
   }
@@ -1066,49 +1244,8 @@ const createProcess = async (neddConsult = true) => {
       boxDepartmentVisibility.value = false;
       emit('close', true);
     }
-  }).catch((err: any) => {
-    console.log(err);
-  });
-};
-// 获取配置项
-const airspaceConfigTypes = [
-  { key: 'ndbs', prefix: 'ndbs' },
-  { key: 'restricteds', prefix: 'restricteds' },
-  { key: 'vors', prefix: 'vors' },
-  { key: 'controlleds', prefix: 'controlleds' }
-];
-const airportConfigTypes = [
-  { key: 'rwys', prefix: 'rwys' },
-  { key: 'rwyDirections', prefix: 'rwyDirections' },
-];
-// 处理config函数
-function processConfig(dataArray, prefix) {
-  const config = {};
-  // 提取唯一键集合
-  const configKeys = [...new Set(dataArray.flatMap(Object.keys))];
-  configKeys.forEach(key => {
-    const configKey = `${prefix}${key}`;
-    const items = createConfigItem(dataArray, key);
-    // 根据数组长度决定赋值方式
-    config[configKey] = items?.length === 1 ? items[0]?.value : items || [];
-  });
-  return config;
-}
-// 处理config函数
-function createConfigItem<T>(data: T[], key: keyof T): { value: string; label: string }[] {
-  return uniqueByProperty(data, key).map((item: any) => ({
-    value: String(item[key]),
-    label: String(item[key]),
-  }));
-}
-// 去重函数
-function uniqueByProperty(array: any, key: any) {
-  const seen = new Set();
-  return array.filter((item: any) => {
-    const value = item[key];
-    if (seen.has(value)) return false;
-    seen.add(value);
-    return true;
+  }).catch(() => {
+    // createWorkflow 错误由 axios 拦截器统一处理
   });
 };
 // 为了满足空管部隐藏Q项的需求
@@ -1140,55 +1277,27 @@ const telegramTextWithoutFirstLine = computed({
 
 // A-E、Q。A项改变事件，触发了静态数据变化。只有A项和Q项可以触发静态数据变化
 async function onChangeA() {
-  // 选择情报区-NDB、VOR/DME、限制区、管制区
   if (airSpaceCodes.value.includes(createData.a_airSpace)) {
     const { data } = await queryAirSpaceConfig({ id: createData.a_airSpace });
     createData.qLat = "";
     createData.qLong = "";
     if (data) {
-      const mergedConfig = airspaceConfigTypes.reduce((acc, { key, prefix }) => {
-        return Object.assign(acc, processConfig(data[key], prefix));
-      }, {});
-      Object.assign(staticData.value, mergedConfig);
-      // 最外层的情报区数据
-      const airspaceKeys = Object.keys(data);
-      airspaceKeys.forEach(key => {
-        if (typeof data[key] !== 'object') {
-          staticData.value[key] = String(data[key]);
-        }
-      })
-    }
-    // 情报区信息为空
-    else {
+      mergeEntityConfig(data, AIRSPACE_CONFIG_TYPES, staticData.value);
+    } else {
       staticData.value = {};
     }
+    return;
   }
-  // 选择了机场-逻辑跑道、物理跑道
-  else {
-    // 例如选择了机场，那么跑道号就可以筛选出来，同时也可以获取到对应的跑道信息作为参考
-    // 如果选择了机场，那么自动填写坐标和半径
-    const { data } = await queryAirPortConfig({ id: createData.a_airSpace });
-    if (data) {
-      createData.qLat = data.geoLat;
-      createData.qLong = data.geoLong;
-      const mergedConfig = airportConfigTypes.reduce((acc, { key, prefix }) => {
-        return Object.assign(acc, processConfig(data[key], prefix));
-      }, {});
-      Object.assign(staticData.value, mergedConfig);
-      // 最外层的机场参数
-      const airportKeys = Object.keys(data);
-      airportKeys.forEach(key => {
-        if (typeof data[key] !== 'object') {
-          staticData.value[key] = String(data[key]);
-        }
-      })
-    }
-    // 机场信息为空
-    else {
-      createData.qLat = "";
-      createData.qLong = "";
-      staticData.value = {};
-    }
+
+  const { data } = await queryAirPortConfig({ id: createData.a_airSpace });
+  if (data) {
+    createData.qLat = data.geoLat;
+    createData.qLong = data.geoLong;
+    mergeEntityConfig(data, AIRPORT_CONFIG_TYPES, staticData.value);
+  } else {
+    createData.qLat = "";
+    createData.qLong = "";
+    staticData.value = {};
   }
 }
 function onChangeB() {
@@ -1227,7 +1336,7 @@ function onFocusFG(data: string) {
   }
 }
 // FG改变事件,回传值并且更新Q项的上下限
-const changeFG = (type: string, data: any, fl: any) => {
+const changeFG = (type: string, data: string, fl: string) => {
   if (type === 'F') {
     createData.f_lowerLimit = data;
     createData.qLowerLimit = fl;
@@ -1269,13 +1378,12 @@ function onChangeMessageType() {
     createData.endTime = "";
     createData.validType = "";
   }
-  console.log(createData.startTime, createData.endTime);
 }
 function getCurrentFormattedTime() {
   const date = new Date();
 
   // 辅助函数：补零到两位
-  const padZero = (num) => num.toString().padStart(2, '0');
+  const padZero = (num: number) => num.toString().padStart(2, '0');
 
   // 提取各时间部分并处理
   const year = date.getFullYear().toString().slice(-2); // 后两位年份
@@ -1301,11 +1409,9 @@ const onRead = async () => {
   try {
     const { data: detailData } = await queryMessageDetail({ id: createData.parentId });
     Object.assign(messageFormData, detailData);
-    console.log("messageFormData--------", messageFormData)
     workflowVisibility.value = true;
   }
   catch (err) {
-    console.log(err);
     Modal.alert('获取数据错误');
   }
 }
@@ -1325,16 +1431,14 @@ function onResizePdf() {
 }
 
 // 材料列表更新函数
-const changeFiles = (files: any) => {
+const changeFiles = (files: MaterialItem[]) => {
   materialList.value = files;
-  //console.log(materialList.value);
   materialCount.value = 0;
   materialList.value.forEach(item => {
     if (!isEmpty(item) && !isEmpty(item.fileList) && item.fileList.length > 0) {
       materialCount.value += item.fileList.length;
     }
   })
-  //console.log(materialCount.value);
 }
 // 获取自动生成的提供序列号
 const getAutoGeneratedNotamSn = async () => {
@@ -1347,16 +1451,6 @@ const getAutoGeneratedNotamSn = async () => {
 const queryNaipOptions = async () => {
   const { data } = await queryNaipSettings();
   Object.assign(naipDataPeriodOptions.value, data);
-}
-
-// 暂时不需要------------------获取领导单位，这个还需要获取该部门下的所有用户，并且+1000
-const getLeaderDepId = async () => {
-  const { data } = await queryLeaderDepId();
-  console.log(data, "--------------------------")
-  if (data && data !== 0) {
-    leaderNodes.value = [data];
-  }
-  console.log(leaderNodes.value)
 }
 
 

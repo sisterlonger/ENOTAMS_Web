@@ -488,7 +488,6 @@ async function publishClick() {
     aftnSn: aftnSn.value
   }
   await publishMessage(publishData).then(async (res) => {
-    console.log("res", res);
     if (res.code === 200) {
       Modal.alert({ message: '发布成功', status: 'success' })
     }

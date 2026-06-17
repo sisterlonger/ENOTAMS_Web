@@ -4,25 +4,12 @@ import NProgress from 'nprogress'; // progress bar
 import usePermission from '@/hooks/permission';
 import { useUserStore } from '@/store';
 import { isLogin } from '@/utils/auth';
-import DefaultLayout from '@/layout/default-layout.vue';
+import { registerAppRoutes } from '../register-app-routes';
 import appRoutes from '../routes';
-import noauthRoutes from '../routes/noauth';
 
 export default function setupPermissionGuard(router: Router) {
   // 应对刷新时的路由刷新
-  router.addRoute({
-    name: 'root',
-    path: import.meta.env.VITE_CONTEXT,
-    component: DefaultLayout,
-    children: appRoutes,
-  });
-  
-  // 添加无需鉴权的页面
-  router.addRoute({
-    name: 'noauth',
-    path: import.meta.env.VITE_CONTEXT,
-    children: noauthRoutes,
-  });
+  registerAppRoutes(router);
   // 其他设置
   router.beforeEach(async (to, from, next) => {
     NProgress.start();
@@ -36,8 +23,6 @@ export default function setupPermissionGuard(router: Router) {
           userStore.roleName
         ) || {
           name: 'notFound',
-        } || {
-          name: 'preview',
         };
         next(destination);
       }
@@ -53,7 +38,6 @@ export default function setupPermissionGuard(router: Router) {
           await userStore.info();
           crossroads();
         } catch (error) {
-          console.log("to.name", to.name);
           next({
             name: 'login',
             query: {

@@ -2,7 +2,7 @@
 // 为每个标签页生成唯一标识
 let tabId = sessionStorage.getItem('tab_id');
 if (!tabId) {
-  tabId = `tab_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  tabId = `tab_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
   sessionStorage.setItem('tab_id', tabId);
 }
 
@@ -26,16 +26,4 @@ const clearToken = () => {
   localStorage.removeItem(getTokenKey());
 };
 
-// 清理函数，退出时调用
-const cleanupOldTokens = () => {
-  // 可以定期清理过期的token
-  const allKeys = Object.keys(localStorage);
-  allKeys.forEach(key => {
-    if (key.startsWith('token_tab_') && !key.includes(tabId)) {
-      // 可以保留或清理，根据需求决定
-      // localStorage.removeItem(key);
-    }
-  });
-};
-
-export { isLogin, getToken, setToken, clearToken, cleanupOldTokens };
+export { isLogin, getToken, setToken, clearToken };

@@ -113,7 +113,6 @@ const fetchData = async () => {
     try {
         const { data } = await queryMessageDetail({ id: messageId.value });
         Object.assign(formData, data);
-        console.log("formData--------", formData)
         // 控制附件的操控权限
         materialsAct.value = act.value
         if (data.sendDepId === userStore.userInfo.depID) {
@@ -125,7 +124,6 @@ const fetchData = async () => {
         }
     }
     catch (err) {
-        console.log(err);
         Modal.alert('获取数据错误');
         emit('close');
     }
@@ -139,7 +137,6 @@ function dialogClose() {
 }
 
 function getCurrentNode(node: any) {
-    console.log(node)
     nodeName.value = node;
     afterCondition.value = true;
 }
@@ -151,7 +148,6 @@ onMounted(async () => {
         isNoAuth.value = true;
     }
     await fetchData();
-    console.log(materialsAct.value, act.value);
     preCondition.value = true;
     const { data } = await queryDepartmentTreeList();
     departmentTreeData.value = data.children;

@@ -80,11 +80,7 @@ import { useUserStore } from '@/store';
 const userStore = useUserStore();
 
 onMounted(() => {
-  console.log("2");
   userStore.info();
-  console.log(userStore.userInfo.email);
-  console.log(userStore.userInfo.mobile);
-  console.log(userStore.userInfo.userName);
 });
 </script>
 

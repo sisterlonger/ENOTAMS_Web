@@ -231,7 +231,6 @@ const getUserAndDepartmentInfo = async () => {
                 pageData.receiveDepName = res.data.fullName || res.data.depName
             })
         }
-        console.log(pageData.receiveUserId, '情报人员id')
         if (!isEmpty(pageData.sendUserId)) {
             await queryUserDetail({ id: pageData.sendUserId }).then((res) => {
                 pageData.sendUserName = res.data.userName
@@ -261,7 +260,6 @@ const getUserAndDepartmentInfo = async () => {
 const setAftnText = async () => {
     if ((pageData.messageType === '代替现有报文' || pageData.messageType === '取消现有报文' || pageData.type === '代替现有报文' || pageData.type === '取消现有报文') && !isEmpty(pageData.parentId)) {
         let { data } = await queryMessageDetail({ id: pageData.parentId });
-        console.log(pageData,"pageData")
         notamFirstlineText.value = `${pageData.aftnSn || ''} NOTAM${pageData.type === '代替现有报文' || pageData.messageType === '代替现有报文' ? 'R' : 'C'} ${data.aftnSn}`
     }
     else {

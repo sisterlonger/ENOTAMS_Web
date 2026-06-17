@@ -89,8 +89,6 @@ const menuData = ref([
 function handleSkip({ url }) {
     const iframe = document.getElementById('workflow');
     iframe.contentWindow.postMessage({ type: 'ROUTE_CHANGE', path: url }, '*');
-    console.log('url',url);
-    //console.log(iframe.contentWindow);
     return false
 }
 
@@ -101,9 +99,7 @@ const getFlyflow = async () => {
 
 onMounted(() => {
     //getFlyflow();
-    //console.log(router.currentRoute.value.meta.locale);
     // TODO 加入到权限控制中
-    //console.log(checkPermission([router.currentRoute.value.meta.locale,'审批']));
 });
 
 </script>

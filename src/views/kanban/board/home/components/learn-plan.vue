@@ -70,7 +70,6 @@ const numData = reactive({
 const preCondition = ref(false)
 
 const goTask = (workflowStatus: string) => {
-  console.log(workflowStatus)
   //message,exam
   
   router.push({
@@ -88,7 +87,6 @@ onMounted(async () => {
     //workFlowList.value = workFlowList.value.concat(res1.data.data.records)
     numData.value = res1.data.data
   }).catch((err: any) => {
-    console.log(err);
     Modal.message({ message: `获取流程详情失败，原因：${err}`, status: 'error' })
   });
   preCondition.value = true

@@ -164,7 +164,6 @@ const removeFieldInstance = (prop, index) => {
 
 // 1vn,静态数据发生变化时触发的函数，函数将会动态调整对应的关键字里选择器中的选项值
 const updateOptions = async (newValue, fieldList) => {
-    //console.log(fieldList);
     if (fieldList) {
         // 遍历formFields
         for (let i = 0; i < fieldList.length; i += 1) {
@@ -293,7 +292,6 @@ function replaceDollarSequentially(str, replacements) {
 // E-E，某选项变化时，触发naip或者上下游选择器获取option,data是该选项的值，field是该选项的配置
 const getOption = async (data, field) => {
     // 非初始化
-    //console.log("field", field);
     if (data) {
         // TODO,目前只有跑道，以后要多点其他。要灵活。是NAIP相关的,预留位置，关联其他选项来触发其他选项的可选项
         // 跑道、机场、情报区等等
@@ -655,7 +653,6 @@ onMounted(async () => {
         result = await getKeyWordJSON({ model: keyWord.value });
     }
     formFields.value = result.data;
-    //console.log(formFields.value);
     // 初始化所有组件
     await initOption(formFields.value);
     preCondition.value = true;

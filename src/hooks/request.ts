@@ -14,6 +14,9 @@ export default function useRequest<T>(
     .then((res) => {
       response.value = res.data as unknown as UnwrapRef<T>;
     })
+    .catch(() => {
+      // errors are handled by axios interceptor
+    })
     .finally(() => {
       setLoading(false);
     });

@@ -67,7 +67,6 @@ const props = defineProps({
 });
 const { formData } = toRefs(props);
 onMounted(async () => {
-  console.log(formData);
 });
 </script>
 

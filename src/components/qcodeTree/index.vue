@@ -47,7 +47,6 @@ watch(qCodePermissions, (newPermissions) => {
 const getNodeDataSync = async () => {
   const { data } = await queryNodeTree();
   treeData.value = data.children;
-  console.log(qCodePermissions);
   handleCheckKey(qCodePermissions)
 }
 //映射
@@ -58,7 +57,6 @@ const mapField = reactive({
 // 变化事件
 const onChange = (data) => {
   let checkedData = treeRef.value.getCheckedNodes(true);
-  console.log(checkedData);
   emit('onChange', checkedData);
 }
 // 处理初始化的勾选

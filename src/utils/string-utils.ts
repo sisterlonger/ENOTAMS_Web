@@ -29,8 +29,6 @@ export function isNotDefaultOrEmpty(
     }
 
     const defaultDateObj = new Date(defaultDateStr);
-    console.log(dateObj.getTime());
-    console.log(defaultDateObj.getTime());
     return dateObj.getTime() !== defaultDateObj.getTime();
   } catch (error) {
     // 日期解析错误也视为无效

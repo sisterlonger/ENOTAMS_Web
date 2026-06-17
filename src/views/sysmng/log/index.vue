@@ -152,7 +152,6 @@ async function getData({ page }) {
 }
 // 行操作
 const editRowEvent = (row) => {
-  console.log(row);
   logId.value = row.logID;
   boxVisibility.value = true;
 }

@@ -48,7 +48,6 @@ class AudioAlert {
         }
       })
       .catch(() => {
-        console.log('音频需要用户交互才能解锁');
       });
   }
 
@@ -87,7 +86,6 @@ class AudioAlert {
 
       if (playPromise !== undefined) {
         await playPromise;
-        console.log('告警声音播放成功');
       }
     } catch (error) {
       console.error('播放告警声音失败:', error);

@@ -2,7 +2,6 @@ import type { RouteRecordRaw } from 'vue-router';
 
 const modules = import.meta.glob('./modules/*.ts', { eager: true });
 // 这里插入角色权限页面
-//console.log("modules",modules);
 const appRoutes: RouteRecordRaw[] = [];
 
 Object.keys(modules).forEach((key) => {

@@ -180,7 +180,6 @@ const fetchData = async () => {
 
 // 初始化请求数据
 onMounted(() => {
-    console.log(templateID.value);
     if (templateID.value) {
         fetchData();
         preCondition.value = true;
